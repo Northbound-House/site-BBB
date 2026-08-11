@@ -24,38 +24,6 @@
     });
   }
 
-  /* ---- Contact modal ---- */
-  var modal = document.getElementById("contact-modal");
-  var lastFocus = null;
-  function openModal() {
-    if (!modal) return;
-    lastFocus = document.activeElement;
-    modal.classList.add("is-open");
-    document.body.style.overflow = "hidden";
-    var first = modal.querySelector("input, textarea, button");
-    if (first) first.focus();
-  }
-  function closeModal() {
-    if (!modal) return;
-    modal.classList.remove("is-open");
-    document.body.style.overflow = "";
-    if (lastFocus) lastFocus.focus();
-  }
-  document.querySelectorAll("[data-open-modal]").forEach(function (el) {
-    el.addEventListener("click", function (e) {
-      e.preventDefault();
-      openModal();
-    });
-  });
-  if (modal) {
-    modal.addEventListener("click", function (e) {
-      if (e.target === modal || e.target.hasAttribute("data-close-modal")) closeModal();
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
-    });
-  }
-
   /* ---- Placeholder form handling (until CRM forms are wired up) ---- */
   document.querySelectorAll("form[data-placeholder]").forEach(function (form) {
     form.addEventListener("submit", function (e) {
