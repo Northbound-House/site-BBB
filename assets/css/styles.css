@@ -679,3 +679,376 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
   .footer-grid { grid-template-columns: 1fr; gap: 1.8rem; }
   .form-grid-2 { grid-template-columns: 1fr; }
 }
+
+/* =================================================================
+   Phase 2–4 components
+   Added for the cruise / all-inclusive / small-group rebuild.
+   ================================================================= */
+
+/* ------------------------- Skip link ---------------------------- */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 200;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 0 var(--radius) 0;
+  font-weight: 500;
+}
+.skip-link:focus {
+  left: 0;
+  outline: 2px solid var(--lagoon);
+  outline-offset: 2px;
+}
+
+/* ------------------------- Narrow measure ----------------------- */
+.shell.narrow,
+.narrow { max-width: 74ch; margin-inline: auto; }
+.shell.narrow h2 { margin-top: 2.6rem; }
+.shell.narrow h3 { margin-top: 1.8rem; }
+.shell.narrow > .lede { font-size: 1.12rem; color: var(--muted); }
+
+/* ------------------------- Trust strip -------------------------- */
+.trust-strip {
+  background: var(--deep-sea);
+  color: var(--cream);
+  padding: 1.4rem 0;
+}
+.trust-strip ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 2.75rem;
+}
+.trust-strip li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.15rem;
+}
+.trust-strip strong {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: var(--sand);
+}
+.trust-strip span { font-size: 0.78rem; opacity: 0.85; }
+
+/* ------------------------- Service cards ------------------------ */
+.service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.service-cards--pair { margin-top: 1.5rem; }
+.service-cards--pair { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+
+.service-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+}
+.service-card:hover,
+.service-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+.service-card img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  display: block;
+}
+.service-card__body {
+  padding: 1.4rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  flex: 1;
+}
+.service-card__body h3 { margin: 0; font-size: 1.25rem; }
+.service-card__body p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+.service-card .arrow {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  color: var(--lagoon);
+  font-weight: 500;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+.service-card .arrow::after {
+  content: " →";
+  transition: margin-left 0.25s var(--ease);
+  display: inline-block;
+}
+.service-card:hover .arrow::after { margin-left: 0.25rem; }
+
+/* ------------------------- Real images in split ----------------- */
+.split__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ------------------------- Process steps ------------------------ */
+.process {
+  list-style: none;
+  counter-reset: step;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+.process--detailed { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.process li {
+  counter-increment: step;
+  position: relative;
+  padding-top: 3.1rem;
+}
+.process li::before {
+  content: counter(step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2.3rem;
+  height: 2.3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--lagoon);
+  color: #fff;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+.process h3 { margin: 0 0 0.4rem; font-size: 1.12rem; }
+.process p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+
+/* ------------------------- Tick lists --------------------------- */
+.tick-list { list-style: none; padding: 0; margin: 1.2rem 0; }
+.tick-list li {
+  position: relative;
+  padding-left: 1.75rem;
+  margin-bottom: 0.7rem;
+}
+.tick-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--aqua);
+}
+
+/* ------------------------- Callout box -------------------------- */
+.callout-box {
+  background: var(--cream);
+  border-left: 3px solid var(--sand);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1.3rem 1.6rem;
+  margin: 2rem 0;
+}
+.callout-box h3 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+.callout-box p:last-child,
+.callout-box ul:last-child { margin-bottom: 0; }
+.callout-box ul { padding-left: 1.1rem; }
+.callout-box li { margin-bottom: 0.5rem; }
+.section--cream .callout-box { background: var(--paper); }
+
+/* ------------------------- Credentials -------------------------- */
+.credential-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+.credential {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.6rem;
+}
+.credential h3 { margin: 0 0 0.4rem; font-size: 1.15rem; color: var(--deep-sea); }
+.credential__what {
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-style: italic;
+  margin: 0 0 0.8rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--line);
+}
+.credential p:last-child { margin-bottom: 0; font-size: 0.95rem; }
+
+/* ------------------------- FAQ ---------------------------------- */
+.faq { border-top: 1px solid var(--line); }
+.faq__item { border-bottom: 1px solid var(--line); }
+.faq__item summary {
+  cursor: pointer;
+  padding: 1.1rem 2.5rem 1.1rem 0;
+  font-weight: 500;
+  font-size: 1.02rem;
+  position: relative;
+  list-style: none;
+}
+.faq__item summary::-webkit-details-marker { display: none; }
+.faq__item summary::after {
+  content: "+";
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.4rem;
+  color: var(--lagoon);
+  line-height: 1;
+  transition: transform 0.25s var(--ease);
+}
+.faq__item[open] summary::after { content: "−"; }
+.faq__item summary:focus-visible {
+  outline: 2px solid var(--lagoon);
+  outline-offset: 2px;
+}
+.faq__body { padding: 0 2.5rem 1.3rem 0; }
+.faq__body p { margin: 0 0 0.7rem; color: var(--muted); font-size: 0.96rem; }
+.faq__body p:last-child { margin-bottom: 0; }
+
+/* ------------------------- Contact ------------------------------ */
+.contact-methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+.contact-method {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.contact-method .icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  color: var(--lagoon);
+  margin-bottom: 0.3rem;
+}
+.contact-method .icon svg { width: 100%; height: 100%; }
+.contact-method h2 { margin: 0; font-size: 1.2rem; }
+.contact-method p { margin: 0; color: var(--muted); font-size: 0.93rem; }
+.contact-method__link {
+  margin-top: auto;
+  padding-top: 0.6rem;
+  font-weight: 500;
+  color: var(--lagoon);
+  word-break: break-word;
+}
+.socials--lg { justify-content: center; }
+.socials--lg a { width: 2.9rem; height: 2.9rem; }
+
+/* ------------------------- CTA band extras ---------------------- */
+.cta-band__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.cta-band__direct {
+  margin-top: 1.25rem;
+  font-size: 0.92rem;
+  opacity: 0.9;
+}
+.cta-band__direct a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.cta-band__direct span { margin: 0 0.5rem; opacity: 0.6; }
+
+/* ------------------------- Referral ----------------------------- */
+.referral-banner {
+  background: var(--deep-sea);
+  color: var(--cream);
+  padding: 1.1rem 0;
+}
+.referral-banner .shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  text-align: center;
+}
+.referral-banner p { margin: 0; font-size: 0.96rem; }
+.referral-banner strong { color: var(--sand); }
+.referral-banner .btn--outline { border-color: rgba(255,255,255,0.5); color: var(--cream); }
+.referral-banner .btn--outline:hover { background: rgba(255,255,255,0.12); }
+
+.referral-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.referral-action {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.referral-action h3 { margin: 0; font-size: 1.12rem; }
+.referral-action p { margin: 0; color: var(--muted); font-size: 0.94rem; flex: 1; }
+.referral-action .btn { align-self: flex-start; }
+
+.btn--sm { padding: 0.55rem 1.1rem; font-size: 0.84rem; }
+
+/* ------------------------- Journal ------------------------------ */
+.journal-planned { list-style: none; padding: 0; margin: 1.5rem 0 0; }
+.journal-planned li {
+  padding: 1.2rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.journal-planned li:first-child { border-top: 1px solid var(--line); }
+.journal-planned h3 { margin: 0 0 0.35rem; font-size: 1.08rem; }
+.journal-planned p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+
+/* ------------------------- Mobile CTA in menu ------------------- */
+.nav-cta-mobile { display: none; }
+
+@media (max-width: 720px) {
+  /* The pinned header CTA is hidden on narrow screens, so surface the same
+     action inside the slide-in menu rather than losing it entirely. */
+  .nav-cta-mobile { display: block; margin-top: 0.6rem; }
+  .nav-cta-mobile .btn { display: inline-block; }
+  .trust-strip ul { gap: 1rem 1.5rem; }
+  .process li { padding-top: 0; padding-left: 3.2rem; }
+  .process li::before { top: -0.15rem; }
+  .referral-banner .shell { flex-direction: column; gap: 0.85rem; }
+}
+
+/* ------------------------- Nav fit ------------------------------ */
+/* Six nav items plus a pinned CTA is tight at mid widths: without this
+   "Ways to Travel" and "How I Work" wrap onto two lines. */
+.nav-links a { white-space: nowrap; }
+.nav-cta .btn { white-space: nowrap; }
+.nav .brand > span { white-space: nowrap; }
+.nav .brand { flex-shrink: 0; }
+@media (max-width: 1180px) and (min-width: 721px) {
+  .nav-links { gap: 1.05rem; }
+  .nav-links a { font-size: 0.74rem; letter-spacing: 0.09em; }
+  .nav .brand small { display: none; }
+  .nav-cta .btn { padding: 0.7rem 1.1rem; font-size: 0.74rem; }
+}

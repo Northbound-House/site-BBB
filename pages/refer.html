@@ -1,0 +1,86 @@
+  <main id="main">
+  <section class="page-hero">
+    <div class="page-hero__bg" style="--page-img: url('https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="shell">
+      <span class="eyebrow">Refer &amp; earn</span>
+      <h1>Share the adventure, reap the rewards</h1>
+      <p>$100 in your pocket every time a friend books, an exclusive experience after three, and a perk for them as well.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <div class="section-head reveal">
+        <span class="eyebrow">How it works</span>
+        <h2>Everybody wins</h2>
+      </div>
+      <div class="cards">
+        <div class="card reveal">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5c0-1.4 1.1-2 2.5-2s2.5.8 2.5 2-1.1 1.6-2.5 2-2.5.6-2.5 2 1.1 2 2.5 2 2.5-.6 2.5-2"/></svg></div>
+          <h3>Earn $100 in cash</h3>
+          <p>$100 every time someone you refer books a trip with me. No cap — refer as many friends as you like.</p>
+        </div>
+        <div class="card reveal d1">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5L12 3z"/></svg></div>
+          <h3>Unlock an exclusive experience</h3>
+          <p>After three successful referrals, an experience on me — a private tour, a luxury upgrade, or a VIP event.</p>
+        </div>
+        <div class="card reveal d2">
+          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 10-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg></div>
+          <h3>Your friend gets a treat, too</h3>
+          <p>They receive something extra on their trip — a bottle of champagne in the room, a spa credit, or a special excursion.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--cream">
+    <div class="shell narrow">
+      <div class="section-head reveal">
+        <span class="eyebrow">Start referring</span>
+        <h2>Send a friend my way</h2>
+        <p>Two ways to do it, and both take about a minute.</p>
+      </div>
+
+      <div class="referral-actions reveal d1">
+        <div class="referral-action">
+          <h3>Use the referral form</h3>
+          <p>Give me your details and theirs, and I'll reach out to your friend directly — mentioning you sent me, so they know it isn't a cold call.</p>
+          <a href="{{TERN_REFERRAL_FORM}}" target="_blank" rel="noopener" class="btn btn--gold" data-cta="refer-form">Refer a friend</a>
+        </div>
+        <div class="referral-action">
+          <h3>Or just introduce us</h3>
+          <p>An email introduction works just as well, and some people prefer it. Copy me in and I'll take it from there.</p>
+          <a href="mailto:{{EMAIL}}?subject=Referral%20from%20a%20Bora%20Bora%20Bound%20client" class="btn btn--outline" data-cta="refer-email">Email an introduction</a>
+        </div>
+      </div>
+
+      <div class="callout-box" style="margin-top:2.5rem">
+        <h3>The small print, in plain terms</h3>
+        <ul>
+          <li>The $100 is paid once your friend's trip is <strong>booked and travelled</strong> — that's when I'm paid, so that's when I can pay you.</li>
+          <li>Your friend needs to be new to me. If they're already a client, the referral doesn't apply.</li>
+          <li>The three-referral experience is based on three separate friends who book and travel, not three bookings by the same person.</li>
+          <li>Their perk depends on what they book — I'll match it to the trip rather than force a bottle of champagne on someone who doesn't drink.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="cta-band__bg" style="--cta-img: url('https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="shell reveal">
+      <h2>Planning your own escape?</h2>
+      <p>I'd love to help you go next. Let's set up a consultation.</p>
+      <div class="cta-band__actions">
+        <a href="{{TERN_SCHEDULING}}" target="_blank" rel="noopener" class="btn btn--gold" data-cta="refer-consult">Book a free consultation</a>
+        <a href="/contact.html" class="btn btn--ghost">Email or call instead</a>
+      </div>
+      <p class="cta-band__direct">
+        <a href="mailto:{{EMAIL}}">{{EMAIL}}</a>
+        <span aria-hidden="true">·</span>
+        <a href="tel:{{PHONE_E164}}">{{PHONE_DISPLAY}}</a>
+      </p>
+    </div>
+  </section>
+  </main>

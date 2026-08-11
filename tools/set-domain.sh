@@ -5,7 +5,7 @@
 #   ./tools/set-domain.sh staging      # test.boraborabound.com, noindex, robots Disallow
 #   ./tools/set-domain.sh production   # boraborabound.com, indexable, robots Allow + Sitemap
 #
-# This rewrites CNAME and the two flags at the top of tools/build-head.py, then
+# This rewrites CNAME and the two flags at the top of tools/build.py, then
 # regenerates every page's canonical/Open Graph URLs, sitemap.xml, robots.txt,
 # and the legacy redirect stubs. Do not hand-edit the domain in the HTML files —
 # it appears in roughly forty places and they must stay in sync.
@@ -14,7 +14,7 @@ set -euo pipefail
 
 MODE="${1:-}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BUILD="$ROOT/tools/build-head.py"
+BUILD="$ROOT/tools/build.py"
 
 case "$MODE" in
   staging)
