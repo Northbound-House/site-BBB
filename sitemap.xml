@@ -65,4 +65,29 @@
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
+  <url>
+    <loc>https://test.boraborabound.com/journal/virgin-voyages-vs-royal-caribbean.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://test.boraborabound.com/journal/what-all-inclusive-actually-includes.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://test.boraborabound.com/journal/alaska-may-july-september.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://test.boraborabound.com/journal/reading-a-small-group-tour-inclusion-list.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://test.boraborabound.com/journal/cabin-categories-worth-paying-for.html</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
 </urlset>

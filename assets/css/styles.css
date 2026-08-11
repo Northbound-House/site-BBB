@@ -1267,3 +1267,74 @@ h1, h2 { text-transform: uppercase; }
 @media (max-height: 900px) {
   .scroll-cue { display: none; }
 }
+
+/* =================================================================
+   Journal — index cards and article layout
+   ================================================================= */
+.post-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.5rem; }
+.post-card {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+}
+.post-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.post-card__media { display: block; }
+.post-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.post-card__body { padding: 1.4rem 1.6rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.post-card__meta {
+  margin: 0;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.post-card h3 { margin: 0; font-size: 1.35rem; letter-spacing: 0.03em; }
+.post-card h3 a { color: var(--ink); }
+.post-card:hover h3 a { color: var(--purple); }
+.post-card p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+.post-card .arrow { margin-top: auto; padding-top: 0.4rem; color: var(--lagoon); font-weight: 500; font-size: 0.88rem; }
+.post-card .arrow::after { content: " →"; }
+
+/* ------------------------- Article ------------------------------ */
+.post-hero {
+  background: var(--purple);
+  color: #fff;
+  padding: calc(4.5rem + 4vw) 0 3rem;
+}
+.post-hero h1 { color: #fff; margin: 0.35em 0 0.4em; font-size: clamp(2.2rem, 1.6rem + 2.6vw, 3.6rem); }
+.post-hero .lede { color: rgba(255,255,255,0.88); font-size: 1.1rem; margin: 0; }
+.post-hero__meta {
+  margin: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--aqua);
+}
+.post-hero__meta a { color: var(--aqua); text-decoration: underline; text-underline-offset: 3px; }
+
+.post-body { padding-block: 3rem 1rem; }
+.post-body h2 { margin: 2.6rem 0 0.6rem; font-size: clamp(1.7rem, 1.4rem + 1.4vw, 2.3rem); }
+.post-body h3 { margin: 1.8rem 0 0.5rem; }
+.post-body p { margin: 0 0 1.15em; }
+.post-body > p:first-of-type { font-size: 1.08rem; }
+.post-body ol { padding-left: 1.2rem; }
+.post-body ol li { margin-bottom: 0.55rem; }
+.post-figure { margin: 0 0 2rem; }
+.post-figure img { width: 100%; border-radius: var(--radius); }
+.post-figure figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 680px) {
+  .post-card { grid-template-columns: 1fr; }
+  .post-card__media img { aspect-ratio: 16 / 9; }
+}
+.post-card__media img { object-position: center 55%; }

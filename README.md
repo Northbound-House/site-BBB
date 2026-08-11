@@ -143,6 +143,28 @@ Running `production` prints the cutover checklist for the steps a script can't d
 The offer is organised by **how** you travel rather than where, matching the shift in
 focus to cruises, all-inclusive resorts, and small group tours.
 
+## Journal
+
+Posts live in `pages/journal/<slug>.html` with a matching row in the `POSTS`
+table in `tools/build.py`. That row drives the index card, the `BlogPosting`
+schema, the sitemap entry and the page registration — adding a post is one
+fragment plus one row.
+
+`journal.html` renders its card list from `{{POST_LIST}}`, so the index never
+needs hand-editing.
+
+**Dates.** All five launch posts carry `2026-08-11`. If the cutover slips,
+re-date them in `POSTS` rather than shipping stale ones.
+
+**On what these posts are.** They are advisory pieces grounded in product facts
+and industry practice — how all-inclusive tiers work, what changes between
+Alaska's shoulder months, how to read a tour inclusion list. They deliberately
+contain **no invented first-hand anecdotes**: no specific sailings, dates,
+resorts stayed at, or trips taken. The only personal claims are ones already
+established elsewhere on the site (the full-time RV, having sailed the ships).
+If you add a personal detail to a post, add it as your own — don't let a
+placeholder become a claim.
+
 ## Legacy URL redirects
 
 The old Travefy site served extensionless URLs, and two pages were renamed in this
@@ -183,7 +205,7 @@ Each of these is a one-line change in `tools/build.py` CONFIG unless noted.
 | **Tern referral form** | `TERN_REFERRAL_FORM` | Same fallback. A dedicated form would capture the referrer and friend separately. |
 | **Attributed reviews** | `pages/reviews.html`, `REVIEWS` in build.py | Still the same three unattributed quotes. Target is 8–10 with name, what they booked, and month/year. |
 | **Off-site review links** | `pages/reviews.html` | Trustpilot, The Knot, WeddingWire, Google Business Profile URLs. |
-| **Destination / lifestyle photography** | `pages/*.html` | The headshot and logos are now the real brand assets. The *scenery* images are still hotlinked Unsplash — they have real `alt` text and are `<img>` elements, but they're stock and load from a third-party CDN. The brand guide's photography section is Zac and Chad's own cruise and resort shots; self-host those into `assets/img/`. |
+| **More of your own photography** | `pages/*.html` | Two of your own photos are now in use and self-hosted: `stkitts-coastline.jpg` (the shot the brand guide uses as its own header) and `bermuda.jpg`. Everything else is still hotlinked Unsplash. The `JustBooked` folder in Drive can't be used — those are 1080×1080 social graphics with "JUST BOOKED" and the URL baked in. What's needed is more clean, unbranded, landscape-orientation photos: ships, resort grounds, and you and Chad on the road. |
 | **Per-page share images** | `og-image.png` | One brand-built 1200×630 card is shared by all pages. |
 | **Brand voice pass** | `pages/*.html` | The guide calls for "modern, upbeat, relatable". The current copy is accurate and honest but reads more measured and dry than that. Worth a deliberate pass. |
 | **Intro video** | `pages/index.html` | Needs recording. |

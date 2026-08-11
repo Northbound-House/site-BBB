@@ -94,6 +94,159 @@ SERVICES = [
 ]
 
 # =============================================================================
+# JOURNAL POSTS
+# =============================================================================
+# Adding a post: drop a fragment in pages/journal/<slug>.html, add a row here,
+# rebuild. The index listing, BlogPosting schema, sitemap entry and prev/next
+# links are all generated from this table.
+#
+# `date` is ISO. These were written for launch, so they all carry the launch
+# date — if the cutover slips, re-date them rather than shipping stale ones.
+
+POSTS = [
+    dict(
+        slug="virgin-voyages-vs-royal-caribbean",
+        title="Virgin Voyages vs. Royal Caribbean for a first cruise",
+        description=(
+            "Two very different answers to the same question. Which one you'll prefer "
+            "comes down almost entirely to whether you want children on the ship."
+        ),
+        excerpt=(
+            "Adults-only and tips-included, or the biggest ships afloat with a waterpark "
+            "on the back. The honest comparison, and the one question that decides it."
+        ),
+        date="2026-08-11",
+        minutes=6,
+        image="/assets/img/stkitts-coastline.jpg",
+        image_alt="Caribbean coastline seen from a hillside, the kind of view a first cruise is built around",
+    ),
+    dict(
+        slug="what-all-inclusive-actually-includes",
+        title="What \u201call-inclusive\u201d actually includes",
+        description=(
+            "A category-by-category walk through what's covered at an all-inclusive resort, "
+            "what quietly isn't, and where the gap between the brochure and the bill opens up."
+        ),
+        excerpt=(
+            "Meals and drinks, obviously. But premium spirits, the good restaurants, the spa, "
+            "the transfers and the wifi are where it gets interesting."
+        ),
+        date="2026-08-11",
+        minutes=6,
+        image="/assets/img/bermuda.jpg",
+        image_alt="Turquoise water and a sheltered cove in Bermuda, photographed by Zac Sweet-Wright",
+    ),
+    dict(
+        slug="alaska-may-july-september",
+        title="Alaska: May vs. July vs. September",
+        description=(
+            "Three very different vacations sold under one name, at three very different "
+            "prices. What actually changes between the shoulder months and peak season."
+        ),
+        excerpt=(
+            "Drier and cheaper in May, warmest and busiest in July, gold and quiet in "
+            "September. Picking the month matters more than picking the ship."
+        ),
+        date="2026-08-11",
+        minutes=5,
+        image="/assets/img/stkitts-coastline.jpg",
+        image_alt="Coastal water and headland — the kind of scenic cruising Alaska is booked for",
+    ),
+    dict(
+        slug="reading-a-small-group-tour-inclusion-list",
+        title="How to read a small group tour's inclusion list",
+        description=(
+            "Where the optional excursions are the actual highlights, the headline price is "
+            "fiction. Eight things to check on an itinerary before you book it."
+        ),
+        excerpt=(
+            "\u201cSmall group\u201d is unregulated, \u201cfirst-class hotel\u201d means nothing, and the "
+            "single supplement is where the real money hides."
+        ),
+        date="2026-08-11",
+        minutes=6,
+        image="/assets/img/bermuda.jpg",
+        image_alt="A coastal viewpoint with a footpath below — the kind of stop a good small group tour builds in",
+    ),
+    dict(
+        slug="cabin-categories-worth-paying-for",
+        title="The cabin categories worth paying for \u2014 and the ones that aren't",
+        description=(
+            "When a balcony earns its money on a cruise and when it's a waste, why deck "
+            "placement beats category, and what suite perks are actually worth having."
+        ),
+        excerpt=(
+            "An honest accounting \u2014 including the times the cheaper cabin was the better "
+            "call, and the upgrade that matters more than any of them."
+        ),
+        date="2026-08-11",
+        minutes=6,
+        image="/assets/img/stkitts-coastline.jpg",
+        image_alt="Open water and coastline from height, the view a balcony cabin is bought for",
+    ),
+]
+
+MONTHS = ("January","February","March","April","May","June","July","August",
+          "September","October","November","December")
+
+
+def pretty_date(iso):
+    y, m, d = iso.split("-")
+    return f"{int(d)} {MONTHS[int(m) - 1]} {y}"
+
+
+def post_url(post):
+    return f"{SITE_URL}/journal/{post['slug']}.html"
+
+
+def blogposting_schema(post):
+    return {
+        "@type": "BlogPosting",
+        "@id": post_url(post) + "#post",
+        "headline": post["title"],
+        "description": post["description"],
+        "datePublished": post["date"],
+        "dateModified": post["date"],
+        "author": {"@id": PERSON_ID},
+        "publisher": {"@id": AGENCY_ID},
+        "mainEntityOfPage": post_url(post),
+        "image": f"{SITE_URL}{post['image']}",
+        "isPartOf": {"@id": f"{SITE_URL}/journal.html#blog"},
+    }
+
+
+def blog_schema():
+    return {
+        "@type": "Blog",
+        "@id": f"{SITE_URL}/journal.html#blog",
+        "name": "The Bora Bora Bound Journal",
+        "url": f"{SITE_URL}/journal.html",
+        "publisher": {"@id": AGENCY_ID},
+        "blogPost": [blogposting_schema(p) for p in POSTS],
+    }
+
+
+def render_post_list():
+    """The card list on journal.html, generated from POSTS."""
+    out = []
+    for post in POSTS:
+        out.append(
+            f'        <li class="post-card">\n'
+            f'          <a class="post-card__media" href="/journal/{post["slug"]}.html" tabindex="-1" aria-hidden="true">'
+            f'<img src="{post["image"]}" alt="" width="1400" height="788" loading="lazy" /></a>\n'
+            f'          <div class="post-card__body">\n'
+            f'            <p class="post-card__meta"><time datetime="{post["date"]}">'
+            f'{pretty_date(post["date"])}</time> &middot; {post["minutes"]} min read</p>\n'
+            f'            <h3><a href="/journal/{post["slug"]}.html">{post["title"]}</a></h3>\n'
+            f'            <p>{post["excerpt"]}</p>\n'
+            f'            <span class="arrow">Read it</span>\n'
+            f'          </div>\n'
+            f'        </li>\n'
+        )
+    return "".join(out)
+
+
+# =============================================================================
 # PAGE TABLE
 # =============================================================================
 
@@ -250,7 +403,7 @@ PAGES = {
             "written from places Zac and Chad have actually been."
         ),
         sitemap=("0.6", "weekly"),
-        schema=lambda: [breadcrumb("Journal", "journal.html")],
+        schema=lambda: [breadcrumb("Journal", "journal.html"), blog_schema()],
     ),
     "terms.html": dict(
         path="terms.html",
@@ -275,6 +428,18 @@ PAGES = {
         schema=lambda: [],
     ),
 }
+
+# Post pages are registered from POSTS so a new row is the only edit needed.
+for _post in POSTS:
+    PAGES[f"journal/{_post['slug']}.html"] = dict(
+        path=f"journal/{_post['slug']}.html",
+        title=f"{_post['title']} | Bora Bora Bound",
+        description=_post["description"],
+        sitemap=("0.5", "yearly"),
+        post=_post,
+        schema=(lambda pst: (lambda: [blogposting_schema(pst),
+                                      breadcrumb(pst["title"], f"journal/{pst['slug']}.html")]))(_post),
+    )
 
 # =============================================================================
 # STRUCTURED DATA
@@ -653,6 +818,7 @@ def tokens():
         "FACEBOOK": FACEBOOK,
         "INSTAGRAM": INSTAGRAM,
         "LINKEDIN": LINKEDIN,
+        "POST_LIST": render_post_list(),
     }
 
 
@@ -767,7 +933,9 @@ def write_robots():
 def main():
     print("pages:")
     for filename, cfg in PAGES.items():
-        (ROOT / filename).write_text(render(filename, cfg), encoding="utf-8")
+        target = ROOT / filename
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(render(filename, cfg), encoding="utf-8")
         print(f"  {filename}")
     print("redirects:")
     write_redirects()
