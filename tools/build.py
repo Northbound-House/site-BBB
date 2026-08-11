@@ -98,11 +98,12 @@ SERVICES = [
 # =============================================================================
 
 BRAND_MARK = (
-    '<span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" '
-    'stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
-    '<path d="M3 18c2 1.5 4 1.5 6 0s4-1.5 6 0 4 1.5 6 0"/>'
-    '<path d="M3 13c2 1.5 4 1.5 6 0s4-1.5 6 0 4 1.5 6 0"/>'
-    '<path d="M12 9V4M12 4c2 0 3 1 3 2M12 4c-2 0-3 1-3 2"/></svg></span>'
+    '<span class="mark" aria-hidden="true">'
+    '<img src="/assets/img/logo-mark.png" alt="" width="27" height="42" /></span>'
+)
+BRAND_MARK_WHITE = (
+    '<span class="mark" aria-hidden="true">'
+    '<img src="/assets/img/logo-mark-white.png" alt="" width="27" height="42" /></span>'
 )
 
 
@@ -503,7 +504,7 @@ def head_block(cfg):
          f'  <meta name="robots" content="{robots}" />\n']
     if not cfg.get("no_canonical"):
         o.append(f'  <link rel="canonical" href="{url}" />\n')
-    o += ['  <meta name="theme-color" content="#0d3a42">\n',
+    o += ['  <meta name="theme-color" content="#4622a2">\n',
           '  <link rel="icon" href="/favicon.ico" sizes="any">\n',
           '  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">\n',
           '  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">\n',
@@ -526,8 +527,8 @@ def head_block(cfg):
           f'  <meta name="twitter:image:alt" content="{OG_IMAGE_ALT}">\n',
           '  <link rel="preconnect" href="https://fonts.googleapis.com" />\n',
           '  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n',
-          '  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700'
-          '&family=Jost:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet" />\n',
+          '  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue'
+          '&family=Poppins:wght@300;400;500;600&family=Sacramento&display=swap" rel="stylesheet" />\n',
           '  <link rel="stylesheet" href="/assets/css/styles.css" />\n',
           json_ld(cfg["schema"]()),
           analytics_head()]
@@ -582,7 +583,7 @@ def footer_block():
       <div class="footer-grid">
         <div>
           <a class="brand" href="/index.html">
-            {BRAND_MARK}
+            {BRAND_MARK_WHITE}
             <span>{BUSINESS_NAME}<small>Cruises · All-Inclusives · Small Groups</small></span>
           </a>
           <p class="muted" style="max-width:34ch">{ADVISOR} (he/him) — cruises, all-inclusive resorts, and small group tours, planned properly.</p>

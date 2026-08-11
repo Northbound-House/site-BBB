@@ -1,33 +1,62 @@
 /* =========================================================
    Bora Bora Bound — global styles
-   Luxury travel advisory. Faithful + polished rebuild.
+   Palette, typography and logo per the official brand guide
+   (Drive: "BBB Brand Guidelines.pdf" / Canva brand kit "Bora Bora Bound").
    ========================================================= */
 
 :root {
-  /* Palette */
-  --navy:      #0c2733;
-  --deep-sea:  #103e4a;
-  --lagoon:    #1f7a87;
-  --aqua:      #4fb3bf;
-  --aqua-soft: #bfe6ea;
-  --sand:      #c9a86a;
-  --gold:      #b8924a;
-  --cream:     #f8f4ec;
-  --paper:     #fffdf9;
-  --ink:       #16242c;
-  --muted:     #5b6b73;
-  --line:      rgba(16, 62, 74, 0.14);
+  /* --- Brand palette (exact values from the brand guide) --- */
+  --purple:      #4622a2;   /* primary */
+  --rose:        #d0356a;   /* secondary — primary CTA */
+  --orange:      #f09839;   /* accent */
+  --teal:        #4aa4a6;   /* supporting */
+  --pink:        #f6cfee;   /* soft */
+  --aqua:        #76efe1;   /* bright accent */
 
-  /* Type */
-  --serif:  "Playfair Display", Georgia, "Times New Roman", serif;
-  --sans:   "Jost", "Helvetica Neue", Arial, sans-serif;
-  --script: "Great Vibes", "Brush Script MT", cursive;
+  /* --- Brand secondary neutrals --- */
+  --black:       #000000;
+  --ink:         #2b2b2b;
+  --off-white:   #fdfefb;
+  --grey:        #ababab;
+  --grey-light:  #d9d9d9;
+
+  /* --- Brand tints (Canva "Color palette" row) --- */
+  --purple-soft: #6a4fb3;
+  --rose-soft:   #e07a95;
+  --aqua-soft:   #8edad3;
+  --pink-soft:   #ead4e2;
+
+  /* --- Derived, used for depth. Not new hues, just darker/lighter brand. --- */
+  --purple-deep: #34197a;
+  --purple-ink:  #1e0e46;
+  --rose-deep:   #b02a59;
+  --blush:       #f8f0f7;   /* very light tint of --pink, for section grounds */
+
+  /* --- Semantic aliases. The rest of the sheet is written against these. --- */
+  --navy:      var(--purple-deep);
+  --deep-sea:  var(--purple);
+  --lagoon:    var(--purple);
+  --sand:      var(--aqua);
+  --gold:      var(--rose);
+  --cream:     var(--blush);
+  --paper:     var(--off-white);
+  --muted:     #6b6b73;
+  --line:      rgba(70, 34, 162, 0.14);
+
+  /* Type — Bebas Neue + Evolve Sans per the brand guide.
+     Evolve Sans is a commercial face and is not on Google Fonts; Poppins is
+     the closest geometric substitute. Swap the stack here if it gets licensed
+     and self-hosted into assets/fonts/. */
+  --display: "Bebas Neue", "Oswald", Impact, "Haettenschweiler", sans-serif;
+  --serif:   var(--display);
+  --sans:    "Poppins", "Evolve Sans", "Helvetica Neue", Arial, sans-serif;
+  --script:  "Sacramento", "Great Vibes", "Brush Script MT", cursive;
 
   /* Layout */
   --maxw: 1180px;
   --radius: 14px;
-  --shadow: 0 18px 50px -22px rgba(12, 39, 51, 0.45);
-  --shadow-sm: 0 8px 24px -14px rgba(12, 39, 51, 0.4);
+  --shadow: 0 18px 50px -22px rgba(30, 14, 70, 0.45);
+  --shadow-sm: 0 8px 24px -14px rgba(30, 14, 70, 0.4);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -109,7 +138,7 @@ p { margin: 0 0 1.1em; }
 .btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
 .btn:active { transform: translateY(-1px); }
 
-.btn--gold { --btn-bg: linear-gradient(135deg, var(--sand), var(--gold)); --btn-fg: #1d160a; }
+.btn--gold { --btn-bg: linear-gradient(135deg, var(--sand), var(--gold)); --btn-fg: #ffffff; }
 .btn--ghost {
   --btn-bg: transparent;
   --btn-fg: #fff;
@@ -128,8 +157,13 @@ p { margin: 0 0 1.1em; }
 .site-header {
   position: fixed;
   top: 0.85rem;
-  left: 50%;
-  transform: translateX(-50%);
+  /* Centred with auto margins rather than left:50% + translateX(-50%): a
+     transform would make this header the containing block for its own
+     position:fixed children, which collapses the mobile slide-in menu to the
+     header's own 60px box instead of the full viewport. */
+  left: 0;
+  right: 0;
+  margin-inline: auto;
   z-index: 60;
   width: min(var(--maxw), calc(100% - 1.6rem));
   border-radius: 22px;
@@ -138,7 +172,7 @@ p { margin: 0 0 1.1em; }
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.45);
   box-shadow:
-    0 12px 36px -16px rgba(12, 39, 51, 0.45),
+    0 12px 36px -16px rgba(52, 25, 122, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
     inset 0 -1px 0 rgba(255, 255, 255, 0.12);
   transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease),
@@ -149,7 +183,7 @@ p { margin: 0 0 1.1em; }
   background: rgba(255, 255, 255, 0.66);
   border-color: rgba(255, 255, 255, 0.6);
   box-shadow:
-    0 14px 32px -14px rgba(12, 39, 51, 0.5),
+    0 14px 32px -14px rgba(52, 25, 122, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 .nav {
@@ -258,15 +292,15 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 .hero__bg {
   position: absolute; inset: 0; z-index: -2;
   background:
-    linear-gradient(180deg, rgba(8,30,40,0.55), rgba(8,30,40,0.35) 40%, rgba(8,30,40,0.7)),
-    radial-gradient(120% 80% at 50% 0%, rgba(79,179,191,0.25), transparent 60%),
+    linear-gradient(180deg, rgba(30, 14, 70,0.55), rgba(30, 14, 70,0.35) 40%, rgba(30, 14, 70,0.7)),
+    radial-gradient(120% 80% at 50% 0%, rgba(118, 239, 225,0.25), transparent 60%),
     var(--deep-sea);
   background-size: cover;
   background-position: center;
 }
 .hero__bg.has-img {
   background-image:
-    linear-gradient(180deg, rgba(8,30,40,0.5), rgba(8,30,40,0.3) 40%, rgba(8,30,40,0.72)),
+    linear-gradient(180deg, rgba(30, 14, 70,0.5), rgba(30, 14, 70,0.3) 40%, rgba(30, 14, 70,0.72)),
     var(--hero-img);
 }
 .hero__inner { max-width: 860px; }
@@ -323,7 +357,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 .page-hero__bg {
   position: absolute; inset: 0; z-index: -1;
   background:
-    linear-gradient(180deg, rgba(8,30,40,0.65), rgba(8,30,40,0.55)),
+    linear-gradient(180deg, rgba(30, 14, 70,0.65), rgba(30, 14, 70,0.55)),
     var(--page-img, none), var(--deep-sea);
   background-size: cover; background-position: center;
 }
@@ -380,7 +414,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 .card .icon {
   width: 54px; height: 54px; border-radius: 14px;
   display: grid; place-items: center; margin-bottom: 1.2rem;
-  background: linear-gradient(135deg, var(--aqua-soft), #e9f5f6);
+  background: linear-gradient(135deg, var(--aqua-soft), var(--blush));
   color: var(--lagoon);
 }
 .card .icon svg { width: 26px; height: 26px; }
@@ -388,7 +422,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 .card p { color: var(--muted); margin: 0; font-size: 0.98rem; }
 .section--navy .card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.12); }
 .section--navy .card p { color: rgba(255,255,255,0.72); }
-.section--navy .card .icon { background: rgba(79,179,191,0.18); color: var(--aqua); }
+.section--navy .card .icon { background: rgba(118, 239, 225,0.18); color: var(--aqua); }
 
 /* numbered promise list */
 .promise-grid { counter-reset: promise; }
@@ -490,7 +524,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 .cta-band__bg {
   position: absolute; inset: 0; z-index: -1;
   background:
-    linear-gradient(135deg, rgba(12,39,51,0.82), rgba(31,122,135,0.78)),
+    linear-gradient(135deg, rgba(52, 25, 122,0.82), rgba(70, 34, 162,0.78)),
     var(--cta-img, none), var(--lagoon);
   background-size: cover; background-position: center;
 }
@@ -554,7 +588,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 }
 .legal h2:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; }
 .legal h3 { font-family: var(--sans); font-weight: 600; font-size: 1.05rem; margin: 1.4rem 0 0.4rem; }
-.legal p, .legal li { color: #33454d; }
+.legal p, .legal li { color: var(--ink); }
 .legal ul { padding-left: 1.2rem; margin: 0 0 1.1em; }
 .legal li { margin-bottom: 0.45rem; }
 .legal a { color: var(--lagoon); text-decoration: underline; text-underline-offset: 2px; }
@@ -572,7 +606,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
   position: fixed; inset: 0; z-index: 100;
   display: grid; place-items: center;
   padding: 1.5rem;
-  background: rgba(8,30,40,0.6);
+  background: rgba(30, 14, 70,0.6);
   backdrop-filter: blur(6px);
   opacity: 0; visibility: hidden;
   transition: opacity 0.35s ease, visibility 0.35s ease;
@@ -621,7 +655,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 .field select:focus {
   outline: none;
   border-color: var(--aqua);
-  box-shadow: 0 0 0 3px rgba(79,179,191,0.18);
+  box-shadow: 0 0 0 3px rgba(118, 239, 225,0.18);
 }
 .field textarea { resize: vertical; min-height: 120px; }
 .form-actions { display: flex; gap: 0.8rem; margin-top: 1.4rem; }
@@ -1051,4 +1085,173 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
   .nav-links a { font-size: 0.74rem; letter-spacing: 0.09em; }
   .nav .brand small { display: none; }
   .nav-cta .btn { padding: 0.7rem 1.1rem; font-size: 0.74rem; }
+}
+
+/* =================================================================
+   Brand typography — Bebas Neue display face
+   Bebas is caps-only, single-weight and condensed, so headings need
+   more size, tighter leading and a little tracking to sit correctly.
+   ================================================================= */
+h1, h2, h3, h4,
+.brand,
+.stat .num {
+  font-family: var(--display);
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  line-height: 1.04;
+}
+h1 { letter-spacing: 0.01em; }
+h3, h4 { letter-spacing: 0.03em; line-height: 1.12; }
+
+/* Bebas runs ~15% narrower than the serif it replaces — size up to keep
+   the same optical weight in the layout. */
+.hero h1        { font-size: clamp(3.1rem, 2.1rem + 5vw, 6rem); }
+.page-hero h1   { font-size: clamp(2.6rem, 1.8rem + 3.6vw, 4.6rem); }
+.section-head h2,
+.split h2       { font-size: clamp(2.1rem, 1.6rem + 2.4vw, 3.3rem); }
+.cta-band h2    { font-size: clamp(2.1rem, 1.6rem + 2.4vw, 3.3rem); }
+.shell.narrow h2 { font-size: clamp(1.9rem, 1.5rem + 1.6vw, 2.6rem); }
+.shell.narrow h3 { font-size: 1.45rem; }
+.card h3,
+.service-card__body h3,
+.credential h3,
+.contact-method h2,
+.process h3,
+.referral-action h3,
+.journal-planned h3 { font-size: 1.35rem; letter-spacing: 0.035em; }
+.stat .num      { font-size: clamp(2.6rem, 2rem + 2vw, 3.6rem); letter-spacing: 0.01em; }
+
+/* Script accent. Bebas has no lowercase, so the script word carries the only
+   lowercase on the page — keep it obviously different, not just italic. */
+.script {
+  font-family: var(--script);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--aqua);
+}
+/* In the hero it stays a full-width second line, as designed. */
+.hero h1 .script {
+  display: block;
+  font-size: clamp(3.6rem, 2.2rem + 8vw, 7.4rem);
+  line-height: 0.85;
+  margin-top: 0.06em;
+}
+/* Everywhere else it sits inline, optically levelled against the caps. */
+h2 .script, h3 .script {
+  display: inline-block;
+  font-size: 1.2em;
+  line-height: 0.9;
+  transform: translateY(0.07em);
+}
+
+/* Brand lockup in the nav / footer */
+.brand { gap: 0.7rem; letter-spacing: 0.05em; }
+.brand > span { font-size: 1.22rem; line-height: 1.05; }
+.brand small {
+  font-family: var(--sans);
+  letter-spacing: 0.12em;
+  font-weight: 400;
+}
+.brand .mark {
+  /* Real logo mark — clear the old gradient disc and its inset white ring. */
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  width: 27px;          /* the mark is 240x373, i.e. ~0.64:1 */
+  height: 42px;
+  display: grid;
+  place-items: center;
+}
+.brand .mark img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* Body face */
+body { font-family: var(--sans); font-weight: 300; }
+strong, b { font-weight: 600; }
+.btn { font-family: var(--sans); font-weight: 500; letter-spacing: 0.1em; }
+.eyebrow { font-family: var(--sans); font-weight: 500; letter-spacing: 0.18em; }
+.trust-strip strong { font-family: var(--display); font-size: 1.3rem; letter-spacing: 0.05em; }
+.faq__item summary { font-family: var(--sans); font-weight: 500; }
+
+/* Accent underline on the active nav item + link hovers uses brand aqua */
+.nav-links a.active { color: var(--rose-deep); }  /* AA at nav's 0.82rem */
+.nav-links a::after { background: var(--aqua); height: 2px; }
+
+/* The brand headshot is a hexagon with transparent corners — no crop, no card. */
+.split__media.is-portrait {
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+}
+.split__media.is-portrait img { object-fit: contain; }
+
+/* Primary CTA: solid brand rose. It has to read as the action on both the
+   white sections and the purple bands, which an aqua→rose gradient did not. */
+.btn--gold { --btn-bg: var(--rose); --btn-fg: #ffffff; }
+.btn--gold:hover { --btn-bg: var(--rose-deep); }
+.btn--outline { --btn-fg: var(--purple); border-color: var(--purple); }
+.btn--outline:hover { background: var(--purple); color: #fff; }
+
+/* The brand guide sets headings in all caps. Bebas has no lowercase glyphs so
+   it caps them anyway — declaring it explicitly keeps the intent if the
+   webfont fails to load. */
+h1, h2 { text-transform: uppercase; }
+.brand > span { text-transform: uppercase; }
+.split__media.is-portrait { padding: 0.5rem 0; }
+
+/* ------------------------- Mobile nav fixes --------------------------- */
+/* The header is position:fixed with a translateX(-50%) centring transform, so
+   it becomes the containing block for its own fixed children. The closed
+   slide-in panel therefore parks against the header's inset edge rather than
+   the viewport edge, leaving a visible sliver. Push it clear of that inset. */
+@media (max-width: 720px) {
+    /* The hero CTAs collide with the decorative scroll cue once the headline
+     wraps to four lines. The cue is ornamental — drop it on small screens. */
+  .scroll-cue { display: none; }
+}
+
+/* ------------------------- Mobile menu (dropdown) --------------------- */
+/* The header uses backdrop-filter, which — like a transform — makes it the
+   containing block for any position:fixed descendant. A full-height slide-in
+   panel therefore collapsed to the header's own 60px box. Rather than fight
+   that, the menu is a dropdown anchored under the floating pill, which suits
+   the header shape better anyway. */
+@media (max-width: 720px) {
+  .nav-links {
+    position: absolute;
+    inset: auto 0 auto 0;
+    top: calc(100% + 0.45rem);
+    width: auto;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0.15rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 0.9rem 1.2rem 1.1rem;
+    box-shadow: 0 24px 48px -20px rgba(30, 14, 70, 0.55);
+    transform: translateY(-10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s var(--ease), transform 0.25s var(--ease),
+      visibility 0.25s linear;
+  }
+  body.nav-open .nav-links {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .nav-links a {
+    display: block;
+    padding: 0.7rem 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-links li:last-of-type a { border-bottom: none; }
+  .nav-cta-mobile { border-bottom: none; padding-top: 0.9rem; }
+  .nav-cta-mobile .btn { width: 100%; justify-content: center; }
+  .nav-cta-mobile a { border-bottom: none; padding: 0.95em 2em; }
 }

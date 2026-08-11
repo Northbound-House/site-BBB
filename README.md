@@ -8,6 +8,73 @@ Hand-coded HTML/CSS/JS with a small Python generator — no npm, no framework, n
 > indexable copy of the site on a second domain competes with the real one in search.
 > Run `./tools/set-domain.sh production` to flip all of it at cutover.
 
+## Brand system
+
+Everything below comes from the official brand guide (Drive: *BBB Brand Guidelines.pdf*
+and *Brand Colors HEX Codes*, cross-checked against the Canva brand kit
+"Bora Bora Bound"). All of it lives in the `:root` block at the top of
+`assets/css/styles.css` — change it there, nowhere else.
+
+### Colour
+
+| Token | Hex | Role |
+| --- | --- | --- |
+| `--purple` | `#4622a2` | Primary. Dark grounds, links, headings. |
+| `--rose` | `#d0356a` | Secondary. Every primary CTA. |
+| `--orange` | `#f09839` | Accent (the flight path in the logo). |
+| `--teal` | `#4aa4a6` | Supporting. |
+| `--pink` | `#f6cfee` | Soft. |
+| `--aqua` | `#76efe1` | Bright accent — nav underline, script word, trust strip. |
+| `--ink` | `#2b2b2b` | Body text. |
+| `--off-white` | `#fdfefb` | Page ground. |
+| `--grey` / `--grey-light` | `#ababab` / `#d9d9d9` | Borders, dividers. |
+
+Tints from the Canva palette row are available as `--purple-soft` `#6a4fb3`,
+`--rose-soft` `#e07a95`, `--aqua-soft` `#8edad3`, `--pink-soft` `#ead4e2`.
+`--purple-deep`, `--purple-ink`, `--rose-deep` and `--blush` are darker/lighter
+derivations of brand hues for depth and section grounds — not new colours.
+
+Legacy aliases (`--navy`, `--lagoon`, `--gold`, `--cream`, …) are kept and mapped
+onto the brand tokens so the rest of the sheet did not need rewriting.
+
+**Contrast:** every text/ground pair used in the design passes WCAG AA. The two
+that needed care: white on `--rose` is 4.77:1 (fine), and the active nav link
+uses `--rose-deep` rather than `--rose` because `--rose` on the frosted header
+was only 3.83:1 at the nav's 0.82rem.
+
+### Typography
+
+The guide specifies **Bebas Neue** for display and **Evolve Sans** for body.
+
+- **Bebas Neue** is on Google Fonts and is loaded. It is caps-only, single-weight
+  and condensed, so headings carry extra size, tighter leading and a little
+  tracking. `h1`/`h2` also set `text-transform: uppercase` explicitly so the
+  all-caps intent survives if the webfont fails to load.
+- **Evolve Sans is a commercial face, is not on Google Fonts, and is not in the
+  Drive Fonts folder** — so it cannot be self-hosted from what is available.
+  **Poppins** is loaded as the closest geometric substitute. If Evolve Sans gets
+  licensed, drop the files in `assets/fonts/`, add a `@font-face`, and change
+  `--sans` — that one line is the whole swap.
+- The signature script in the guide is "Jonathan Signature", also commercial.
+  **Sacramento** stands in for it via `--script`, used only for the accent word
+  in the hero.
+
+### Logo
+
+| File | Use |
+| --- | --- |
+| `assets/img/logo-mark.png` | Colour BB monogram — header on light grounds. |
+| `assets/img/logo-mark-white.png` | White monogram — footer on purple. |
+| `brand/logo-full-color.png`, `brand/logo-full-white.png` | Full-resolution originals (1350×1350). |
+
+Favicons, `apple-touch-icon`, the PWA icons and `og-image.png` are all generated
+from the brand mark on `--purple`. The wordmark next to the mark is live text in
+Bebas Neue rather than an image, so it stays crisp and selectable.
+
+`assets/img/zac-headshot.png` is the hexagon-cropped brand headshot. It has
+transparent corners, so it is rendered with `.split__media.is-portrait`
+(`object-fit: contain`, no card, no shadow) — do not put it in a cropped frame.
+
 ## How the site is built
 
 Content lives in `pages/*.html` as bare fragments. Everything shared — `<head>` metadata,
@@ -116,8 +183,9 @@ Each of these is a one-line change in `tools/build.py` CONFIG unless noted.
 | **Tern referral form** | `TERN_REFERRAL_FORM` | Same fallback. A dedicated form would capture the referrer and friend separately. |
 | **Attributed reviews** | `pages/reviews.html`, `REVIEWS` in build.py | Still the same three unattributed quotes. Target is 8–10 with name, what they booked, and month/year. |
 | **Off-site review links** | `pages/reviews.html` | Trustpilot, The Knot, WeddingWire, Google Business Profile URLs. |
-| **Own photography** | `pages/*.html` | Every image is still a hotlinked Unsplash URL. They now have real `alt` text and are `<img>` elements rather than CSS backgrounds, but they're stock and load from a third-party CDN. Self-host into `assets/img/`. |
-| **Per-page share images** | `og-image.png` | All pages share one 1200×630 card. |
+| **Destination / lifestyle photography** | `pages/*.html` | The headshot and logos are now the real brand assets. The *scenery* images are still hotlinked Unsplash — they have real `alt` text and are `<img>` elements, but they're stock and load from a third-party CDN. The brand guide's photography section is Zac and Chad's own cruise and resort shots; self-host those into `assets/img/`. |
+| **Per-page share images** | `og-image.png` | One brand-built 1200×630 card is shared by all pages. |
+| **Brand voice pass** | `pages/*.html` | The guide calls for "modern, upbeat, relatable". The current copy is accurate and honest but reads more measured and dry than that. Worth a deliberate pass. |
 | **Intro video** | `pages/index.html` | Needs recording. |
 | **Lead magnet** | — | Deliberately not built: an email-capture form needs a real endpoint, and shipping another dead form would repeat the problem this rebuild just fixed. |
 
