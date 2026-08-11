@@ -376,33 +376,27 @@ def services_list_schema():
     }
 
 
-# Kept in sync by hand with the FAQ markup in pages/how-i-work.html.
-FAQS = [
-    ("Do I pay you to plan my trip?",
-     "For most cruise, all-inclusive, and small group tour bookings, no. I am paid a commission "
-     "by the cruise line, resort, or tour operator after you travel, and it comes out of their "
-     "margin rather than being added to your price. If a trip is complex enough to need a "
-     "planning fee, I tell you the amount before you commit to anything."),
-    ("Will I pay more than booking online myself?",
-     "No. I book the same published rates, and through Signature Travel Network I can often add "
-     "amenities on top — resort credits, upgrades where available, onboard credit on many "
-     "sailings. You are not paying a markup for the service."),
-    ("What happens after I get in touch?",
-     "A free consultation, by phone or video, about where you want to go and how you like to "
-     "travel. Then I send a proposal with two or three options and what each includes. You pick "
-     "one, I handle the booking and the deposits, and you get a full itinerary before you leave."),
-    ("How far ahead should I book?",
-     "For cruises, six to twelve months for the best cabin choice, and further out for holiday "
-     "sailings and Alaska. All-inclusive resorts want three to six months. Small group tours sell "
-     "out earliest — a year ahead is not unusual for popular departures."),
-    ("What support do I get while I am travelling?",
-     "You have my number. If a flight cancels, a transfer does not show, or a room is wrong, you "
-     "call me rather than standing in a queue at a service desk. That is the part of this job "
-     "that a booking website cannot do."),
-    ("Do you only book cruises, all-inclusives, and tours?",
-     "Those are my focus, and where I can add the most value. If you need something outside that "
-     "and I am not the right fit, I will say so rather than take the booking."),
-]
+# FAQ content is parsed straight out of pages/how-i-work.html rather than kept
+# in a parallel list here. Google requires FAQPage markup to match the text a
+# visitor actually sees, and a hand-synced copy had already drifted — six
+# entries in the schema against eight on the page, with reworded answers.
+
+
+def _faqs_from_page():
+    src = (PAGES_DIR / "how-i-work.html").read_text(encoding="utf-8")
+    out = []
+    for q, body in re.findall(
+        r"<summary>(.*?)</summary>\s*<div class=\"faq__body\">(.*?)</div>", src, re.S
+    ):
+        answer = " ".join(
+            re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", para)).strip()
+            for para in re.findall(r"<p>(.*?)</p>", body, re.S)
+        )
+        answer = substitute(re.sub(r"\s+", " ", answer).strip(), "how-i-work FAQ")
+        out.append((re.sub(r"<[^>]+>", "", q).strip(), answer))
+    if not out:
+        raise SystemExit("no FAQs parsed from pages/how-i-work.html")
+    return out
 
 
 def faq_schema():
@@ -411,7 +405,7 @@ def faq_schema():
         "mainEntity": [
             {"@type": "Question", "name": q,
              "acceptedAnswer": {"@type": "Answer", "text": a}}
-            for q, a in FAQS
+            for q, a in _faqs_from_page()
         ],
     }
 
