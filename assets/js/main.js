@@ -4,8 +4,9 @@
 
   /* ---- Sticky header state ---- */
   var header = document.querySelector(".site-header");
+  var heroHeader = header && !header.classList.contains("is-scrolled");
   var onScroll = function () {
-    if (!header) return;
+    if (!header || !heroHeader) return;
     header.classList.toggle("is-scrolled", window.scrollY > 40);
   };
   onScroll();
@@ -14,56 +15,60 @@
   /* ---- Mobile nav ---- */
   var toggle = document.querySelector(".nav-toggle");
   if (toggle) {
+    var setOpen = function (open) {
+      document.body.classList.toggle("nav-open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    };
     toggle.addEventListener("click", function () {
-      document.body.classList.toggle("nav-open");
+      setOpen(!document.body.classList.contains("nav-open"));
     });
     document.querySelectorAll(".nav-links a").forEach(function (link) {
-      link.addEventListener("click", function () {
-        document.body.classList.remove("nav-open");
-      });
-    });
-  }
-
-  /* ---- Contact modal ---- */
-  var modal = document.getElementById("contact-modal");
-  var lastFocus = null;
-  function openModal() {
-    if (!modal) return;
-    lastFocus = document.activeElement;
-    modal.classList.add("is-open");
-    document.body.style.overflow = "hidden";
-    var first = modal.querySelector("input, textarea, button");
-    if (first) first.focus();
-  }
-  function closeModal() {
-    if (!modal) return;
-    modal.classList.remove("is-open");
-    document.body.style.overflow = "";
-    if (lastFocus) lastFocus.focus();
-  }
-  document.querySelectorAll("[data-open-modal]").forEach(function (el) {
-    el.addEventListener("click", function (e) {
-      e.preventDefault();
-      openModal();
-    });
-  });
-  if (modal) {
-    modal.addEventListener("click", function (e) {
-      if (e.target === modal || e.target.hasAttribute("data-close-modal")) closeModal();
+      link.addEventListener("click", function () { setOpen(false); });
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && modal.classList.contains("is-open")) closeModal();
+      if (e.key === "Escape" && document.body.classList.contains("nav-open")) {
+        setOpen(false);
+        toggle.focus();
+      }
     });
   }
 
-  /* ---- Placeholder form handling (until CRM forms are wired up) ---- */
+  /* ---- Conversion tracking ----------------------------------------------
+     Every CTA carries data-cta="<location>". A click fires a GA4 event and a
+     Meta Pixel Lead event, tagged with where on the site it came from, so it
+     is possible to tell which page actually produces consultations.
+
+     Both calls no-op safely when the tags are absent — the loaders in the page
+     head are only emitted once GA4_ID / META_PIXEL_ID are set in
+     tools/build.py. Mark generate_lead as a key event in the GA4 admin panel
+     for it to count as a conversion.
+  ------------------------------------------------------------------------ */
+  document.querySelectorAll("[data-cta]").forEach(function (el) {
+    el.addEventListener("click", function () {
+      var where = el.getAttribute("data-cta") || "unknown";
+      var label = (el.textContent || "").trim().slice(0, 80);
+
+      if (typeof window.gtag === "function") {
+        window.gtag("event", "generate_lead", {
+          cta_location: where,
+          cta_label: label,
+          page_path: window.location.pathname
+        });
+      }
+      if (typeof window.fbq === "function") {
+        window.fbq("track", "Lead", { content_name: where });
+      }
+    });
+  });
+
+  /* ---- Placeholder form handling (kept for any form not yet wired up) ---- */
   document.querySelectorAll("form[data-placeholder]").forEach(function (form) {
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       var note = form.querySelector(".form-feedback");
       if (note) {
         note.textContent =
-          "Thanks! This form isn't connected yet — please reach out via Instagram or Facebook in the meantime.";
+          "Thanks! This form isn't connected yet — please email hello@boraborabound.com or call (656) 201-5022 in the meantime.";
         note.style.color = "var(--lagoon)";
       }
       form.reset();

@@ -1,0 +1,76 @@
+  <main id="main">
+  <section class="page-hero">
+    <div class="page-hero__bg" style="--page-img: url('https://images.unsplash.com/photo-1559599189-fe84dea4eb79?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="shell">
+      <span class="eyebrow">Reviews</span>
+      <h1>What my travelers say</h1>
+      <p>Let their words speak for themselves.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell">
+      <div class="quotes">
+        <figure class="quote reveal">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>Incredibly easy and stress-free.</blockquote>
+          <cite>— Michael C.</cite>
+        </figure>
+        <figure class="quote reveal d1">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>Personalized our trip by listening to our wants and needs.</blockquote>
+          <cite>— Steven</cite>
+        </figure>
+        <figure class="quote reveal d2">
+          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+          <blockquote>Helped to turn a dream into reality.</blockquote>
+          <cite>— Becky G.</cite>
+        </figure>
+      </div>
+      <!--
+        TODO (blocked on Zac): replace these three with eight to ten attributed
+        reviews. The format that actually persuades is:
+
+          first name + last initial · what they booked · month and year
+
+        e.g. "Becky G. — Royal Caribbean, Alaska, June 2025". A photo from the
+        trip is better still. When these land, also update REVIEWS in
+        tools/build.py so the schema carries datePublished and the destination.
+      -->
+    </div>
+  </section>
+
+  <section class="section section--cream">
+    <div class="shell narrow center">
+      <div class="section-head reveal">
+        <span class="eyebrow">Recently traveled with me?</span>
+        <h2>A review helps more than you'd think</h2>
+        <p>I'm an independent advisor, so word of mouth is how this works. If a trip went well, a couple of sentences somewhere public makes a real difference. And if anything fell short, tell me directly first — I'd like the chance to put it right.</p>
+      </div>
+      <div class="reveal d1" style="display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center">
+        <a href="{{FACEBOOK}}/reviews" target="_blank" rel="noopener" class="btn btn--gold" data-cta="review-facebook">Leave a Facebook recommendation</a>
+        <a href="mailto:{{EMAIL}}?subject=Feedback%20on%20my%20trip" class="btn btn--outline" data-cta="review-email">Tell me directly</a>
+      </div>
+      <!--
+        TODO (blocked on Zac): add buttons for the Trustpilot, The Knot,
+        WeddingWire, and Google Business Profile listings once those URLs are
+        confirmed. The audit flagged that none of them currently link back here,
+        and that the Knot listing has no reviews and no website link on it.
+      -->
+    </div>
+  </section>
+
+  <section class="section section--navy">
+    <div class="shell center">
+      <div class="section-head reveal">
+        <span class="eyebrow">Your story next</span>
+        <h2>Ready to write your own review?</h2>
+        <p>It starts with a short conversation about where you'd love to go.</p>
+      </div>
+      <div class="reveal d1" style="display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center">
+        <a href="{{TERN_SCHEDULING}}" target="_blank" rel="noopener" class="btn btn--gold" data-cta="reviews-consult">Book a free consultation</a>
+        <a href="/refer.html" class="btn btn--ghost">Refer a friend</a>
+      </div>
+    </div>
+  </section>
+  </main>
