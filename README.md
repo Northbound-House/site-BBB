@@ -8,6 +8,10 @@ Hand-coded HTML/CSS/JS with a small Python generator — no npm, no framework, n
 > indexable copy of the site on a second domain competes with the real one in search.
 > Run `./tools/set-domain.sh production` to flip all of it at cutover.
 
+**Deployed to https://test.boraborabound.com** — see **[STATE.md](STATE.md)** for
+where everything stands and **[PLAN.md](PLAN.md)** for what's next, including the
+cutover checklist. This README covers how to work on the site.
+
 ## Brand system
 
 Everything below comes from the official brand guide (Drive: *BBB Brand Guidelines.pdf*
