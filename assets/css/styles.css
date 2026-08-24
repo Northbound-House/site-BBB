@@ -61,7 +61,9 @@
      draft: treat them as fixed. Work that needs a measurement
      adds a new knob here rather than retuning a locked one, and
      a new element gets its own knob even when an existing value
-     looks close.
+     looks close. One change since the lock, the same day and at
+     the author's request: three identical card-title knobs
+     merged into one. No value moved.
 
      Change a number here, save, refresh. Nothing below this
      block carries a raw measurement for anything the homepage
@@ -224,6 +226,8 @@
   --btn-sm-size:            0.84rem; /* label size on the small button */
 
   /* CARD SURFACES (shared by every card on the page) --------------- */
+  --card-title-size:         1.35rem; /* title on any card — trip, feature, step */
+  --card-title-tracking:     0.035em; /* letter spacing on those titles */
   --radius:                    14px; /* corner rounding on cards and media — bigger = softer */
   --border-width:               1px; /* thickness of card outlines */
   --shadow-y:                  18px; /* how far a raised card's shadow drops */
@@ -254,8 +258,6 @@
   --service-pad-x:           1.5rem; /* left/right padding inside a service card */
   --service-pad-bottom:      1.5rem; /* space below the card link */
   --service-body-gap:       0.55rem; /* space between title, text and link */
-  --service-title-size:     1.35rem; /* service card title size */
-  --service-title-tracking: 0.035em; /* letter spacing on card titles */
   --service-text-size:      0.94rem; /* service card paragraph size */
   --service-arrow-gap:       0.5rem; /* space above the "Plan a cruise →" link */
   --service-arrow-size:      0.9rem; /* size of that link */
@@ -273,8 +275,6 @@
   --card-icon-radius:          14px; /* corner rounding on the icon tile */
   --card-icon-gap:           1.2rem; /* space under the icon tile */
   --card-icon-glyph:           26px; /* size of the drawn icon inside that tile */
-  --card-title-size:        1.35rem; /* feature card title size */
-  --card-title-tracking:    0.035em; /* letter spacing on feature card titles */
   --card-title-gap:          0.4rem; /* space under a feature card title */
   --card-text-size:         0.98rem; /* feature card paragraph size */
 
@@ -286,8 +286,6 @@
   --process-number-text:    1.05rem; /* size of the digit inside it */
   --process-step-gap:        3.1rem; /* space the circle reserves above each step */
   --process-title-gap:       0.4rem; /* space under a step title */
-  --process-title-size:     1.35rem; /* step title size */
-  --process-title-tracking: 0.035em; /* letter spacing on step titles */
   --process-text-size:      0.94rem; /* step paragraph size */
 
   /* PORTRAIT SPLIT (meet your advisor) ----------------------------- */
@@ -1547,9 +1545,11 @@ h3, h4 { letter-spacing: var(--h3-tracking); line-height: var(--subhead-leading)
 .cta-band h2 {
   font-size: clamp(var(--h2-size-min), var(--h2-size-base) + var(--h2-size-vw), var(--h2-size-max));
 }
-.card h3 { font-size: var(--card-title-size); letter-spacing: var(--card-title-tracking); }
-.service-card__body h3 { font-size: var(--service-title-size); letter-spacing: var(--service-title-tracking); }
-.process h3 { font-size: var(--process-title-size); letter-spacing: var(--process-title-tracking); }
+/* Trip cards, feature cards and process steps share one title step. Merged
+   from three identical knobs on 24 August 2026, at the author's request. */
+.card h3,
+.service-card__body h3,
+.process h3 { font-size: var(--card-title-size); letter-spacing: var(--card-title-tracking); }
 .page-hero h1 {
   font-size: clamp(var(--page-hero-title-min),
                    var(--page-hero-title-base) + var(--page-hero-title-vw),

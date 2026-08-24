@@ -112,6 +112,9 @@ Three details worth knowing:
   across go two by two) and `--bp-cards` (everything stacks). The rule: a row
   never holds a single card. Adding a card to a grid means checking its count
   against those knobs.
+- **One knob sets every card title.** Trip cards, feature cards and process steps
+  share `--card-title-size` / `--card-title-tracking`, in the CARD SURFACES group.
+  Give a component its own knob if you ever want its titles to differ.
 - **The values are locked** as of 24 August 2026. Tune them freely, but treat what
   is in the file as the current design: new work adds a new knob rather than
   retuning a locked one, and a new element gets its own knob even when an existing
