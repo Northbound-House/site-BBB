@@ -79,6 +79,32 @@ Bebas Neue rather than an image, so it stays crisp and selectable.
 transparent corners, so it is rendered with `.split__media.is-portrait`
 (`object-fit: contain`, no card, no shadow) — do not put it in a cropped frame.
 
+## Tuning the layout
+
+Every measurement the homepage renders — spacing, padding, gaps, widths, type sizes,
+line heights, radii, shadow offsets, animation timings — is declared once in the
+**control block** at the top of `assets/css/styles.css`, each with a one-line comment
+saying what it moves. Nothing below that block carries a raw measurement for anything
+the homepage draws.
+
+To tune: change a number in the block, save, reload the page. Start with
+`--maxw` (content width), `--section-pad-*` (air between sections) and
+`--hero-title-size-*` (headline size) — they move the most pixels per keystroke.
+
+Three details worth knowing:
+
+- **Fluid type** reads as `clamp(MIN, BASE + VW, MAX)`. `MIN` is the phone size, `MAX`
+  the size it stops growing at, `BASE + VW` the rate in between.
+- **Breakpoints** are the one place a number is repeated: `@media` cannot read a custom
+  property, so `--bp-mobile` and friends document the value and the media query below
+  restates it. Change both.
+- **Three JS values** (`--header-scrolled-at`, `--reveal-trigger`, `--reveal-margin`)
+  are also knobs; `assets/js/main.js` reads them out of the block at load.
+
+Inner-page-only components — forms, FAQ, contact cards, legal prose, journal cards,
+the modal, stats and badges — still carry literal values further down the sheet. They
+can be lifted into the block the same way when the inner pages get their tuning pass.
+
 ## How the site is built
 
 Content lives in `pages/*.html` as bare fragments. Everything shared — `<head>` metadata,

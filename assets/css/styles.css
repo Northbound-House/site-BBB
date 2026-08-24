@@ -52,12 +52,354 @@
   --sans:    "Poppins", "Evolve Sans", "Helvetica Neue", Arial, sans-serif;
   --script:  "Sacramento", "Great Vibes", "Brush Script MT", cursive;
 
-  /* Layout */
-  --maxw: 1180px;
-  --radius: 14px;
-  --shadow: 0 18px 50px -22px rgba(30, 14, 70, 0.45);
-  --shadow-sm: 0 8px 24px -14px rgba(30, 14, 70, 0.4);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* =========================================================
+     CONTROL BLOCK — every measurement the homepage renders
+     ---------------------------------------------------------
+     Change a number here, save, refresh. Nothing below this
+     block carries a raw measurement for anything the homepage
+     draws: frame, header, hero, trust strip, sections, cards,
+     process, portrait split, quotes, CTA band, referral band,
+     footer, buttons and motion.
+
+     Inner-page-only components (forms, FAQ, contact cards,
+     legal prose, journal cards, modal, stats, badges) still
+     carry literal values further down — say the word and they
+     get lifted too.
+
+     Fluid type reads as clamp(MIN, BASE + VW, MAX): MIN is the
+     phone size, MAX the size it stops growing at, BASE + VW the
+     rate in between.
+     ========================================================= */
+
+  /* PAGE FRAME ---------------------------------------------------- */
+  --maxw:                    1180px; /* how wide content gets before it stops growing */
+  --page-pad-min:           1.25rem; /* side gutter on the narrowest phone */
+  --page-pad-vw:                5vw; /* how fast the side gutter grows with the window */
+  --page-pad-max:              3rem; /* widest the side gutter ever gets */
+
+  /* BODY TYPE ----------------------------------------------------- */
+  --body-size-min:             1rem; /* paragraph size on a phone */
+  --body-size-base:         0.96rem; /* fixed part of the in-between paragraph size */
+  --body-size-vw:             0.2vw; /* how fast paragraphs grow with the window */
+  --body-size-max:         1.075rem; /* paragraph size once the window is wide */
+  --body-leading:              1.65; /* line spacing in paragraphs — bigger = airier */
+  --para-gap:                 1.1em; /* space under each paragraph */
+  --heading-gap:              0.5em; /* space under a heading before its text */
+  --heading-leading:           1.04; /* line spacing inside big headings — bigger = looser */
+  --subhead-leading:           1.12; /* line spacing inside h3 / h4 */
+  --heading-tracking:       0.015em; /* letter spacing in headings — bigger = wider caps */
+  --h1-tracking:             0.01em; /* letter spacing in the page headline */
+  --h3-tracking:             0.03em; /* letter spacing in small headings */
+  --eyebrow-size:           0.72rem; /* the small label above a heading */
+  --eyebrow-tracking:        0.18em; /* how spread out that small label reads */
+  --eyebrow-gap:               1rem; /* space under the small label */
+
+  /* FLOATING HEADER ----------------------------------------------- */
+  --header-top:             0.85rem; /* how far the nav pill floats below the top */
+  --header-top-scrolled:     0.6rem; /* where the pill settles once you scroll */
+  --header-side-inset:       1.6rem; /* air between the pill and the window edges */
+  --header-radius:             22px; /* corner rounding on the nav pill */
+  --header-blur:               20px; /* how frosted the glass behind the nav is */
+  --header-saturate:           180%; /* how much colour the frosted glass pulls through */
+  --header-highlight-width:     1px; /* thickness of the light catch along the pill's edge */
+  --header-border-width:        1px; /* hairline around the nav pill */
+  --header-shadow-y:           12px; /* how far the nav pill's shadow drops */
+  --header-shadow-blur:        36px; /* how soft that shadow is */
+  --header-shadow-spread:     -16px; /* negative pulls the shadow in tighter */
+  --header-shadow-y-scrolled:  14px; /* shadow drop once the pill is scrolled */
+  --header-shadow-blur-scrolled: 32px; /* shadow softness once scrolled */
+  --header-shadow-spread-scrolled: -14px; /* how tight that scrolled shadow sits */
+  --nav-pad-y:              0.42rem; /* height of the pill above and below the links */
+  --nav-pad-left:            1.2rem; /* space before the logo inside the pill */
+  --nav-pad-right:           0.5rem; /* space after the pinned CTA inside the pill */
+  --nav-gap:                 1.5rem; /* gap between logo, links and CTA */
+  --nav-link-gap:            1.9rem; /* space between nav links */
+  --nav-link-size:          0.82rem; /* nav link text size */
+  --nav-link-tracking:       0.16em; /* how spread out the nav links read */
+  --nav-underline-gap:          3px; /* drop from a nav link to its hover underline */
+  --nav-underline-height:       2px; /* thickness of that underline */
+  --nav-cta-gap:               1rem; /* space between the CTA and the links */
+  --nav-cta-pad-y:           0.7rem; /* height of the pinned CTA at tight widths */
+  --nav-cta-pad-x:           1.1rem; /* width of the pinned CTA at tight widths */
+  --nav-cta-size:           0.74rem; /* its label size at tight widths */
+  --brand-gap:               0.7rem; /* space between the logo mark and the wordmark */
+  --brand-lockup-size:      1.15rem; /* text size the lockup's letter spacing is measured from */
+  --brand-size:             1.22rem; /* wordmark size in the nav and footer */
+  --brand-leading:             1.05; /* line spacing if the wordmark wraps */
+  --brand-tracking:          0.05em; /* letter spacing in the wordmark */
+  --brand-mark-width:          27px; /* logo mark width — the art is 240x373 */
+  --brand-mark-height:         42px; /* logo mark height — keep the 0.64:1 ratio */
+  --brand-sub-size:         0.58rem; /* the small line under the wordmark */
+  --brand-sub-tracking:      0.12em; /* how spread out that small line reads */
+  --brand-sub-gap:              2px; /* space between wordmark and that small line */
+  --nav-toggle-width:          30px; /* width of the hamburger button */
+  --nav-toggle-height:         24px; /* height of the hamburger button */
+  --nav-toggle-bar:             2px; /* thickness of each hamburger bar */
+  --nav-toggle-bar-top:         2px; /* where the top bar sits */
+  --nav-toggle-bar-mid:        11px; /* where the middle bar sits — also the X pivot */
+  --nav-toggle-bar-bottom:     20px; /* where the bottom bar sits */
+
+  /* HERO ---------------------------------------------------------- */
+  --hero-min-height:         100svh; /* how much of the screen the hero fills */
+  --hero-pad-top:              7rem; /* clearance under the floating nav */
+  --hero-pad-x:                1rem; /* side air around the hero text */
+  --hero-pad-bottom:           4rem; /* space under the hero buttons */
+  --hero-width:               860px; /* how wide the hero text block gets */
+  --hero-tagline-size-min:   0.7rem; /* "Cruises · All-Inclusives" line on a phone */
+  --hero-tagline-size-base:  0.6rem; /* fixed part of its in-between size */
+  --hero-tagline-size-vw:     0.4vw; /* how fast that line grows with the window */
+  --hero-tagline-size-max:   0.9rem; /* its size once the window is wide */
+  --hero-tagline-tracking:    0.3em; /* how spread out that line reads */
+  --hero-tagline-gap:        1.4rem; /* space between that line and the headline */
+  --hero-title-size-min:     2.7rem; /* headline size on a phone */
+  --hero-title-size-base:    1.9rem; /* fixed part of the in-between headline size */
+  --hero-title-size-vw:         4vw; /* how fast the headline grows with the window */
+  --hero-title-size-max:       5rem; /* headline size once the window is wide */
+  --hero-title-gap:           0.3em; /* space under the headline */
+  --hero-title-shadow-y:        2px; /* how far the headline's soft shadow drops */
+  --hero-title-shadow-blur:    30px; /* how soft that shadow is — keeps text legible */
+  --hero-script-size-min:    3.1rem; /* the script word "guesswork" on a phone */
+  --hero-script-size-base:     2rem; /* fixed part of its in-between size */
+  --hero-script-size-vw:        6vw; /* how fast the script word grows */
+  --hero-script-size-max:    6.2rem; /* script word size once the window is wide */
+  --hero-script-leading:       0.85; /* line spacing on the script word — bigger = looser */
+  --hero-script-gap:         0.06em; /* lift of the script word toward the line above */
+  --script-inline-size:       1.2em; /* size of a script word inside a smaller heading */
+  --script-inline-leading:      0.9; /* line spacing around that inline script word */
+  --script-inline-lift:      0.07em; /* nudge that levels it against the caps */
+  --hero-lede-size-min:     1.05rem; /* hero paragraph size on a phone */
+  --hero-lede-size-base:       1rem; /* fixed part of its in-between size */
+  --hero-lede-size-vw:        0.4vw; /* how fast the hero paragraph grows */
+  --hero-lede-size-max:      1.3rem; /* hero paragraph size once wide */
+  --hero-lede-width:          620px; /* how wide the hero paragraph gets before wrapping */
+  --hero-lede-gap:           2.2rem; /* space between that paragraph and the buttons */
+  --hero-actions-gap:          1rem; /* space between the two hero buttons */
+  --cue-bottom:              1.8rem; /* how far "Three ways to travel" sits off the bottom */
+  --cue-size:               0.65rem; /* size of that scroll cue text */
+  --cue-tracking:             0.3em; /* how spread out the scroll cue reads */
+  --cue-gap:                 0.5rem; /* space between cue text and its line */
+  --cue-line-width:             1px; /* thickness of the animated cue line */
+  --cue-line-height:           38px; /* length of the animated cue line */
+  --cue-cycle:                 2.2s; /* how long one sweep of that line takes */
+
+  /* SECTION RHYTHM ------------------------------------------------ */
+  --section-pad-min:           4rem; /* vertical air inside a section on a phone */
+  --section-pad-base:          3rem; /* fixed part of the in-between section air */
+  --section-pad-vw:             6vw; /* how fast section air grows with the window */
+  --section-pad-max:         7.5rem; /* section air once the window is wide */
+  --section-head-width:       680px; /* how wide a centred section intro gets */
+  --section-head-gap:        3.2rem; /* gap from a section intro to its content */
+  --h2-size-min:             2.1rem; /* section heading size on a phone */
+  --h2-size-base:            1.6rem; /* fixed part of the in-between heading size */
+  --h2-size-vw:               2.4vw; /* how fast section headings grow */
+  --h2-size-max:             3.3rem; /* section heading size once the window is wide */
+  --section-lede-size:      1.08rem; /* the paragraph under a section heading */
+  --section-cta-gap:         2.5rem; /* space above a section's closing button */
+
+  /* BUTTONS ------------------------------------------------------- */
+  --btn-size:               0.78rem; /* button label size */
+  --btn-tracking:             0.1em; /* how spread out button labels read */
+  --btn-pad-y:               0.95em; /* button height above and below the label */
+  --btn-pad-x:                  2em; /* button width left and right of the label */
+  --btn-radius:               100px; /* corner rounding — 100px keeps them pill-shaped */
+  --btn-border-width:           1px; /* outline thickness on ghost and outline buttons */
+  --btn-gap:                  0.6em; /* space between a button label and its icon */
+  --btn-lift:                   3px; /* how far a button rises on hover */
+  --btn-press:                  1px; /* how far it settles back when clicked */
+  --btn-sm-pad-y:           0.55rem; /* height of the small referral button */
+  --btn-sm-pad-x:            1.1rem; /* width of the small referral button */
+  --btn-sm-size:            0.84rem; /* label size on the small button */
+
+  /* CARD SURFACES (shared by every card on the page) --------------- */
+  --radius:                    14px; /* corner rounding on cards and media — bigger = softer */
+  --border-width:               1px; /* thickness of card outlines */
+  --shadow-y:                  18px; /* how far a raised card's shadow drops */
+  --shadow-blur:               50px; /* how soft that shadow is */
+  --shadow-spread:            -22px; /* negative keeps the shadow under the card */
+  --shadow-sm-y:                8px; /* how far a resting card's shadow drops */
+  --shadow-sm-blur:            24px; /* how soft the resting shadow is */
+  --shadow-sm-spread:         -14px; /* negative keeps the resting shadow tight */
+  --shadow:    0 var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgba(30, 14, 70, 0.45);
+  --shadow-sm: 0 var(--shadow-sm-y) var(--shadow-sm-blur) var(--shadow-sm-spread) rgba(30, 14, 70, 0.4);
+
+  /* TRUST STRIP --------------------------------------------------- */
+  --trust-pad-y:             1.4rem; /* height of the purple credentials bar */
+  --trust-gap-x:            2.75rem; /* space between credentials across the bar */
+  --trust-gap-y:               1rem; /* space between credential rows when they wrap */
+  --trust-item-gap:         0.15rem; /* gap between a credential name and its note */
+  --trust-name-size:         1.3rem; /* "CLIA", "ASTA" — the bold names */
+  --trust-name-tracking:     0.05em; /* letter spacing on those names */
+  --trust-note-size:        0.78rem; /* the small line under each name */
+
+  /* SERVICE CARDS (the five "what I plan" tiles) ------------------- */
+  --service-min:              280px; /* narrowest a service card gets before wrapping */
+  --service-pair-min:         320px; /* same, for the wider two-card row */
+  --service-gap:             1.5rem; /* space between service cards */
+  --service-row-gap:         1.5rem; /* space between the three-card and two-card rows */
+  --service-image-ratio:     3 / 2; /* shape of the card photo — bigger = shorter */
+  --service-pad-top:         1.4rem; /* space above the card title */
+  --service-pad-x:           1.5rem; /* left/right padding inside a service card */
+  --service-pad-bottom:      1.5rem; /* space below the card link */
+  --service-body-gap:       0.55rem; /* space between title, text and link */
+  --service-title-size:     1.35rem; /* service card title size */
+  --service-title-tracking: 0.035em; /* letter spacing on card titles */
+  --service-text-size:      0.94rem; /* service card paragraph size */
+  --service-arrow-gap:       0.5rem; /* space above the "Plan a cruise →" link */
+  --service-arrow-size:      0.9rem; /* size of that link */
+  --service-arrow-tracking:  0.02em; /* letter spacing on that link */
+  --service-arrow-nudge:    0.25rem; /* how far the arrow slides on hover */
+  --service-lift:               4px; /* how far a service card rises on hover */
+
+  /* FEATURE CARDS (the three "a booking site can't do" cards) ------ */
+  --card-min:                 240px; /* narrowest a feature card gets before wrapping */
+  --card-gap:                1.5rem; /* space between feature cards, both directions */
+  --card-pad-y:              2.2rem; /* top/bottom padding inside a feature card */
+  --card-pad-x:              1.8rem; /* left/right padding inside a feature card */
+  --card-lift:                  6px; /* how far a feature card rises on hover */
+  --card-icon-size:            54px; /* size of the icon tile */
+  --card-icon-radius:          14px; /* corner rounding on the icon tile */
+  --card-icon-gap:           1.2rem; /* space under the icon tile */
+  --card-icon-glyph:           26px; /* size of the drawn icon inside that tile */
+  --card-title-size:        1.35rem; /* feature card title size */
+  --card-title-tracking:    0.035em; /* letter spacing on feature card titles */
+  --card-title-gap:          0.4rem; /* space under a feature card title */
+  --card-text-size:         0.98rem; /* feature card paragraph size */
+
+  /* PROCESS STEPS ------------------------------------------------- */
+  --process-min:              220px; /* narrowest a step gets before wrapping */
+  --process-detailed-min:     280px; /* same, on the longer How I Work version */
+  --process-gap:             1.5rem; /* space between the four steps */
+  --process-number-size:     2.3rem; /* diameter of the numbered circle */
+  --process-number-text:    1.05rem; /* size of the digit inside it */
+  --process-step-gap:        3.1rem; /* space the circle reserves above each step */
+  --process-title-gap:       0.4rem; /* space under a step title */
+  --process-title-size:     1.35rem; /* step title size */
+  --process-title-tracking: 0.035em; /* letter spacing on step titles */
+  --process-text-size:      0.94rem; /* step paragraph size */
+
+  /* PORTRAIT SPLIT (meet your advisor) ----------------------------- */
+  --split-gap-min:             2rem; /* space between portrait and text on a phone */
+  --split-gap-base:            1rem; /* fixed part of the in-between gap */
+  --split-gap-vw:               4vw; /* how fast that gap grows with the window */
+  --split-gap-max:             5rem; /* that gap once the window is wide */
+  --split-media-ratio:       4 / 5; /* shape of a split image — bigger = shorter */
+  --split-media-ratio-tall:  3 / 4; /* shape when the image is marked tall */
+  --split-portrait-pad:      0.5rem; /* breathing room above and below the headshot */
+  --split-portrait-ratio:    1 / 1; /* shape of the headshot's box — bigger = shorter */
+
+  /* QUOTES -------------------------------------------------------- */
+  --quote-min:                280px; /* narrowest a quote card gets before wrapping */
+  --quote-gap:               1.6rem; /* space between quote cards */
+  --quote-pad-top:           2.4rem; /* space above the stars, under the quote mark */
+  --quote-pad-x:               2rem; /* left/right padding inside a quote card */
+  --quote-pad-bottom:          2rem; /* space under the traveler's name */
+  --quote-mark-size:         4.5rem; /* size of the decorative opening quote */
+  --quote-mark-leading:         0.5; /* how far that mark sits into the card */
+  --quote-mark-top:          1.2rem; /* how far the mark sits from the card top */
+  --quote-mark-left:         1.3rem; /* how far the mark sits from the card edge */
+  --quote-text-size:         1.3rem; /* the quoted sentence */
+  --quote-text-leading:        1.35; /* line spacing in the quote — bigger = looser */
+  --quote-text-gap-top:      1.3rem; /* space between the stars and the quote */
+  --quote-text-gap-bottom:   1.4rem; /* space between the quote and the name */
+  --quote-stars-tracking:    0.15em; /* how spread out the five stars read */
+  --quote-stars-gap:         0.4rem; /* space under the stars */
+  --quote-cite-size:        0.82rem; /* the traveler's name */
+  --quote-cite-tracking:      0.1em; /* letter spacing on that name */
+
+  /* CTA BAND ------------------------------------------------------ */
+  --cta-pad-min:               4rem; /* vertical air in the closing band on a phone */
+  --cta-pad-base:              3rem; /* fixed part of the in-between band air */
+  --cta-pad-vw:                 5vw; /* how fast the band's air grows */
+  --cta-pad-max:             6.5rem; /* the band's air once the window is wide */
+  --cta-pad-x:                 1rem; /* side air inside the band */
+  --cta-title-gap:            0.4em; /* space under "Ready when you are" */
+  --cta-text-width:           560px; /* how wide the band's paragraph gets */
+  --cta-text-gap:              2rem; /* space between that paragraph and the buttons */
+  --cta-actions-gap:        0.75rem; /* space between the two band buttons */
+  --cta-direct-gap:         1.25rem; /* space above the email and phone line */
+  --cta-direct-size:        0.92rem; /* size of that email and phone line */
+  --cta-direct-underline:       3px; /* drop from those links to their underline */
+  --cta-direct-dot-space:    0.5rem; /* air either side of the dot separator */
+
+  /* REFERRAL BAND ------------------------------------------------- */
+  --referral-pad-y:          1.1rem; /* height of the bottom referral bar */
+  --referral-gap:           1.25rem; /* space between its sentence and its button */
+  --referral-text-size:     0.96rem; /* size of that sentence */
+
+  /* FOOTER -------------------------------------------------------- */
+  --footer-pad-top:            4rem; /* space above the footer columns */
+  --footer-pad-bottom:         2rem; /* space under the fine print */
+  --footer-size:            0.92rem; /* footer text size */
+  --footer-grid-gap:         2.5rem; /* space between footer columns */
+  --footer-grid-gap-bottom:  2.5rem; /* space under the columns, above the fine print */
+  --footer-brand-gap:          1rem; /* space under the footer wordmark */
+  --footer-head-size:       0.74rem; /* the column headings */
+  --footer-head-tracking:     0.2em; /* how spread out those headings read */
+  --footer-head-gap:           1rem; /* space under a column heading */
+  --footer-link-gap:        0.55rem; /* space between footer links */
+  --social-size:               40px; /* diameter of a social icon button */
+  --social-gap:              0.8rem; /* space between social buttons */
+  --social-row-gap:          0.4rem; /* space above the row of social buttons */
+  --footer-licence-tracking: 0.04em; /* letter spacing on the licence numbers */
+  --social-glyph:              18px; /* size of the drawn icon inside them */
+  --social-lift:                3px; /* how far a social button rises on hover */
+  --footer-rule-width:          1px; /* thickness of the line above the fine print */
+  --footer-bottom-pad:       1.6rem; /* space between that line and the fine print */
+  --footer-bottom-gap-y:     0.8rem; /* space between fine-print rows when they wrap */
+  --footer-bottom-gap-x:     1.5rem; /* space between fine-print items across */
+  --footer-bottom-size:      0.8rem; /* fine-print size */
+  --footer-underline-offset:    2px; /* drop from a fine-print link to its underline */
+
+  /* FOCUS AND SKIP LINK ------------------------------------------- */
+  --focus-ring-width:           2px; /* thickness of the keyboard focus outline */
+  --focus-ring-offset:          2px; /* gap between the element and that outline */
+  --skip-pad-y:             0.75rem; /* height of the skip-to-content chip */
+  --skip-pad-x:             1.25rem; /* width of the skip-to-content chip */
+
+  /* MOTION -------------------------------------------------------- */
+  --hover-fast:               0.25s; /* quickest hover fades — arrows, small hints */
+  --nav-underline-ms:         0.35s; /* how fast a nav link's underline sweeps across */
+  --hover-ms:                  0.3s; /* standard colour fade on hover */
+  --lift-ms:                   0.4s; /* how long a button or the nav takes to move */
+  --card-hover-ms:            0.35s; /* how long a service card takes to rise */
+  --feature-hover-ms:         0.45s; /* how long a feature card takes to rise */
+  --reveal-ms:                 0.8s; /* how long a section takes to fade in on scroll */
+  --reveal-rise:               28px; /* how far it travels up while fading in */
+  --reveal-step:              0.08s; /* stagger between cards in the same row */
+  --reveal-trigger:            0.12; /* how much of a section shows before it fades in */
+  --reveal-margin:            -40px; /* extra scroll past the fold before that starts */
+  --header-scrolled-at:        40px; /* how far you scroll before the nav pill tightens */
+
+  /* MOBILE MENU (dropdown under the nav pill) ---------------------- */
+  --menu-offset:            0.45rem; /* gap between the nav pill and the open menu */
+  --menu-radius:               18px; /* corner rounding on the menu panel */
+  --menu-pad-top:            0.9rem; /* space above the first menu item */
+  --menu-pad-x:              1.2rem; /* side padding inside the menu */
+  --menu-pad-bottom:         1.1rem; /* space under the last menu item */
+  --menu-item-gap:          0.15rem; /* space between menu items */
+  --menu-link-pad-y:         0.7rem; /* height of each menu row */
+  --menu-link-size:          0.9rem; /* menu link size */
+  --menu-rise:                 10px; /* how far the menu drops in when opening */
+  --menu-shadow-y:             24px; /* how far the menu's shadow falls */
+  --menu-shadow-blur:          48px; /* how soft that shadow is */
+  --menu-shadow-spread:       -20px; /* negative keeps it under the panel */
+  --menu-cta-gap:            0.9rem; /* space above the CTA inside the menu panel */
+  --menu-cta-gap-top:        0.6rem; /* space between the last link and that CTA */
+
+  /* PHONE-ONLY KNOBS (the rest are re-set inside the breakpoints) -- */
+  --process-indent:          3.2rem; /* how far step text sits right of its number on phones */
+  --process-number-rise:   -0.15rem; /* fine vertical nudge of that number on phones */
+
+  /* BREAKPOINTS — the numbers are repeated in the @media conditions
+     further down, because @media cannot read a custom property.
+     Change both. ------------------------------------------------- */
+  --bp-nav-tight:            1180px; /* width where the nav starts packing tighter */
+  --bp-desktop:               900px; /* width where the portrait split stacks */
+  --bp-mobile:                720px; /* width where the nav becomes a dropdown menu */
+  --bp-phone-narrow:          400px; /* width below which the wordmark drops its sub-line */
+  --bp-short:                 900px; /* window HEIGHT below which the scroll cue hides */
 }
 
 /* ----------------------------- Reset ---------------------------- */
@@ -73,8 +415,8 @@ body {
   font-weight: 300;
   color: var(--ink);
   background: var(--paper);
-  line-height: 1.65;
-  font-size: clamp(1rem, 0.96rem + 0.2vw, 1.075rem);
+  line-height: var(--body-leading);
+  font-size: clamp(var(--body-size-min), var(--body-size-base) + var(--body-size-vw), var(--body-size-max));
   overflow-x: hidden;
 }
 
@@ -82,15 +424,11 @@ img { max-width: 100%; display: block; }
 
 a { color: inherit; text-decoration: none; }
 
-h1, h2, h3, h4 {
-  font-family: var(--serif);
-  font-weight: 600;
-  line-height: 1.12;
-  margin: 0 0 0.5em;
-  letter-spacing: 0.01em;
-}
+/* Face, weight, leading and tracking for headings are set once in the brand
+   typography block further down — this rule only owns the space beneath. */
+h1, h2, h3, h4 { margin: 0 0 var(--heading-gap); }
 
-p { margin: 0 0 1.1em; }
+p { margin: 0 0 var(--para-gap); }
 
 .script { font-family: var(--script); font-weight: 400; }
 
@@ -98,10 +436,9 @@ p { margin: 0 0 1.1em; }
   font-family: var(--sans);
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.32em;
-  font-size: 0.72rem;
+  font-size: var(--eyebrow-size);
   color: var(--lagoon);
-  margin: 0 0 1rem;
+  margin: 0 0 var(--eyebrow-gap);
   display: inline-block;
 }
 
@@ -109,7 +446,7 @@ p { margin: 0 0 1.1em; }
   width: 100%;
   max-width: var(--maxw);
   margin-inline: auto;
-  padding-inline: clamp(1.25rem, 5vw, 3rem);
+  padding-inline: clamp(var(--page-pad-min), var(--page-pad-vw), var(--page-pad-max));
 }
 
 .center { text-align: center; }
@@ -120,23 +457,22 @@ p { margin: 0 0 1.1em; }
   --btn-fg: #fff;
   display: inline-flex;
   align-items: center;
-  gap: 0.6em;
+  gap: var(--btn-gap);
   font-family: var(--sans);
   font-weight: 500;
-  letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-size: 0.78rem;
-  padding: 0.95em 2em;
-  border: 1px solid transparent;
-  border-radius: 100px;
+  font-size: var(--btn-size);
+  padding: var(--btn-pad-y) var(--btn-pad-x);
+  border: var(--btn-border-width) solid transparent;
+  border-radius: var(--btn-radius);
   background: var(--btn-bg);
   color: var(--btn-fg);
   cursor: pointer;
-  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease),
-    background 0.3s ease, color 0.3s ease;
+  transition: transform var(--lift-ms) var(--ease), box-shadow var(--lift-ms) var(--ease),
+    background var(--hover-ms) ease, color var(--hover-ms) ease;
 }
-.btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
-.btn:active { transform: translateY(-1px); }
+.btn:hover { transform: translateY(calc(-1 * var(--btn-lift))); box-shadow: var(--shadow-sm); }
+.btn:active { transform: translateY(calc(-1 * var(--btn-press))); }
 
 .btn--gold { --btn-bg: linear-gradient(135deg, var(--sand), var(--gold)); --btn-fg: #ffffff; }
 .btn--ghost {
@@ -156,7 +492,7 @@ p { margin: 0 0 1.1em; }
 /* Floating "liquid glass" nav bar — always frosted so it reads on any background */
 .site-header {
   position: fixed;
-  top: 0.85rem;
+  top: var(--header-top);
   /* Centred with auto margins rather than left:50% + translateX(-50%): a
      transform would make this header the containing block for its own
      position:fixed children, which collapses the mobile slide-in menu to the
@@ -165,65 +501,56 @@ p { margin: 0 0 1.1em; }
   right: 0;
   margin-inline: auto;
   z-index: 60;
-  width: min(var(--maxw), calc(100% - 1.6rem));
-  border-radius: 22px;
+  width: min(var(--maxw), calc(100% - var(--header-side-inset)));
+  border-radius: var(--header-radius);
   background: rgba(255, 255, 255, 0.42);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  -webkit-backdrop-filter: blur(var(--header-blur)) saturate(var(--header-saturate));
+  backdrop-filter: blur(var(--header-blur)) saturate(var(--header-saturate));
+  border: var(--header-border-width) solid rgba(255, 255, 255, 0.45);
   box-shadow:
-    0 12px 36px -16px rgba(52, 25, 122, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.12);
-  transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease),
-    top 0.4s var(--ease), border-color 0.4s var(--ease);
+    0 var(--header-shadow-y) var(--header-shadow-blur) var(--header-shadow-spread) rgba(52, 25, 122, 0.45),
+    inset 0 var(--header-highlight-width) 0 rgba(255, 255, 255, 0.6),
+    inset 0 calc(-1 * var(--header-highlight-width)) 0 rgba(255, 255, 255, 0.12);
+  transition: background var(--lift-ms) var(--ease), box-shadow var(--lift-ms) var(--ease),
+    top var(--lift-ms) var(--ease), border-color var(--lift-ms) var(--ease);
 }
 .site-header.is-scrolled {
-  top: 0.6rem;
+  top: var(--header-top-scrolled);
   background: rgba(255, 255, 255, 0.66);
   border-color: rgba(255, 255, 255, 0.6);
   box-shadow:
-    0 14px 32px -14px rgba(52, 25, 122, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    0 var(--header-shadow-y-scrolled) var(--header-shadow-blur-scrolled) var(--header-shadow-spread-scrolled) rgba(52, 25, 122, 0.5),
+    inset 0 var(--header-highlight-width) 0 rgba(255, 255, 255, 0.7);
 }
 .nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: var(--nav-gap);
   max-width: none;
   margin: 0;
-  padding: 0.42rem 0.5rem 0.42rem 1.2rem;
+  padding: var(--nav-pad-y) var(--nav-pad-right) var(--nav-pad-y) var(--nav-pad-left);
 }
+/* Gap, wordmark size and tracking are set once in the brand lockup block
+   further down; the size here is the box the lockup's tracking measures against. */
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  font-size: var(--brand-lockup-size);
   font-family: var(--serif);
-  font-weight: 700;
-  font-size: 1.15rem;
-  letter-spacing: 0.02em;
   color: var(--ink);
-  transition: color 0.4s ease;
+  transition: color var(--lift-ms) ease;
 }
-.brand .mark {
-  width: 38px; height: 38px;
-  display: grid; place-items: center;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--aqua), var(--lagoon));
-  color: #fff; flex: none;
-  box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.35);
-}
-.brand .mark svg { width: 20px; height: 20px; }
+/* Box, size and art are set once in the brand lockup block further down. */
+.brand .mark { flex: none; color: #fff; }
 .brand small {
   display: block;
   font-family: var(--sans);
   font-weight: 400;
-  font-size: 0.58rem;
-  letter-spacing: 0.34em;
+  font-size: var(--brand-sub-size);
   text-transform: uppercase;
   opacity: 0.85;
-  margin-top: 2px;
+  margin-top: var(--brand-sub-gap);
 }
 .is-scrolled .brand,
 .inner-page .brand { color: var(--ink); }
@@ -231,26 +558,26 @@ p { margin: 0 0 1.1em; }
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 1.9rem;
+  gap: var(--nav-link-gap);
   list-style: none;
   margin: 0; padding: 0;
 }
 .nav-links a {
   font-weight: 400;
-  font-size: 0.82rem;
-  letter-spacing: 0.16em;
+  font-size: var(--nav-link-size);
+  letter-spacing: var(--nav-link-tracking);
   text-transform: uppercase;
   color: var(--ink);
   position: relative;
-  padding-bottom: 3px;
-  transition: color 0.3s ease;
+  padding-bottom: var(--nav-underline-gap);
+  transition: color var(--hover-ms) ease;
 }
+/* Colour and thickness of the underline are set in the brand block below. */
 .nav-links a::after {
   content: "";
   position: absolute; left: 0; bottom: 0;
-  width: 0; height: 1.5px;
-  background: var(--sand);
-  transition: width 0.35s var(--ease);
+  width: 0;
+  transition: width var(--nav-underline-ms) var(--ease);
 }
 .nav-links a:hover::after,
 .nav-links a.active::after { width: 100%; }
@@ -258,36 +585,36 @@ p { margin: 0 0 1.1em; }
 .inner-page .nav-links a { color: var(--ink); }
 .nav-links a.active { color: var(--lagoon); }
 
-.nav-cta { display: flex; align-items: center; gap: 1rem; }
+.nav-cta { display: flex; align-items: center; gap: var(--nav-cta-gap); }
 
 .nav-toggle {
   display: none;
   background: none; border: 0; cursor: pointer;
-  width: 30px; height: 24px; position: relative;
+  width: var(--nav-toggle-width); height: var(--nav-toggle-height); position: relative;
 }
 .nav-toggle span {
-  position: absolute; left: 0; height: 2px; width: 100%;
-  background: var(--ink); border-radius: 2px; transition: 0.3s var(--ease);
+  position: absolute; left: 0; height: var(--nav-toggle-bar); width: 100%;
+  background: var(--ink); border-radius: var(--nav-toggle-bar); transition: var(--hover-ms) var(--ease);
 }
 .is-scrolled .nav-toggle span,
 .inner-page .nav-toggle span { background: var(--ink); }
-.nav-toggle span:nth-child(1) { top: 2px; }
-.nav-toggle span:nth-child(2) { top: 11px; }
-.nav-toggle span:nth-child(3) { top: 20px; }
-body.nav-open .nav-toggle span:nth-child(1) { top: 11px; transform: rotate(45deg); }
+.nav-toggle span:nth-child(1) { top: var(--nav-toggle-bar-top); }
+.nav-toggle span:nth-child(2) { top: var(--nav-toggle-bar-mid); }
+.nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-bottom); }
+body.nav-open .nav-toggle span:nth-child(1) { top: var(--nav-toggle-bar-mid); transform: rotate(45deg); }
 body.nav-open .nav-toggle span:nth-child(2) { opacity: 0; }
-body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45deg); }
+body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); transform: rotate(-45deg); }
 
 /* --------------------------- Hero ------------------------------- */
 .hero {
   position: relative;
-  min-height: 100svh;
+  min-height: var(--hero-min-height);
   display: grid;
   place-items: center;
   text-align: center;
   color: #fff;
   isolation: isolate;
-  padding: 7rem 1rem 4rem;
+  padding: var(--hero-pad-top) var(--hero-pad-x) var(--hero-pad-bottom);
 }
 .hero__bg {
   position: absolute; inset: 0; z-index: -2;
@@ -303,46 +630,57 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
     linear-gradient(180deg, rgba(30, 14, 70,0.5), rgba(30, 14, 70,0.3) 40%, rgba(30, 14, 70,0.72)),
     var(--hero-img);
 }
-.hero__inner { max-width: 860px; }
+.hero__inner { max-width: var(--hero-width); }
 .hero .tagline {
   font-family: var(--sans);
   font-weight: 300;
-  letter-spacing: 0.3em;
+  letter-spacing: var(--hero-tagline-tracking);
   text-transform: uppercase;
-  font-size: clamp(0.7rem, 0.6rem + 0.4vw, 0.9rem);
-  margin-bottom: 1.4rem;
+  font-size: clamp(var(--hero-tagline-size-min),
+                   var(--hero-tagline-size-base) + var(--hero-tagline-size-vw),
+                   var(--hero-tagline-size-max));
+  margin-bottom: var(--hero-tagline-gap);
   opacity: 0.95;
 }
+/* Bebas Neue plus the script line makes this headline tall. The sizes below are
+   the only ones that apply to it — trimming them is what keeps the CTAs clear of
+   the scroll cue on a 13" laptop. */
 .hero h1 {
-  font-size: clamp(2.6rem, 1.6rem + 5vw, 5.4rem);
-  margin-bottom: 0.3em;
-  text-shadow: 0 2px 30px rgba(0,0,0,0.3);
+  font-size: clamp(var(--hero-title-size-min),
+                   var(--hero-title-size-base) + var(--hero-title-size-vw),
+                   var(--hero-title-size-max));
+  margin-bottom: var(--hero-title-gap);
+  text-shadow: 0 var(--hero-title-shadow-y) var(--hero-title-shadow-blur) rgba(0,0,0,0.3);
 }
 .hero h1 .script {
   display: block;
-  font-size: clamp(3.4rem, 2rem + 8vw, 7rem);
+  font-size: clamp(var(--hero-script-size-min),
+                   var(--hero-script-size-base) + var(--hero-script-size-vw),
+                   var(--hero-script-size-max));
   color: var(--aqua-soft);
-  line-height: 0.9;
-  margin-top: 0.1em;
+  line-height: var(--hero-script-leading);
+  margin-top: var(--hero-script-gap);
 }
 .hero p.lede {
-  font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+  font-size: clamp(var(--hero-lede-size-min),
+                   var(--hero-lede-size-base) + var(--hero-lede-size-vw),
+                   var(--hero-lede-size-max));
   font-weight: 300;
-  max-width: 620px;
-  margin: 0 auto 2.2rem;
+  max-width: var(--hero-lede-width);
+  margin: 0 auto var(--hero-lede-gap);
   color: rgba(255,255,255,0.92);
 }
-.hero__actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.hero__actions { display: flex; gap: var(--hero-actions-gap); justify-content: center; flex-wrap: wrap; }
 
 .scroll-cue {
-  position: absolute; bottom: 1.8rem; left: 50%; transform: translateX(-50%);
-  font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
-  opacity: 0.8; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  position: absolute; bottom: var(--cue-bottom); left: 50%; transform: translateX(-50%);
+  font-size: var(--cue-size); letter-spacing: var(--cue-tracking); text-transform: uppercase;
+  opacity: 0.8; display: flex; flex-direction: column; align-items: center; gap: var(--cue-gap);
 }
 .scroll-cue::after {
-  content: ""; width: 1px; height: 38px;
+  content: ""; width: var(--cue-line-width); height: var(--cue-line-height);
   background: linear-gradient(rgba(255,255,255,0.9), transparent);
-  animation: cue 2.2s var(--ease) infinite;
+  animation: cue var(--cue-cycle) var(--ease) infinite;
 }
 @keyframes cue { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1);} 100% { transform: scaleY(0); transform-origin: bottom; } }
 
@@ -366,60 +704,63 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 .page-hero .eyebrow { color: var(--aqua-soft); }
 
 /* ---------------------------- Sections -------------------------- */
-.section { padding: clamp(4rem, 3rem + 6vw, 7.5rem) 0; }
+.section { padding: clamp(var(--section-pad-min), var(--section-pad-base) + var(--section-pad-vw), var(--section-pad-max)) 0; }
 .section--cream { background: var(--cream); }
 .section--navy { background: var(--navy); color: #fff; }
 .section--navy .eyebrow { color: var(--aqua); }
 .section--navy .muted { color: rgba(255,255,255,0.7); }
 
-.section-head { max-width: 680px; margin: 0 auto 3.2rem; text-align: center; }
-.section-head h2 { font-size: clamp(1.9rem, 1.4rem + 2.4vw, 3rem); }
-.section-head p { color: var(--muted); font-size: 1.08rem; }
+.section-head { max-width: var(--section-head-width); margin: 0 auto var(--section-head-gap); text-align: center; }
+/* Section heading sizes are set once in the brand typography block below. */
+.section-head p { color: var(--muted); font-size: var(--section-lede-size); }
 .section--navy .section-head p { color: rgba(255,255,255,0.78); }
 
 .muted { color: var(--muted); }
+
+/* The button that closes a section — "Read more reviews", "Fees, process…". */
+.section-cta { margin-top: var(--section-cta-gap); }
 
 /* Split / intro layout */
 .split {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(2rem, 1rem + 4vw, 5rem);
+  gap: clamp(var(--split-gap-min), var(--split-gap-base) + var(--split-gap-vw), var(--split-gap-max));
   align-items: center;
 }
 .split__media {
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow);
-  aspect-ratio: 4 / 5;
+  aspect-ratio: var(--split-media-ratio);
   background: var(--aqua-soft) var(--media-img) center/cover no-repeat;
   position: relative;
 }
-.split__media.tall { aspect-ratio: 3 / 4; }
-.split h2 { font-size: clamp(1.8rem, 1.4rem + 2vw, 2.8rem); }
+.split__media.tall { aspect-ratio: var(--split-media-ratio-tall); }
 
 /* ------------------------- Feature cards ------------------------ */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(var(--card-min), 1fr));
+  gap: var(--card-gap);
 }
 .card {
   background: var(--paper);
-  border: 1px solid var(--line);
+  border: var(--border-width) solid var(--line);
   border-radius: var(--radius);
-  padding: 2.2rem 1.8rem;
-  transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease);
+  padding: var(--card-pad-y) var(--card-pad-x);
+  transition: transform var(--feature-hover-ms) var(--ease), box-shadow var(--feature-hover-ms) var(--ease);
 }
-.card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+.card:hover { transform: translateY(calc(-1 * var(--card-lift))); box-shadow: var(--shadow); }
 .card .icon {
-  width: 54px; height: 54px; border-radius: 14px;
-  display: grid; place-items: center; margin-bottom: 1.2rem;
+  width: var(--card-icon-size); height: var(--card-icon-size); border-radius: var(--card-icon-radius);
+  display: grid; place-items: center; margin-bottom: var(--card-icon-gap);
   background: linear-gradient(135deg, var(--aqua-soft), var(--blush));
   color: var(--lagoon);
 }
-.card .icon svg { width: 26px; height: 26px; }
-.card h3 { font-size: 1.3rem; margin-bottom: 0.4rem; }
-.card p { color: var(--muted); margin: 0; font-size: 0.98rem; }
+.card .icon svg { width: var(--card-icon-glyph); height: var(--card-icon-glyph); }
+/* Card title size is set once in the brand typography block below. */
+.card h3 { margin-bottom: var(--card-title-gap); }
+.card p { color: var(--muted); margin: 0; font-size: var(--card-text-size); }
 .section--navy .card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.12); }
 .section--navy .card p { color: rgba(255,255,255,0.72); }
 .section--navy .card .icon { background: rgba(118, 239, 225,0.18); color: var(--aqua); }
@@ -440,40 +781,40 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 /* --------------------------- Testimonials ----------------------- */
 .quotes {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(var(--quote-min), 1fr));
+  gap: var(--quote-gap);
 }
 .quote {
   background: var(--paper);
   border-radius: var(--radius);
-  padding: 2.4rem 2rem 2rem;
+  padding: var(--quote-pad-top) var(--quote-pad-x) var(--quote-pad-bottom);
   box-shadow: var(--shadow-sm);
-  border: 1px solid var(--line);
+  border: var(--border-width) solid var(--line);
   position: relative;
 }
 .quote::before {
   content: "\201C";
   font-family: var(--serif);
-  font-size: 4.5rem;
-  line-height: 0.5;
+  font-size: var(--quote-mark-size);
+  line-height: var(--quote-mark-leading);
   color: var(--aqua-soft);
-  position: absolute; top: 1.2rem; left: 1.3rem;
+  position: absolute; top: var(--quote-mark-top); left: var(--quote-mark-left);
 }
 .quote blockquote {
-  margin: 1.3rem 0 1.4rem;
+  margin: var(--quote-text-gap-top) 0 var(--quote-text-gap-bottom);
   font-family: var(--serif);
-  font-size: 1.3rem;
+  font-size: var(--quote-text-size);
   font-weight: 500;
-  line-height: 1.35;
+  line-height: var(--quote-text-leading);
   color: var(--deep-sea);
 }
-.quote .stars { color: var(--sand); letter-spacing: 0.15em; margin-bottom: 0.4rem; }
+.quote .stars { color: var(--sand); letter-spacing: var(--quote-stars-tracking); margin-bottom: var(--quote-stars-gap); }
 .quote cite {
   font-style: normal;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--quote-cite-tracking);
   text-transform: uppercase;
-  font-size: 0.82rem;
+  font-size: var(--quote-cite-size);
   color: var(--lagoon);
 }
 
@@ -518,7 +859,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
   position: relative;
   text-align: center;
   color: #fff;
-  padding: clamp(4rem, 3rem + 5vw, 6.5rem) 1rem;
+  padding: clamp(var(--cta-pad-min), var(--cta-pad-base) + var(--cta-pad-vw), var(--cta-pad-max)) var(--cta-pad-x);
   isolation: isolate;
 }
 .cta-band__bg {
@@ -528,52 +869,53 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
     var(--cta-img, none), var(--lagoon);
   background-size: cover; background-position: center;
 }
-.cta-band h2 { font-size: clamp(2rem, 1.5rem + 2.6vw, 3.2rem); margin-bottom: 0.4em; }
-.cta-band p { max-width: 560px; margin: 0 auto 2rem; opacity: 0.92; }
+/* The band's heading size is set once in the brand typography block below. */
+.cta-band h2 { margin-bottom: var(--cta-title-gap); }
+.cta-band p { max-width: var(--cta-text-width); margin: 0 auto var(--cta-text-gap); opacity: 0.92; }
 
 /* ---------------------------- Footer ---------------------------- */
 .site-footer {
   background: var(--navy);
   color: rgba(255,255,255,0.8);
-  padding: 4rem 0 2rem;
-  font-size: 0.92rem;
+  padding: var(--footer-pad-top) 0 var(--footer-pad-bottom);
+  font-size: var(--footer-size);
 }
 .footer-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr 1fr;
-  gap: 2.5rem;
-  margin-bottom: 2.5rem;
+  gap: var(--footer-grid-gap);
+  margin-bottom: var(--footer-grid-gap-bottom);
 }
-.site-footer .brand { color: #fff; margin-bottom: 1rem; }
+.site-footer .brand { color: #fff; margin-bottom: var(--footer-brand-gap); }
 .site-footer h4 {
   font-family: var(--sans);
   text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 0.74rem;
+  letter-spacing: var(--footer-head-tracking);
+  font-size: var(--footer-head-size);
   color: var(--aqua);
-  margin-bottom: 1rem;
+  margin-bottom: var(--footer-head-gap);
   font-weight: 500;
 }
-.footer-links { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.55rem; }
+.footer-links { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--footer-link-gap); }
 .footer-links a:hover { color: var(--aqua); }
-.socials { display: flex; gap: 0.8rem; margin-top: 0.4rem; }
+.socials { display: flex; gap: var(--social-gap); margin-top: var(--social-row-gap); }
 .socials a {
-  width: 40px; height: 40px; border-radius: 50%;
+  width: var(--social-size); height: var(--social-size); border-radius: 50%;
   display: grid; place-items: center;
-  border: 1px solid rgba(255,255,255,0.2);
-  transition: 0.3s var(--ease);
+  border: var(--border-width) solid rgba(255,255,255,0.2);
+  transition: var(--hover-ms) var(--ease);
 }
-.socials a:hover { background: var(--aqua); border-color: var(--aqua); color: var(--navy); transform: translateY(-3px); }
-.socials svg { width: 18px; height: 18px; }
+.socials a:hover { background: var(--aqua); border-color: var(--aqua); color: var(--navy); transform: translateY(calc(-1 * var(--social-lift))); }
+.socials svg { width: var(--social-glyph); height: var(--social-glyph); }
 .footer-bottom {
-  border-top: 1px solid rgba(255,255,255,0.12);
-  padding-top: 1.6rem;
-  display: flex; flex-wrap: wrap; gap: 0.8rem 1.5rem;
+  border-top: var(--footer-rule-width) solid rgba(255,255,255,0.12);
+  padding-top: var(--footer-bottom-pad);
+  display: flex; flex-wrap: wrap; gap: var(--footer-bottom-gap-y) var(--footer-bottom-gap-x);
   justify-content: space-between; align-items: center;
-  font-size: 0.8rem; color: rgba(255,255,255,0.6);
+  font-size: var(--footer-bottom-size); color: rgba(255,255,255,0.6);
 }
-.licenses { letter-spacing: 0.04em; }
-.footer-bottom a { color: rgba(255,255,255,0.82); text-decoration: underline; text-underline-offset: 2px; }
+.licenses { letter-spacing: var(--footer-licence-tracking); }
+.footer-bottom a { color: rgba(255,255,255,0.82); text-decoration: underline; text-underline-offset: var(--footer-underline-offset); }
 .footer-bottom a:hover { color: var(--aqua); }
 
 /* ------------------------- Legal / prose ----------------------- */
@@ -675,11 +1017,11 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 }
 
 /* --------------------------- Reveal anim ------------------------ */
-.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s var(--ease), transform 0.8s var(--ease); }
+.reveal { opacity: 0; transform: translateY(var(--reveal-rise)); transition: opacity var(--reveal-ms) var(--ease), transform var(--reveal-ms) var(--ease); }
 .reveal.in { opacity: 1; transform: none; }
-.reveal.d1 { transition-delay: 0.08s; }
-.reveal.d2 { transition-delay: 0.16s; }
-.reveal.d3 { transition-delay: 0.24s; }
+.reveal.d1 { transition-delay: var(--reveal-step); }                    /* one stagger step */
+.reveal.d2 { transition-delay: calc(var(--reveal-step) * 2); }          /* two steps behind */
+.reveal.d3 { transition-delay: calc(var(--reveal-step) * 3); }          /* three steps behind */
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
   html { scroll-behavior: auto; }
@@ -687,30 +1029,23 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 }
 
 /* ---------------------------- Responsive ------------------------ */
-@media (max-width: 900px) {
+@media (max-width: 900px) { /* --bp-desktop */
+  :root {
+    --split-media-ratio:   16 / 11; /* the portrait goes landscape once it stacks */
+  }
   .split { grid-template-columns: 1fr; }
-  .split__media { aspect-ratio: 16 / 11; order: -1; }
+  .split__media { order: -1; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
-@media (max-width: 720px) {
-  .nav-toggle { display: block; }
-  .nav-links {
-    position: fixed; inset: 0 0 0 auto;
-    width: min(78vw, 320px);
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 1.6rem;
-    background: var(--paper);
-    padding: 2rem 2.2rem;
-    box-shadow: -10px 0 40px -20px rgba(0,0,0,0.5);
-    transform: translateX(100%);
-    transition: transform 0.4s var(--ease);
+@media (max-width: 720px) { /* --bp-mobile */
+  :root {
+    --footer-grid-gap:      1.8rem; /* space between footer columns once they stack */
   }
-  body.nav-open .nav-links { transform: none; }
-  .nav-links a { color: var(--ink); font-size: 1rem; }
+  .nav-toggle { display: block; }
+  /* The open menu itself is styled in the dropdown block further down. */
+  .nav-links a { color: var(--ink); }
   .nav-cta .btn { display: none; }
-  .footer-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+  .footer-grid { grid-template-columns: 1fr; }
   .form-grid-2 { grid-template-columns: 1fr; }
 }
 
@@ -727,14 +1062,14 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
   z-index: 200;
   background: var(--paper);
   color: var(--ink);
-  padding: 0.75rem 1.25rem;
+  padding: var(--skip-pad-y) var(--skip-pad-x);
   border-radius: 0 0 var(--radius) 0;
   font-weight: 500;
 }
 .skip-link:focus {
   left: 0;
-  outline: 2px solid var(--lagoon);
-  outline-offset: 2px;
+  outline: var(--focus-ring-width) solid var(--lagoon);
+  outline-offset: var(--focus-ring-offset);
 }
 
 /* ------------------------- Narrow measure ----------------------- */
@@ -748,7 +1083,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 .trust-strip {
   background: var(--deep-sea);
   color: var(--cream);
-  padding: 1.4rem 0;
+  padding: var(--trust-pad-y) 0;
 }
 .trust-strip ul {
   list-style: none;
@@ -757,78 +1092,78 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1rem 2.75rem;
+  gap: var(--trust-gap-y) var(--trust-gap-x);
 }
 .trust-strip li {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0.15rem;
+  gap: var(--trust-item-gap);
 }
-.trust-strip strong {
-  font-family: var(--serif);
-  font-size: 1.05rem;
-  letter-spacing: 0.04em;
-  color: var(--sand);
-}
-.trust-strip span { font-size: 0.78rem; opacity: 0.85; }
+/* Face, size and tracking for the credential names are set once in the brand
+   typography block below. */
+.trust-strip strong { color: var(--sand); }
+.trust-strip span { font-size: var(--trust-note-size); opacity: 0.85; }
 
 /* ------------------------- Service cards ------------------------ */
 .service-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(var(--service-min), 1fr));
+  gap: var(--service-gap);
 }
-.service-cards--pair { margin-top: 1.5rem; }
-.service-cards--pair { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.service-cards--pair {
+  margin-top: var(--service-row-gap);
+  grid-template-columns: repeat(auto-fit, minmax(var(--service-pair-min), 1fr));
+}
 
 .service-card {
   display: flex;
   flex-direction: column;
   background: var(--paper);
-  border: 1px solid var(--line);
+  border: var(--border-width) solid var(--line);
   border-radius: var(--radius);
   overflow: hidden;
   text-decoration: none;
   color: inherit;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+  transition: transform var(--card-hover-ms) var(--ease), box-shadow var(--card-hover-ms) var(--ease);
 }
 .service-card:hover,
 .service-card:focus-visible {
-  transform: translateY(-4px);
+  transform: translateY(calc(-1 * var(--service-lift)));
   box-shadow: var(--shadow);
 }
 .service-card img {
   width: 100%;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: var(--service-image-ratio);
   object-fit: cover;
   display: block;
 }
 .service-card__body {
-  padding: 1.4rem 1.5rem 1.5rem;
+  padding: var(--service-pad-top) var(--service-pad-x) var(--service-pad-bottom);
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: var(--service-body-gap);
   flex: 1;
 }
-.service-card__body h3 { margin: 0; font-size: 1.25rem; }
-.service-card__body p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+/* Card title size is set once in the brand typography block below. */
+.service-card__body h3 { margin: 0; }
+.service-card__body p { margin: 0; color: var(--muted); font-size: var(--service-text-size); }
 .service-card .arrow {
   margin-top: auto;
-  padding-top: 0.5rem;
+  padding-top: var(--service-arrow-gap);
   color: var(--lagoon);
   font-weight: 500;
-  font-size: 0.9rem;
-  letter-spacing: 0.02em;
+  font-size: var(--service-arrow-size);
+  letter-spacing: var(--service-arrow-tracking);
 }
 .service-card .arrow::after {
   content: " →";
-  transition: margin-left 0.25s var(--ease);
+  transition: margin-left var(--hover-fast) var(--ease);
   display: inline-block;
 }
-.service-card:hover .arrow::after { margin-left: 0.25rem; }
+.service-card:hover .arrow::after { margin-left: var(--service-arrow-nudge); }
 
 /* ------------------------- Real images in split ----------------- */
 .split__media img {
@@ -845,33 +1180,34 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(var(--process-min), 1fr));
+  gap: var(--process-gap);
 }
-.process--detailed { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.process--detailed { grid-template-columns: repeat(auto-fit, minmax(var(--process-detailed-min), 1fr)); }
 .process li {
   counter-increment: step;
   position: relative;
-  padding-top: 3.1rem;
+  padding-top: var(--process-step-gap);
 }
 .process li::before {
   content: counter(step);
   position: absolute;
   top: 0;
   left: 0;
-  width: 2.3rem;
-  height: 2.3rem;
+  width: var(--process-number-size);
+  height: var(--process-number-size);
   display: grid;
   place-items: center;
   border-radius: 50%;
   background: var(--lagoon);
   color: #fff;
   font-family: var(--serif);
-  font-size: 1.05rem;
+  font-size: var(--process-number-text);
   line-height: 1;
 }
-.process h3 { margin: 0 0 0.4rem; font-size: 1.12rem; }
-.process p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+/* Step title size is set once in the brand typography block below. */
+.process h3 { margin: 0 0 var(--process-title-gap); }
+.process p { margin: 0; color: var(--muted); font-size: var(--process-text-size); }
 
 /* ------------------------- Tick lists --------------------------- */
 .tick-list { list-style: none; padding: 0; margin: 1.2rem 0; }
@@ -998,33 +1334,33 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 /* ------------------------- CTA band extras ---------------------- */
 .cta-band__actions {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--cta-actions-gap);
   flex-wrap: wrap;
   justify-content: center;
 }
 .cta-band__direct {
-  margin-top: 1.25rem;
-  font-size: 0.92rem;
+  margin-top: var(--cta-direct-gap);
+  font-size: var(--cta-direct-size);
   opacity: 0.9;
 }
-.cta-band__direct a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
-.cta-band__direct span { margin: 0 0.5rem; opacity: 0.6; }
+.cta-band__direct a { color: inherit; text-decoration: underline; text-underline-offset: var(--cta-direct-underline); }
+.cta-band__direct span { margin: 0 var(--cta-direct-dot-space); opacity: 0.6; }
 
 /* ------------------------- Referral ----------------------------- */
 .referral-banner {
   background: var(--deep-sea);
   color: var(--cream);
-  padding: 1.1rem 0;
+  padding: var(--referral-pad-y) 0;
 }
 .referral-banner .shell {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
+  gap: var(--referral-gap);
   flex-wrap: wrap;
   text-align: center;
 }
-.referral-banner p { margin: 0; font-size: 0.96rem; }
+.referral-banner p { margin: 0; font-size: var(--referral-text-size); }
 .referral-banner strong { color: var(--sand); }
 .referral-banner .btn--outline { border-color: rgba(255,255,255,0.5); color: var(--cream); }
 .referral-banner .btn--outline:hover { background: rgba(255,255,255,0.12); }
@@ -1047,7 +1383,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 .referral-action p { margin: 0; color: var(--muted); font-size: 0.94rem; flex: 1; }
 .referral-action .btn { align-self: flex-start; }
 
-.btn--sm { padding: 0.55rem 1.1rem; font-size: 0.84rem; }
+.btn--sm { padding: var(--btn-sm-pad-y) var(--btn-sm-pad-x); font-size: var(--btn-sm-size); }
 
 /* ------------------------- Journal ------------------------------ */
 .journal-planned { list-style: none; padding: 0; margin: 1.5rem 0 0; }
@@ -1062,15 +1398,19 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 /* ------------------------- Mobile CTA in menu ------------------- */
 .nav-cta-mobile { display: none; }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) { /* --bp-mobile */
+  :root {
+    --trust-gap-x:          1.5rem; /* credentials pack tighter across a phone */
+    --referral-gap:        0.85rem; /* space between referral text and its button */
+    --process-step-gap:          0; /* the number moves beside the step, not above it */
+  }
   /* The pinned header CTA is hidden on narrow screens, so surface the same
-     action inside the slide-in menu rather than losing it entirely. */
-  .nav-cta-mobile { display: block; margin-top: 0.6rem; }
+     action inside the dropdown menu rather than losing it entirely. */
+  .nav-cta-mobile { display: block; margin-top: var(--menu-cta-gap-top); }
   .nav-cta-mobile .btn { display: inline-block; }
-  .trust-strip ul { gap: 1rem 1.5rem; }
-  .process li { padding-top: 0; padding-left: 3.2rem; }
-  .process li::before { top: -0.15rem; }
-  .referral-banner .shell { flex-direction: column; gap: 0.85rem; }
+  .process li { padding-left: var(--process-indent); }
+  .process li::before { top: var(--process-number-rise); }
+  .referral-banner .shell { flex-direction: column; }
 }
 
 /* ------------------------- Nav fit ------------------------------ */
@@ -1080,11 +1420,23 @@ body.nav-open .nav-toggle span:nth-child(3) { top: 11px; transform: rotate(-45de
 .nav-cta .btn { white-space: nowrap; }
 .nav .brand > span { white-space: nowrap; }
 .nav .brand { flex-shrink: 0; }
-@media (max-width: 1180px) and (min-width: 721px) {
-  .nav-links { gap: 1.05rem; }
-  .nav-links a { font-size: 0.74rem; letter-spacing: 0.09em; }
+/* Below --bp-phone-narrow the wordmark's sub-line pushes the menu button off
+   the pill (a 360px phone loses half the button). The sub-line is decorative;
+   the button is not. */
+@media (max-width: 400px) { /* --bp-phone-narrow */
   .nav .brand small { display: none; }
-  .nav-cta .btn { padding: 0.7rem 1.1rem; font-size: 0.74rem; }
+}
+@media (max-width: 1180px) and (min-width: 721px) { /* --bp-nav-tight to --bp-mobile */
+  :root {
+    --nav-link-gap:       1.05rem; /* links pack tighter before the menu appears */
+    --nav-link-size:      0.74rem; /* nav link size at that tight width */
+    --nav-link-tracking:   0.09em; /* how spread out the links read there */
+  }
+  .nav .brand small { display: none; }
+  .nav-cta .btn {
+    padding: var(--nav-cta-pad-y) var(--nav-cta-pad-x);
+    font-size: var(--nav-cta-size);
+  }
 }
 
 /* =================================================================
@@ -1097,26 +1449,29 @@ h1, h2, h3, h4,
 .stat .num {
   font-family: var(--display);
   font-weight: 400;
-  letter-spacing: 0.015em;
-  line-height: 1.04;
+  letter-spacing: var(--heading-tracking);
+  line-height: var(--heading-leading);
 }
-h1 { letter-spacing: 0.01em; }
-h3, h4 { letter-spacing: 0.03em; line-height: 1.12; }
+h1 { letter-spacing: var(--h1-tracking); }
+h3, h4 { letter-spacing: var(--h3-tracking); line-height: var(--subhead-leading); }
 
 /* Bebas runs ~15% narrower than the serif it replaces — size up to keep
-   the same optical weight in the layout. */
-.hero h1        { font-size: clamp(3.1rem, 2.1rem + 5vw, 6rem); }
-.page-hero h1   { font-size: clamp(2.6rem, 1.8rem + 3.6vw, 4.6rem); }
+   the same optical weight in the layout. The hero headline is sized in the
+   hero rule above; everything else that carries a heading is sized here. */
 .section-head h2,
-.split h2       { font-size: clamp(2.1rem, 1.6rem + 2.4vw, 3.3rem); }
-.cta-band h2    { font-size: clamp(2.1rem, 1.6rem + 2.4vw, 3.3rem); }
+.split h2,
+.cta-band h2 {
+  font-size: clamp(var(--h2-size-min), var(--h2-size-base) + var(--h2-size-vw), var(--h2-size-max));
+}
+.card h3 { font-size: var(--card-title-size); letter-spacing: var(--card-title-tracking); }
+.service-card__body h3 { font-size: var(--service-title-size); letter-spacing: var(--service-title-tracking); }
+.process h3 { font-size: var(--process-title-size); letter-spacing: var(--process-title-tracking); }
+/* Inner pages only — these components do not appear on the homepage. */
+.page-hero h1   { font-size: clamp(2.6rem, 1.8rem + 3.6vw, 4.6rem); }
 .shell.narrow h2 { font-size: clamp(1.9rem, 1.5rem + 1.6vw, 2.6rem); }
 .shell.narrow h3 { font-size: 1.45rem; }
-.card h3,
-.service-card__body h3,
 .credential h3,
 .contact-method h2,
-.process h3,
 .referral-action h3,
 .journal-planned h3 { font-size: 1.35rem; letter-spacing: 0.035em; }
 .stat .num      { font-size: clamp(2.6rem, 2rem + 2vw, 3.6rem); letter-spacing: 0.01em; }
@@ -1129,36 +1484,27 @@ h3, h4 { letter-spacing: 0.03em; line-height: 1.12; }
   letter-spacing: 0;
   color: var(--aqua);
 }
-/* In the hero it stays a full-width second line, as designed. */
-.hero h1 .script {
-  display: block;
-  font-size: clamp(3.6rem, 2.2rem + 8vw, 7.4rem);
-  line-height: 0.85;
-  margin-top: 0.06em;
-}
-/* Everywhere else it sits inline, optically levelled against the caps. */
+/* In the hero the script word stays a full-width second line — it is sized
+   with the rest of the hero above. Everywhere else it sits inline, optically
+   levelled against the caps. */
 h2 .script, h3 .script {
   display: inline-block;
-  font-size: 1.2em;
-  line-height: 0.9;
-  transform: translateY(0.07em);
+  font-size: var(--script-inline-size);
+  line-height: var(--script-inline-leading);
+  transform: translateY(var(--script-inline-lift));
 }
 
 /* Brand lockup in the nav / footer */
-.brand { gap: 0.7rem; letter-spacing: 0.05em; }
-.brand > span { font-size: 1.22rem; line-height: 1.05; }
+.brand { gap: var(--brand-gap); letter-spacing: var(--brand-tracking); }
+.brand > span { font-size: var(--brand-size); line-height: var(--brand-leading); }
 .brand small {
   font-family: var(--sans);
-  letter-spacing: 0.12em;
+  letter-spacing: var(--brand-sub-tracking);
   font-weight: 400;
 }
 .brand .mark {
-  /* Real logo mark — clear the old gradient disc and its inset white ring. */
-  background: none;
-  border-radius: 0;
-  box-shadow: none;
-  width: 27px;          /* the mark is 240x373, i.e. ~0.64:1 */
-  height: 42px;
+  width: var(--brand-mark-width);
+  height: var(--brand-mark-height);
   display: grid;
   place-items: center;
 }
@@ -1167,21 +1513,26 @@ h2 .script, h3 .script {
 /* Body face */
 body { font-family: var(--sans); font-weight: 300; }
 strong, b { font-weight: 600; }
-.btn { font-family: var(--sans); font-weight: 500; letter-spacing: 0.1em; }
-.eyebrow { font-family: var(--sans); font-weight: 500; letter-spacing: 0.18em; }
-.trust-strip strong { font-family: var(--display); font-size: 1.3rem; letter-spacing: 0.05em; }
+.btn { font-family: var(--sans); font-weight: 500; letter-spacing: var(--btn-tracking); }
+.eyebrow { font-family: var(--sans); font-weight: 500; letter-spacing: var(--eyebrow-tracking); }
+.trust-strip strong {
+  font-family: var(--display);
+  font-size: var(--trust-name-size);
+  letter-spacing: var(--trust-name-tracking);
+}
 .faq__item summary { font-family: var(--sans); font-weight: 500; }
 
 /* Accent underline on the active nav item + link hovers uses brand aqua */
 .nav-links a.active { color: var(--rose-deep); }  /* AA at nav's 0.82rem */
-.nav-links a::after { background: var(--aqua); height: 2px; }
+.nav-links a::after { background: var(--aqua); height: var(--nav-underline-height); }
 
 /* The brand headshot is a hexagon with transparent corners — no crop, no card. */
 .split__media.is-portrait {
   background: none;
   box-shadow: none;
   border-radius: 0;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: var(--split-portrait-ratio);
+  padding: var(--split-portrait-pad) 0;
   display: grid;
   place-items: center;
 }
@@ -1199,20 +1550,20 @@ strong, b { font-weight: 600; }
    webfont fails to load. */
 h1, h2 { text-transform: uppercase; }
 .brand > span { text-transform: uppercase; }
-.split__media.is-portrait { padding: 0.5rem 0; }
 
 /* ------------------------- Mobile nav fixes --------------------------- */
 /* The header is position:fixed with a translateX(-50%) centring transform, so
    it becomes the containing block for its own fixed children. The closed
    slide-in panel therefore parks against the header's inset edge rather than
    the viewport edge, leaving a visible sliver. Push it clear of that inset. */
-@media (max-width: 720px) {
-    /* The hero CTAs collide with the decorative scroll cue once the headline
+@media (max-width: 720px) { /* --bp-mobile */
+  /* The hero CTAs collide with the decorative scroll cue once the headline
      wraps to four lines. The cue is ornamental — drop it on small screens. */
   .scroll-cue { display: none; }
 }
 
 /* ------------------------- Mobile menu (dropdown) --------------------- */
+/* --bp-mobile */
 /* The header uses backdrop-filter, which — like a transform — makes it the
    containing block for any position:fixed descendant. A full-height slide-in
    panel therefore collapsed to the header's own 60px box. Rather than fight
@@ -1222,22 +1573,22 @@ h1, h2 { text-transform: uppercase; }
   .nav-links {
     position: absolute;
     inset: auto 0 auto 0;
-    top: calc(100% + 0.45rem);
+    top: calc(100% + var(--menu-offset));
     width: auto;
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    gap: 0.15rem;
+    gap: var(--menu-item-gap);
     background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 0.9rem 1.2rem 1.1rem;
-    box-shadow: 0 24px 48px -20px rgba(30, 14, 70, 0.55);
-    transform: translateY(-10px);
+    border: var(--border-width) solid var(--line);
+    border-radius: var(--menu-radius);
+    padding: var(--menu-pad-top) var(--menu-pad-x) var(--menu-pad-bottom);
+    box-shadow: 0 var(--menu-shadow-y) var(--menu-shadow-blur) var(--menu-shadow-spread) rgba(30, 14, 70, 0.55);
+    transform: translateY(calc(-1 * var(--menu-rise)));
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.25s var(--ease), transform 0.25s var(--ease),
-      visibility 0.25s linear;
+    transition: opacity var(--hover-fast) var(--ease), transform var(--hover-fast) var(--ease),
+      visibility var(--hover-fast) linear;
   }
   body.nav-open .nav-links {
     opacity: 1;
@@ -1246,25 +1597,20 @@ h1, h2 { text-transform: uppercase; }
   }
   .nav-links a {
     display: block;
-    padding: 0.7rem 0;
-    font-size: 0.9rem;
-    border-bottom: 1px solid var(--line);
+    padding: var(--menu-link-pad-y) 0;
+    font-size: var(--menu-link-size);
+    border-bottom: var(--border-width) solid var(--line);
   }
   .nav-links li:last-of-type a { border-bottom: none; }
-  .nav-cta-mobile { border-bottom: none; padding-top: 0.9rem; }
+  .nav-cta-mobile { border-bottom: none; padding-top: var(--menu-cta-gap); }
   .nav-cta-mobile .btn { width: 100%; justify-content: center; }
-  .nav-cta-mobile a { border-bottom: none; padding: 0.95em 2em; }
+  .nav-cta-mobile a { border-bottom: none; padding: var(--btn-pad-y) var(--btn-pad-x); }
 }
 
 /* ------------------------- Hero fit ----------------------------------- */
-/* Bebas Neue plus the script line made the hero headline tall enough to push
-   the CTAs into the scroll cue on a 13" laptop (1280x800). Trim the display
-   sizes, and drop the cue entirely when the viewport is too short for it —
-   it is decorative, the CTAs are not. */
-.hero h1 { font-size: clamp(2.7rem, 1.9rem + 4vw, 5rem); }
-.hero h1 .script { font-size: clamp(3.1rem, 2rem + 6vw, 6.2rem); }
-
-@media (max-height: 900px) {
+/* The scroll cue is decorative and the hero CTAs are not: on a short window
+   (a 13" laptop at 1280x800) the cue is what gives way. */
+@media (max-height: 900px) { /* --bp-short */
   .scroll-cue { display: none; }
 }
 
