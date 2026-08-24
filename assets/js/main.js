@@ -2,12 +2,25 @@
 (function () {
   "use strict";
 
+  /* ---- Tunable values ----
+     These three are measurements like any other, so they live in the control
+     block at the top of assets/css/styles.css and are read from there. Change
+     them in the CSS, not here. */
+  var root = getComputedStyle(document.documentElement);
+  var knob = function (name, fallback) {
+    var v = root.getPropertyValue(name).trim();
+    return v === "" ? fallback : v;
+  };
+  var SCROLLED_AT = parseFloat(knob("--header-scrolled-at", "40px"));
+  var REVEAL_TRIGGER = parseFloat(knob("--reveal-trigger", "0.12"));
+  var REVEAL_MARGIN = knob("--reveal-margin", "-40px");
+
   /* ---- Sticky header state ---- */
   var header = document.querySelector(".site-header");
   var heroHeader = header && !header.classList.contains("is-scrolled");
   var onScroll = function () {
     if (!header || !heroHeader) return;
-    header.classList.toggle("is-scrolled", window.scrollY > 40);
+    header.classList.toggle("is-scrolled", window.scrollY > SCROLLED_AT);
   };
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
@@ -87,11 +100,26 @@
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+      { threshold: REVEAL_TRIGGER, rootMargin: "0px 0px " + REVEAL_MARGIN + " 0px" }
     );
     revealEls.forEach(function (el) { io.observe(el); });
   } else {
     revealEls.forEach(function (el) { el.classList.add("in"); });
+  }
+
+  /* ---- Display face loaded? ----
+     Bebas Neue is condensed: a headline set in it is roughly a third narrower
+     than the same headline in the sans that stands in while the webfont loads
+     (or forever, if Google Fonts is blocked). The phone headline curve in the
+     stylesheet is sized for that wider stand-in, so it only applies until the
+     real face is confirmed present. document.fonts.check() is not usable here —
+     it answers true for a family that was never loaded — but fonts.load()
+     resolves with the FontFace objects that actually matched, so an empty array
+     means the face is genuinely absent. */
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load('1em "Bebas Neue"').then(function (faces) {
+      if (faces.length) document.documentElement.classList.add("display-face-ready");
+    }, function () { /* leave the stand-in sizes in place */ });
   }
 
   /* ---- Footer year ---- */

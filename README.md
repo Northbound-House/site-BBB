@@ -79,6 +79,66 @@ Bebas Neue rather than an image, so it stays crisp and selectable.
 transparent corners, so it is rendered with `.split__media.is-portrait`
 (`object-fit: contain`, no card, no shadow) — do not put it in a cropped frame.
 
+## Tuning the layout
+
+Every measurement the homepage renders — spacing, padding, gaps, widths, type sizes,
+line heights, radii, shadow offsets, animation timings — is declared once in the
+**control block** at the top of `assets/css/styles.css`, each with a one-line comment
+saying what it moves. Nothing below that block carries a raw measurement for anything
+the homepage draws.
+
+To tune: change a number in the block, save, reload the page. Start with
+`--maxw` (content width), `--section-pad-*` (air between sections) and
+`--hero-title-size-*` (headline size) — they move the most pixels per keystroke.
+
+Three details worth knowing:
+
+- **Fluid type** reads as `clamp(MIN, BASE + VW, MAX)`. `MIN` is the phone size, `MAX`
+  the size it stops growing at, `BASE + VW` the rate in between.
+- **Breakpoints** are the one place a number is repeated: `@media` cannot read a custom
+  property, so `--bp-mobile` and friends document the value and the media query below
+  restates it. Change both.
+- **Three JS values** (`--header-scrolled-at`, `--reveal-trigger`, `--reveal-margin`)
+  are also knobs; `assets/js/main.js` reads them out of the block at load.
+- **The nav switches to the dropdown at `--bp-nav-menu` (1000px), not at
+  `--bp-mobile`.** Six links, a wordmark and a pinned CTA need about 970px of pill
+  to sit in a row — measured in the stand-in sans, the widest the nav ever gets —
+  so the nav runs out of room long before the content columns do. `--bp-mobile`
+  (720px) still governs where columns stack.
+- **Card rows carry an explicit column count**, not an auto-fit pixel floor.
+  Auto-fit lets the available space pick the column count, and at mid widths that
+  left a row holding one card — three trip cards came out two-and-one. `--*-cols`
+  knobs set the count, and step down at `--bp-process` / `--bp-contact` (four
+  across go two by two) and `--bp-cards` (everything stacks). The rule: a row
+  never holds a single card. Adding a card to a grid means checking its count
+  against those knobs.
+- **One knob sets every card title.** Trip cards, feature cards and process steps
+  share `--card-title-size` / `--card-title-tracking`, in the CARD SURFACES group.
+  Give a component its own knob if you ever want its titles to differ.
+- **The values are locked** as of 24 August 2026. Tune them freely, but treat what
+  is in the file as the current design: new work adds a new knob rather than
+  retuning a locked one, and a new element gets its own knob even when an existing
+  value looks close.
+- **Headlines follow a second curve below `--bp-phone`.** Bebas is a condensed caps
+  face, so one long word — CONGRATULATIONS, HONEYMOONS — is wider than a phone column
+  at the size the desktop curve asks for. The phone curve is lower and steeper, and
+  meets the desktop one exactly at 480px so nothing jumps at the breakpoint. That is
+  why `--h2-size-base` is negative inside that block: the width term carries the size
+  there. `overflow-wrap: break-word` on headings is the backstop if a word ever grows
+  past what the curve can absorb.
+- **That phone curve is scoped to the stand-in face.** Bebas is condensed; the sans
+  that stands in while the webfont loads — or forever, if Google Fonts is blocked —
+  is about a third wider, and that is the face the overflow happens in. `main.js`
+  adds `.display-face-ready` to `<html>` once Bebas is confirmed loaded, and the
+  phone sizes drop away, so a visitor with the webfont sees the headlines at their
+  designed size. Note `document.fonts.check()` cannot be used for this: it answers
+  true for a family that was never loaded. `document.fonts.load()` resolves with the
+  faces that actually matched, so an empty array means the face is genuinely absent.
+
+Inner-page-only components — forms, FAQ, contact cards, legal prose, journal cards,
+the modal, stats and badges — still carry literal values further down the sheet. They
+can be lifted into the block the same way when the inner pages get their tuning pass.
+
 ## How the site is built
 
 Content lives in `pages/*.html` as bare fragments. Everything shared — `<head>` metadata,
