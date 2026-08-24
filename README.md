@@ -100,6 +100,13 @@ Three details worth knowing:
   restates it. Change both.
 - **Three JS values** (`--header-scrolled-at`, `--reveal-trigger`, `--reveal-margin`)
   are also knobs; `assets/js/main.js` reads them out of the block at load.
+- **Headlines follow a second curve below `--bp-phone`.** Bebas is a condensed caps
+  face, so one long word — CONGRATULATIONS, HONEYMOONS — is wider than a phone column
+  at the size the desktop curve asks for. The phone curve is lower and steeper, and
+  meets the desktop one exactly at 480px so nothing jumps at the breakpoint. That is
+  why `--h2-size-base` is negative inside that block: the width term carries the size
+  there. `overflow-wrap: break-word` on headings is the backstop if a word ever grows
+  past what the curve can absorb.
 
 Inner-page-only components — forms, FAQ, contact cards, legal prose, journal cards,
 the modal, stats and badges — still carry literal values further down the sheet. They
