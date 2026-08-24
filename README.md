@@ -100,6 +100,11 @@ Three details worth knowing:
   restates it. Change both.
 - **Three JS values** (`--header-scrolled-at`, `--reveal-trigger`, `--reveal-margin`)
   are also knobs; `assets/js/main.js` reads them out of the block at load.
+- **The nav switches to the dropdown at `--bp-nav-menu` (1000px), not at
+  `--bp-mobile`.** Six links, a wordmark and a pinned CTA need about 970px of pill
+  to sit in a row — measured in the stand-in sans, the widest the nav ever gets —
+  so the nav runs out of room long before the content columns do. `--bp-mobile`
+  (720px) still governs where columns stack.
 - **The values are locked** as of 24 August 2026. Tune them freely, but treat what
   is in the file as the current design: new work adds a new knob rather than
   retuning a locked one, and a new element gets its own knob even when an existing
