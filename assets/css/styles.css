@@ -57,6 +57,12 @@
   /* =========================================================
      CONTROL BLOCK — every measurement the homepage renders
      ---------------------------------------------------------
+     LOCKED 24 August 2026. These numbers are the design, not a
+     draft: treat them as fixed. Work that needs a measurement
+     adds a new knob here rather than retuning a locked one, and
+     a new element gets its own knob even when an existing value
+     looks close.
+
      Change a number here, save, refresh. Nothing below this
      block carries a raw measurement for anything the homepage
      draws: frame, header, hero, trust strip, sections, cards,
@@ -1447,7 +1453,11 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
    headlines follow a lower, steeper curve that meets the desktop one exactly
    at 480px, so nothing jumps as the window crosses the breakpoint. */
 @media (max-width: 480px) { /* --bp-phone */
-  :root {
+  /* Scoped to the stand-in face: main.js adds .display-face-ready once Bebas is
+     confirmed loaded, and these sizes drop away because Bebas is narrow enough
+     not to need them. Without JS, or with the webfont blocked, the smaller
+     sizes stay — which is exactly the case that needs them. */
+  :root:not(.display-face-ready) {
     --h2-size-min:            1.2rem; /* floor, low enough that the curve below governs */
     --h2-size-base:          -0.2rem; /* negative: the width term carries the size here */
     --h2-size-vw:              8.4vw; /* how fast section headings grow across phones */

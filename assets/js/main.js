@@ -107,6 +107,21 @@
     revealEls.forEach(function (el) { el.classList.add("in"); });
   }
 
+  /* ---- Display face loaded? ----
+     Bebas Neue is condensed: a headline set in it is roughly a third narrower
+     than the same headline in the sans that stands in while the webfont loads
+     (or forever, if Google Fonts is blocked). The phone headline curve in the
+     stylesheet is sized for that wider stand-in, so it only applies until the
+     real face is confirmed present. document.fonts.check() is not usable here —
+     it answers true for a family that was never loaded — but fonts.load()
+     resolves with the FontFace objects that actually matched, so an empty array
+     means the face is genuinely absent. */
+  if (document.fonts && document.fonts.load) {
+    document.fonts.load('1em "Bebas Neue"').then(function (faces) {
+      if (faces.length) document.documentElement.classList.add("display-face-ready");
+    }, function () { /* leave the stand-in sizes in place */ });
+  }
+
   /* ---- Footer year ---- */
   var yr = document.getElementById("year");
   if (yr) yr.textContent = new Date().getFullYear();
