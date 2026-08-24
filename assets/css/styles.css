@@ -245,8 +245,8 @@
   --trust-note-size:        0.78rem; /* the small line under each name */
 
   /* SERVICE CARDS (the five "what I plan" tiles) ------------------- */
-  --service-min:              280px; /* narrowest a service card gets before wrapping */
-  --service-pair-min:         320px; /* same, for the wider two-card row */
+  --service-cols:                 3; /* service cards per row — 5 cards read as 3 then 2 */
+  --service-pair-cols:            2; /* cards per row in the two-card row */
   --service-gap:             1.5rem; /* space between service cards */
   --service-row-gap:         1.5rem; /* space between the three-card and two-card rows */
   --service-image-ratio:     3 / 2; /* shape of the card photo — bigger = shorter */
@@ -264,7 +264,7 @@
   --service-lift:               4px; /* how far a service card rises on hover */
 
   /* FEATURE CARDS (the three "a booking site can't do" cards) ------ */
-  --card-min:                 240px; /* narrowest a feature card gets before wrapping */
+  --cards-cols:                   3; /* feature cards per row — 5 cards read as 3 then 2 */
   --card-gap:                1.5rem; /* space between feature cards, both directions */
   --card-pad-y:              2.2rem; /* top/bottom padding inside a feature card */
   --card-pad-x:              1.8rem; /* left/right padding inside a feature card */
@@ -279,8 +279,8 @@
   --card-text-size:         0.98rem; /* feature card paragraph size */
 
   /* PROCESS STEPS ------------------------------------------------- */
-  --process-min:              220px; /* narrowest a step gets before wrapping */
-  --process-detailed-min:     280px; /* same, on the longer How I Work version */
+  --process-cols:                 4; /* steps per row on the four-step version */
+  --process-detailed-cols:        3; /* steps per row on the five-step version — 3 then 2 */
   --process-gap:             1.5rem; /* space between the four steps */
   --process-number-size:     2.3rem; /* diameter of the numbered circle */
   --process-number-text:    1.05rem; /* size of the digit inside it */
@@ -301,7 +301,7 @@
   --split-portrait-ratio:    1 / 1; /* shape of the headshot's box — bigger = shorter */
 
   /* QUOTES -------------------------------------------------------- */
-  --quote-min:                280px; /* narrowest a quote card gets before wrapping */
+  --quotes-cols:                  3; /* quote cards per row */
   --quote-gap:               1.6rem; /* space between quote cards */
   --quote-pad-top:           2.4rem; /* space above the stars, under the quote mark */
   --quote-pad-x:               2rem; /* left/right padding inside a quote card */
@@ -334,6 +334,7 @@
   --cta-direct-underline:       3px; /* drop from those links to their underline */
   --cta-direct-dot-space:    0.5rem; /* air either side of the dot separator */
   --cta-direct-stack-gap:    0.35rem; /* space between address and phone once they stack */
+  --contact-cols:                 4; /* contact cards per row (inner pages) */
 
   /* REFERRAL BAND ------------------------------------------------- */
   --referral-pad-y:          1.1rem; /* height of the bottom referral bar */
@@ -412,6 +413,9 @@
   --bp-desktop:               900px; /* width where the portrait split stacks */
   --bp-mobile:                720px; /* width where content columns stack to one */
   --bp-nav-menu:             1000px; /* width where the nav becomes a dropdown menu */
+  --bp-cards:                 900px; /* width below which card rows stack to one column */
+  --bp-process:              1100px; /* width below which the four steps go two by two */
+  --bp-contact:              1100px; /* width below which the contact cards go two by two */
   --bp-phone-narrow:          400px; /* width below which the wordmark drops its sub-line */
   --bp-phone:                 480px; /* width below which headlines shrink to fit long words */
   --bp-short:                 900px; /* window HEIGHT below which the scroll cue hides */
@@ -762,7 +766,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 /* ------------------------- Feature cards ------------------------ */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(var(--card-min), 100%), 1fr));
+  grid-template-columns: repeat(var(--cards-cols), minmax(0, 1fr));
   gap: var(--card-gap);
 }
 .card {
@@ -803,10 +807,13 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 /* --------------------------- Testimonials ----------------------- */
 .quotes {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(var(--quote-min), 100%), 1fr));
+  grid-template-columns: repeat(var(--quotes-cols), minmax(0, 1fr));
   gap: var(--quote-gap);
 }
 .quote {
+  /* figure carries a 40px side margin from the browser's own stylesheet, which
+     was eating 80px out of every quote card's grid track. */
+  margin: 0;
   background: var(--paper);
   border-radius: var(--radius);
   padding: var(--quote-pad-top) var(--quote-pad-x) var(--quote-pad-bottom);
@@ -1127,12 +1134,12 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 /* ------------------------- Service cards ------------------------ */
 .service-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(var(--service-min), 100%), 1fr));
+  grid-template-columns: repeat(var(--service-cols), minmax(0, 1fr));
   gap: var(--service-gap);
 }
 .service-cards--pair {
   margin-top: var(--service-row-gap);
-  grid-template-columns: repeat(auto-fit, minmax(min(var(--service-pair-min), 100%), 1fr));
+  grid-template-columns: repeat(var(--service-pair-cols), minmax(0, 1fr));
 }
 
 .service-card {
@@ -1198,10 +1205,10 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(var(--process-min), 100%), 1fr));
+  grid-template-columns: repeat(var(--process-cols), minmax(0, 1fr));
   gap: var(--process-gap);
 }
-.process--detailed { grid-template-columns: repeat(auto-fit, minmax(min(var(--process-detailed-min), 100%), 1fr)); }
+.process--detailed { grid-template-columns: repeat(var(--process-detailed-cols), minmax(0, 1fr)); }
 .process li {
   counter-increment: step;
   position: relative;
@@ -1318,7 +1325,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 /* ------------------------- Contact ------------------------------ */
 .contact-methods {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  grid-template-columns: repeat(var(--contact-cols), minmax(0, 1fr));
   gap: 1.5rem;
 }
 .contact-method {
@@ -1432,6 +1439,30 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   .process li { padding-left: var(--process-indent); }
   .process li::before { top: var(--process-number-rise); }
   .referral-banner .shell { flex-direction: column; }
+}
+
+/* ------------------------- Card rows ---------------------------- */
+/* These grids used auto-fit with a pixel floor, which lets the space available
+   decide the column count — and at mid widths that left a row of one: three
+   trip cards came out two-and-one, four steps three-and-one. The counts are
+   explicit now, and step down at the widths where the cards would otherwise be
+   too narrow to read. The rule throughout: a row never holds a single card. */
+@media (max-width: 1100px) { /* --bp-process, --bp-contact */
+  :root {
+    --process-cols:                 2; /* four steps go two by two */
+    --contact-cols:                 2; /* contact cards go two by two */
+  }
+}
+@media (max-width: 900px) { /* --bp-cards */
+  :root {
+    --service-cols:                 1; /* trip cards stack rather than orphan one */
+    --service-pair-cols:            1; /* the two-card row stacks with them */
+    --cards-cols:                   1; /* feature cards stack */
+    --quotes-cols:                  1; /* quotes stack */
+    --process-cols:                 1; /* steps stack */
+    --process-detailed-cols:        1; /* the five-step version stacks */
+    --contact-cols:                 1; /* contact cards stack */
+  }
 }
 
 /* ------------------------- Nav fit ------------------------------ */

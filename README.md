@@ -105,6 +105,13 @@ Three details worth knowing:
   to sit in a row — measured in the stand-in sans, the widest the nav ever gets —
   so the nav runs out of room long before the content columns do. `--bp-mobile`
   (720px) still governs where columns stack.
+- **Card rows carry an explicit column count**, not an auto-fit pixel floor.
+  Auto-fit lets the available space pick the column count, and at mid widths that
+  left a row holding one card — three trip cards came out two-and-one. `--*-cols`
+  knobs set the count, and step down at `--bp-process` / `--bp-contact` (four
+  across go two by two) and `--bp-cards` (everything stacks). The rule: a row
+  never holds a single card. Adding a card to a grid means checking its count
+  against those knobs.
 - **The values are locked** as of 24 August 2026. Tune them freely, but treat what
   is in the file as the current design: new work adds a new knob rather than
   retuning a locked one, and a new element gets its own knob even when an existing
