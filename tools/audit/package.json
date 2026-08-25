@@ -1,0 +1,13 @@
+{
+  "name": "bbb-audit",
+  "private": true,
+  "type": "module",
+  "description": "Dev-only detector suite for the Bora Bora Bound site. Never shipped — GitHub Pages serves the repo root.",
+  "scripts": {
+    "audit": "node audit.mjs",
+    "shots": "node audit.mjs --screenshots"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

@@ -1,6 +1,6 @@
   <main id="main">
   <section class="page-hero">
-    <div class="page-hero__bg" style="--page-img: url('https://images.unsplash.com/photo-1468413253725-0d5181091126?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="page-hero__bg" style="--page-img: url('{{IMG_PAGEHERO_GENERIC}}')"></div>
     <div class="shell">
       <span class="eyebrow">Ways to travel</span>
       <h1>Three ways to travel, all done properly</h1>
@@ -15,11 +15,15 @@
     </div>
   </section>
 
-  <section class="section section--cream">
+  <section class="section section--tint">
     <div class="shell">
+      <div class="section-head reveal">
+        <span class="eyebrow">What I plan</span>
+        <h2>The three, and the two built on them</h2>
+      </div>
       <div class="service-cards">
         <a class="service-card reveal" href="/cruises.html">
-          <img src="https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=800&q=80" alt="A cruise ship at anchor in calm turquoise water beside a green island" width="800" height="533" loading="lazy" />
+          <img src="{{IMG_CARD_CRUISES}}" alt="{{IMG_CARD_CRUISES_ALT}}" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>Cruises</h3>
             <p>Ocean, river, and expedition. CLIA Certified Cruise Counsellor, with line certifications across Virgin Voyages, Royal Caribbean, and Carnival.</p>
@@ -27,7 +31,7 @@
           </div>
         </a>
         <a class="service-card reveal d1" href="/all-inclusive-resorts.html">
-          <img src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=800&q=80" alt="Palm-shaded infinity pool at a Caribbean all-inclusive resort at golden hour" width="800" height="533" loading="lazy" />
+          <img src="{{IMG_CARD_ALL_INCLUSIVE}}" alt="{{IMG_CARD_ALL_INCLUSIVE_ALT}}" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>All-Inclusive Resorts</h3>
             <p>Certified with Sandals and the Hyatt Inclusive Collection. The room category matters more than the resort, and almost nobody tells you that.</p>
@@ -35,7 +39,7 @@
           </div>
         </a>
         <a class="service-card reveal d2" href="/small-group-tours.html">
-          <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80" alt="A small group of travelers walking a narrow cobbled street in a hilltop village" width="800" height="533" loading="lazy" />
+          <img src="{{IMG_CARD_SMALL_GROUP}}" alt="{{IMG_CARD_SMALL_GROUP_ALT}}" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>Small Group Tours</h3>
             <p>Real group caps, employed guides, and honest inclusion lists. For the places where going independently is more work than it's worth.</p>
@@ -43,7 +47,7 @@
           </div>
         </a>
         <a class="service-card reveal" href="/honeymoons.html">
-          <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80" alt="Two champagne glasses on a balcony railing overlooking the ocean at sunset" width="800" height="533" loading="lazy" />
+          <img src="{{IMG_CARD_HONEYMOON}}" alt="{{IMG_CARD_HONEYMOON_ALT}}" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>Honeymoons &amp; Romance</h3>
             <p>Built on the same three foundations, with the upgrades and celebration perks requested properly — which is the only way they arrive.</p>
@@ -51,7 +55,7 @@
           </div>
         </a>
         <a class="service-card reveal d1" href="/lgbtq-travel.html">
-          <img src="https://images.unsplash.com/photo-1561612217-e5dbc7b4b1ab?auto=format&fit=crop&w=800&q=80" alt="A couple walking hand in hand along a palm-lined waterfront promenade" width="800" height="533" loading="lazy" />
+          <img src="{{IMG_CARD_LGBTQ}}" alt="{{IMG_CARD_LGBTQ_ALT}}" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>LGBTQ+ Travel</h3>
             <p>NGLCC-certified. Which ships, resorts, and destinations are genuinely welcoming — and which ones just have a rainbow on the landing page in June.</p>
@@ -66,17 +70,17 @@
     <div class="shell narrow">
       <h2>What if I want something else?</h2>
       <p>Ask. Plenty of trips are adjacent — a land package either side of a sailing, a family celebration that needs eight rooms, a rail journey. If it's close to what I do well, I'll take it on. If it isn't, I'll point you to someone who does it properly — because you deserve the specialist, not the generalist.</p>
-      <p><a href="/how-i-work.html">See how the process works →</a></p>
+      <p><a href="/how-i-work.html" class="link-cta">See how the process works →</a></p>
     </div>
   </section>
 
   <section class="cta-band">
-    <div class="cta-band__bg" style="--cta-img: url('https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="cta-band__bg" style="--cta-img: url('{{IMG_HERO_HOME}}')"></div>
     <div class="shell reveal">
       <h2>Not sure which one fits?</h2>
       <p>That's a good conversation to have out loud. Tell me who's traveling and what you're imagining.</p>
       <div class="cta-band__actions">
-        <a href="{{TERN_SCHEDULING}}" target="_blank" rel="noopener" class="btn btn--gold" data-cta="ways-consult">Book a free consultation</a>
+        <a href="{{TERN_SCHEDULING}}" target="_blank" rel="noopener" class="btn btn--primary" data-cta="ways-consult">Book a free consultation</a>
         <a href="/contact.html" class="btn btn--ghost">Email or call instead</a>
       </div>
       <p class="cta-band__direct">

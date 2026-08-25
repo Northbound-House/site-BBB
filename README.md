@@ -1,12 +1,21 @@
 # Bora Bora Bound
 
 A static site for [boraborabound.com](https://boraborabound.com), hosted on **GitHub Pages**.
-Hand-coded HTML/CSS/JS with a small Python generator — no npm, no framework, no runtime deps.
+Hand-coded HTML/CSS/JS with a small Python generator — no framework, and nothing
+the browser downloads but the site's own files. The one npm dependency is
+`tools/audit`, a dev-only detector suite that never ships: Pages serves the repo
+root, and that folder's `node_modules` is gitignored.
 
 > **Status: staging.** `CNAME` points at `test.boraborabound.com`, every page carries
 > `noindex, nofollow`, and `robots.txt` disallows everything. This is deliberate — an
 > indexable copy of the site on a second domain competes with the real one in search.
 > Run `./tools/set-domain.sh production` to flip all of it at cutover.
+>
+> **The `noindex` is the lock with no visible symptom.** Ship it to production and
+> the site looks perfect and never appears in search. `tools/build.py` therefore
+> refuses to write a production build that still carries it — see
+> `verify_indexability()` — and it is an explicit line on the cutover checklist in
+> [PLAN.md](PLAN.md). Do not remove either guard.
 
 **Deployed to https://test.boraborabound.com** — see **[STATE.md](STATE.md)** for
 where everything stands and **[PLAN.md](PLAN.md)** for what's next, including the
@@ -38,8 +47,31 @@ Tints from the Canva palette row are available as `--purple-soft` `#6a4fb3`,
 `--purple-deep`, `--purple-ink`, `--rose-deep` and `--blush` are darker/lighter
 derivations of brand hues for depth and section grounds — not new colours.
 
-Legacy aliases (`--navy`, `--lagoon`, `--gold`, `--cream`, …) are kept and mapped
-onto the brand tokens so the rest of the sheet did not need rewriting.
+The rest of the sheet is written against a thin **semantic layer**, so a
+re-theme is an edit to six lines rather than to six hundred:
+
+| Alias | Maps to | Role |
+| --- | --- | --- |
+| `--ground-deep` | `--purple-deep` | Dark section grounds and the footer |
+| `--brand` | `--purple` | Brand grounds and heading text |
+| `--link` | `--purple` | Links, focus rings, interactive text |
+| `--accent-bright` | `--aqua` | Bright accent on dark grounds |
+| `--cta` | `--rose` | The primary call to action |
+| `--surface-tint` | `--blush` | The tinted section ground |
+| `--paper` | `--off-white` | Card and page surfaces |
+
+**Name these for the role, never for the colour.** The layer was previously
+nautical — `--navy`, `--gold`, `--sand`, `--lagoon`, `--deep-sea` — mapped onto
+a purple and rose palette, so `--gold` painted pink and `--navy` painted purple.
+The class names lied the same way: `.btn--gold` drew a rose button. A name that
+states a hue goes stale the moment the palette moves, and it misleads whoever
+edits the sheet next, human or agent. The matching class names are
+`.btn--primary`, `.section--tint` and `.section--deep`.
+
+`--brand` and `--link` hold the same purple today and stay two names on purpose,
+so either can move without dragging the other with it. The `token-truth`
+detector in `tools/audit` fails if a name starts lying again, or if two aliases
+collapse onto one value without a documented reason.
 
 **Contrast:** every text/ground pair used in the design passes WCAG AA. The two
 that needed care: white on `--rose` is 4.77:1 (fine), and the active nav link
@@ -118,7 +150,10 @@ Three details worth knowing:
 - **The values are locked** as of 24 August 2026. Tune them freely, but treat what
   is in the file as the current design: new work adds a new knob rather than
   retuning a locked one, and a new element gets its own knob even when an existing
-  value looks close.
+  value looks close. The `TAP TARGETS` group (`--tap-min`, `--bp-tap`) went in
+  under that rule rather than by widening `--social-size` and friends: it grows
+  the area a finger can hit without moving a drawn pixel, so the desktop design
+  renders exactly as it did before.
 - **Headlines follow a second curve below `--bp-phone`.** Bebas is a condensed caps
   face, so one long word — CONGRATULATIONS, HONEYMOONS — is wider than a phone column
   at the size the desktop curve asks for. The phone curve is lower and steeper, and
@@ -165,11 +200,117 @@ Single source of truth for:
 - Nav and footer markup
 - GA4 and Meta Pixel loaders
 - `sitemap.xml`, `robots.txt`, and the legacy redirect stubs
+- Every photo the site renders, via the `IMAGES` table
+- `verify_indexability()`, which fails the build if the `robots` meta disagrees
+  with `STAGING`
 
 Content fragments can reference config values as `{{TOKEN}}` — `{{EMAIL}}`,
 `{{PHONE_DISPLAY}}`, `{{PHONE_E164}}`, `{{TERN_SCHEDULING}}`, `{{TERN_TRIP_FORM}}`,
 `{{TERN_REFERRAL_FORM}}`, `{{FACEBOOK}}`, `{{INSTAGRAM}}`, `{{LINKEDIN}}`, `{{ADVISOR}}`,
 `{{BUSINESS_NAME}}`. An unknown token fails the build rather than shipping silently.
+
+#### Swapping a photo
+
+Photos live in the `IMAGES` table, keyed by the **slot** they fill rather than by
+what the picture shows — `IMG_CARD_HONEYMOON`, `IMG_PAGEHERO_ABOUT`. Each entry
+carries its URL and its alt text as a pair, and fragments reference them as
+`{{IMG_CARD_HONEYMOON}}` and `{{IMG_CARD_HONEYMOON_ALT}}`. So dropping in one of
+Zac's own photos is one edit in one place, and the description cannot drift away
+from the picture it describes. See [ASSETS.md](ASSETS.md) for what to supply.
+
+Most entries are still Unsplash hotlinks, which rot without warning — one had
+already been withdrawn upstream, and three places on the site were rendering its
+alt text where the photo should have been. Run the detectors from a network that
+can reach `images.unsplash.com` to catch the next one.
+
+### `tools/audit`
+
+Six detectors, run against the rendered page in headless Chromium rather than
+against the source. Hit areas are measured by hit-testing and colours by
+resolving them in the browser, because the defects worth catching only exist
+once the cascade has run.
+
+```bash
+cd tools/audit && npm install
+node audit.mjs                 # all six detectors
+node audit.mjs --screenshots   # plus 1280x800 stills, for before/after diffs
+```
+
+| Detector | Asserts |
+| --- | --- |
+| `staging-leak` | The `robots` meta matches the `STAGING` flag, both directions |
+| `broken-images` | No `<img>` fails to decode |
+| `token-truth` | No token name states a hue it does not hold; no two aliases share a value undocumented |
+| `menu-a11y` | `aria-controls` resolves, focus enters the panel, the body does not scroll behind it, Escape returns focus |
+| `tap-targets` | Every control offers 44x44, per WCAG 2.5.5 |
+| `heading-order` | Every page starts at `h1` and skips no level |
+
+Runs at 390px and 768px — phone, and the touch band between the phone
+breakpoints and the 1000px nav collapse.
+
+**It blocks Google Fonts while measuring, on purpose.** Bebas is condensed: with
+it loaded a journal title fits one 26px line, without it the same title wraps to
+two and measures 52px. That flipped a tap-target finding between runs on
+different networks, which makes a green result worth nothing. The fallback face
+is the deterministic choice and a state the site explicitly supports — see
+`.display-face-ready` in `main.js` and the phone headline curve scoped to the
+stand-in.
+
+Three behaviours worth knowing:
+
+- **A result you could not check is never a pass.** An image is judged by what
+  the host actually answered: 404 or 410 means the photo is gone, but 403, 407
+  or a 5xx means a gateway refused and we learned nothing, so it is reported
+  **UNVERIFIED**. This distinction is not cosmetic — an egress proxy answers 403
+  as an ordinary HTTP response rather than failing, so "the request didn't work"
+  cannot tell a withdrawn photo from one this network declined to fetch. Getting
+  it backwards sends someone hunting for replacements for photos that are fine.
+- **A withdrawn remote photo warns; it does not fail.** Reported as **ROTTED**
+  with a non-fatal exit. Blocking an unrelated merge on a stranger's decision
+  gets the check disabled, not the photo replaced. The weekly `hotlink-watch`
+  workflow chases them instead. A broken image in `assets/img/` does fail — that
+  one is ours.
+- **Anything held below the bar is held on the record.** `tap-targets` reports
+  **EXEMPT** rather than quietly passing: links inside a sentence (WCAG excludes
+  targets constrained by the line-height around them) and anything listed in
+  `TAP_EXEMPT` with a written reason. An exemption nobody can see is
+  indistinguishable from a detector that missed something.
+
+### `tools/audit/compare.mjs`
+
+Answers one question: did this change move anything it was not supposed to?
+
+```bash
+git worktree add --detach /tmp/before HEAD~1
+node compare.mjs /tmp/before "$PWD/../.." 1280 index.html contact.html
+```
+
+It compares the box, colour and type of every laid-out element between two
+checkouts, so an intended image swap does not drown out an accidental
+two-pixel shift elsewhere. Two details it took a wrong answer to learn:
+
+- **It freezes transitions before measuring.** Scroll-reveal blocks fade and
+  translate into place, so measuring mid-transition reports positions that
+  differ by a pixel or two between two runs of the *same* build. That noise
+  buries the signal completely.
+- **Check the baseline is the branch's actual parent.** A stale local `main` ref
+  once made it report a header regression that did not exist. `git log` the
+  worktree before trusting a diff.
+
+### `.github/workflows/`
+
+`checks.yml` runs on every pull request and every push to `main`: the build
+(which fails on a robots/`STAGING` mismatch), a check that the committed HTML
+matches what `build.py` generates, then the full detector sweep. No reduced
+mode for PRs — the shared nav and footer mean a `build.py` change touches all
+twenty pages, so "changed pages only" is misleading for exactly the edits most
+likely to break something.
+
+`hotlink-watch.yml` runs weekly and opens (or closes) an issue when a hotlinked
+photo stops resolving. It exists because PR checks only run when someone opens
+a PR, and rot on a launched site is precisely what nobody notices in a quiet
+month. It becomes unnecessary the day the placeholders are replaced with real
+photography.
 
 ### `tools/set-domain.sh`
 

@@ -25,26 +25,123 @@
   onScroll();
   window.addEventListener("scroll", onScroll, { passive: true });
 
-  /* ---- Mobile nav ---- */
+  /* ---- Mobile nav ----
+     The markup gives the panel an id and the toggle an aria-controls pointing
+     at it, so the pair is announced as one control. Three things happen here
+     that the markup cannot do on its own:
+
+       - Focus moves into the panel on open and back to the toggle on close.
+         Without it the menu opens behind the reader: aria-expanded says "true"
+         while focus is still sitting on the button, and the next Tab walks into
+         the page rather than the menu that just appeared.
+       - The body is scroll-locked while it is open. The panel is anchored under
+         the floating pill, so a page that keeps scrolling drags the menu away
+         from what it is attached to.
+       - Focus leaving the header closes it, so focus can never end up inside a
+         panel the reader has visually left.
+
+     The closed panel is already out of the tab order: the stylesheet hides it
+     with visibility: hidden, which removes it from the accessibility tree too.
+  ---------------------------------------------------------------------------*/
   var toggle = document.querySelector(".nav-toggle");
-  if (toggle) {
-    var setOpen = function (open) {
+  var panel = toggle && toggle.getAttribute("aria-controls")
+    ? document.getElementById(toggle.getAttribute("aria-controls"))
+    : document.querySelector(".nav-links");
+
+  if (toggle && panel) {
+    var isOpen = function () { return document.body.classList.contains("nav-open"); };
+
+    /* Where the page was when the menu opened, so it can be put back.
+       null means "not currently locked". */
+    var lockedAt = null;
+
+    /* iOS Safari ignores overflow: hidden on the body often enough that it
+       cannot be relied on — the page keeps scrolling behind the panel, which is
+       the defect this is here to fix. Pinning the body at its own offset with
+       position: fixed is the technique that actually holds, and it works
+       everywhere else too. The stylesheet keeps overflow: hidden as well, so a
+       visitor with JS disabled gets the better-than-nothing version. */
+    var lockScroll = function () {
+      lockedAt = window.scrollY;
+      /* Fixing the body removes the scrollbar, which would shunt the page
+         sideways. Hand its width to the stylesheet to pay back as padding. */
+      var gap = window.innerWidth - document.documentElement.clientWidth;
+      document.documentElement.style.setProperty("--scrollbar-width", gap + "px");
+      document.body.style.top = -lockedAt + "px";
+    };
+
+    var unlockScroll = function () {
+      if (lockedAt === null) return;
+      var y = lockedAt;
+      lockedAt = null;
+      document.body.style.top = "";
+      document.documentElement.style.removeProperty("--scrollbar-width");
+      /* The sheet sets scroll-behavior: smooth, which would animate the
+         restore into a visible jump back up the page. */
+      window.scrollTo({ top: y, behavior: "instant" });
+    };
+
+    var setOpen = function (open, returnFocus) {
+      if (open === isOpen()) return;
+
+      if (open) lockScroll();
+
       document.body.classList.toggle("nav-open", open);
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
-    };
-    toggle.addEventListener("click", function () {
-      setOpen(!document.body.classList.contains("nav-open"));
-    });
-    document.querySelectorAll(".nav-links a").forEach(function (link) {
-      link.addEventListener("click", function () { setOpen(false); });
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && document.body.classList.contains("nav-open")) {
-        setOpen(false);
-        toggle.focus();
+
+      if (open) {
+        /* The panel is visibility: hidden until .nav-open lands, and an element
+           that computes to hidden cannot take focus. Style has not been
+           recalculated yet at this point in the same task, so wait a frame —
+           calling focus() straight away silently does nothing. */
+        requestAnimationFrame(function () {
+          var first = panel.querySelector("a[href], button");
+          if (first && isOpen()) first.focus();
+        });
+      } else {
+        unlockScroll();
+        if (returnFocus !== false) toggle.focus();
       }
+    };
+
+    toggle.addEventListener("click", function () { setOpen(!isOpen()); });
+
+    /* Following a link closes the menu, but the browser is already navigating —
+       pulling focus back to the toggle would fight that. */
+    panel.querySelectorAll("a[href]").forEach(function (link) {
+      link.addEventListener("click", function () { setOpen(false, false); });
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && isOpen()) setOpen(false);
+    });
+
+    document.addEventListener("pointerdown", function (e) {
+      if (isOpen() && header && !header.contains(e.target)) setOpen(false, false);
+    });
+
+    document.addEventListener("focusin", function (e) {
+      if (isOpen() && header && !header.contains(e.target)) setOpen(false, false);
     });
   }
+
+  /* ---- Images that did not arrive ----
+     Most photos on the site are still hotlinked placeholders, and a hotlink
+     rots without warning — one had been withdrawn upstream, so two cards
+     printed a sentence of alt text where the picture should have been. Swap a
+     failed image for a quiet brand-tinted tile and move the description to a
+     title, so the layout survives the next withdrawal. The reserved box does
+     not change size: every img here carries width and height. */
+  document.querySelectorAll("img").forEach(function (img) {
+    var onBroken = function () {
+      if (img.dataset.failed) return;
+      img.dataset.failed = "1";
+      if (img.alt) { img.title = img.alt; img.alt = ""; }
+      img.classList.add("img-missing");
+    };
+    if (img.complete && img.naturalWidth === 0) onBroken();
+    else img.addEventListener("error", onBroken);
+  });
 
   /* ---- Conversion tracking ----------------------------------------------
      Every CTA carries data-cta="<location>". A click fires a GA4 event and a
@@ -82,7 +179,7 @@
       if (note) {
         note.textContent =
           "Thanks! This form isn't connected yet — please email hello@boraborabound.com or call (656) 201-5022 in the meantime.";
-        note.style.color = "var(--lagoon)";
+        note.style.color = "var(--link)";
       }
       form.reset();
     });

@@ -161,18 +161,18 @@
         <span class="mark" aria-hidden="true"><img src="/assets/img/logo-mark.png" alt="" width="27" height="42" /></span>
         <span>Bora Bora Bound<small>Cruises · All-Inclusives · Small Groups</small></span>
       </a>
-      <ul class="nav-links">
+      <ul class="nav-links" id="primary-menu">
           <li><a href="/index.html" class="active">Home</a></li>
           <li><a href="/ways-to-travel.html">Ways to Travel</a></li>
           <li><a href="/how-i-work.html">How I Work</a></li>
           <li><a href="/about.html">About</a></li>
           <li><a href="/reviews.html">Reviews</a></li>
           <li><a href="/refer.html">Refer</a></li>
-        <li class="nav-cta-mobile"><a href="https://app.tern.travel/public/forms/YSXCa_LTnTtBehDg0Kty1Q/responses/new" target="_blank" rel="noopener" class="btn btn--gold" data-cta="mobile-plan-your-trip">Plan Your Trip</a></li>
+        <li class="nav-cta-mobile"><a href="https://app.tern.travel/public/forms/YSXCa_LTnTtBehDg0Kty1Q/responses/new" target="_blank" rel="noopener" class="btn btn--primary" data-cta="mobile-plan-your-trip">Plan Your Trip</a></li>
       </ul>
       <div class="nav-cta">
-        <a href="https://app.tern.travel/public/forms/YSXCa_LTnTtBehDg0Kty1Q/responses/new" target="_blank" rel="noopener" class="btn btn--gold" data-cta="nav-plan-your-trip">Plan Your Trip</a>
-        <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+        <a href="https://app.tern.travel/public/forms/YSXCa_LTnTtBehDg0Kty1Q/responses/new" target="_blank" rel="noopener" class="btn btn--primary" data-cta="nav-plan-your-trip">Plan Your Trip</a>
+        <button class="nav-toggle" type="button" aria-label="Toggle menu" aria-controls="primary-menu" aria-expanded="false"><span></span><span></span><span></span></button>
       </div>
     </nav>
   </header>
@@ -186,7 +186,7 @@
       <h1>The good trips, without the <span class="script">guesswork</span></h1>
       <p class="lede">Hi, I'm Zac. Cruises, all-inclusive resorts, and small group tours — that's what I do, and I do it properly. You get the right ship, the right room, and perks you can't book on your own. On most trips, you pay me nothing for it.</p>
       <div class="hero__actions">
-        <a href="#plan" class="btn btn--gold" data-cta="hero-primary">Book a free consultation</a>
+        <a href="#plan" class="btn btn--primary" data-cta="hero-primary">Book a free consultation</a>
         <a href="/ways-to-travel.html" class="btn btn--ghost">See what I plan</a>
       </div>
     </div>
@@ -241,7 +241,7 @@
       </div>
       <div class="service-cards service-cards--pair">
         <a class="service-card reveal" href="/honeymoons.html">
-          <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80" alt="Two champagne glasses on a balcony railing overlooking the ocean at sunset" width="800" height="533" loading="lazy" />
+          <img src="/assets/img/bermuda.jpg" alt="A sheltered turquoise cove in Bermuda, photographed by Zac Sweet-Wright" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>Honeymoons &amp; Romance</h3>
             <p>Built on the same three foundations, with the upgrades and romance amenities arranged in advance rather than requested at check-in.</p>
@@ -249,7 +249,7 @@
           </div>
         </a>
         <a class="service-card reveal d1" href="/lgbtq-travel.html">
-          <img src="https://images.unsplash.com/photo-1561612217-e5dbc7b4b1ab?auto=format&fit=crop&w=800&q=80" alt="A couple walking hand in hand along a palm-lined waterfront promenade" width="800" height="533" loading="lazy" />
+          <img src="/assets/img/stkitts-coastline.jpg" alt="Caribbean coastline seen from a hillside above the water" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>LGBTQ+ Travel</h3>
             <p>NGLCC-certified and personally invested. I'll tell you which ships and resorts are genuinely welcoming — and which ones just say so in the brochure.</p>
@@ -261,7 +261,7 @@
   </section>
 
   <!-- ============ WHY AN ADVISOR ============ -->
-  <section class="section section--cream">
+  <section class="section section--tint">
     <div class="shell">
       <div class="section-head reveal">
         <span class="eyebrow">Why use an advisor at all</span>
@@ -319,7 +319,7 @@
   </section>
 
   <!-- ============ MEET ZAC ============ -->
-  <section class="section section--cream">
+  <section class="section section--tint">
     <div class="shell split">
       <div class="split__media is-portrait reveal">
         <img src="/assets/img/zac-headshot.png" alt="Zac Sweet-Wright, founder and travel advisor at Bora Bora Bound" width="560" height="560" loading="lazy" />
@@ -371,7 +371,7 @@
       <h2>Ready when you are</h2>
       <p>Tell me roughly where, and roughly when. I'll take it from there.</p>
       <div class="cta-band__actions">
-        <a href="https://app.tern.travel/public/forms/YSXCa_LTnTtBehDg0Kty1Q/responses/new" target="_blank" rel="noopener" class="btn btn--gold" data-cta="home-consult">Book a free consultation</a>
+        <a href="https://app.tern.travel/public/forms/YSXCa_LTnTtBehDg0Kty1Q/responses/new" target="_blank" rel="noopener" class="btn btn--primary" data-cta="home-consult">Book a free consultation</a>
         <a href="/contact.html" class="btn btn--ghost">Email or call instead</a>
       </div>
       <p class="cta-band__direct">
@@ -406,7 +406,8 @@
           </div>
         </div>
         <div>
-          <h4>What I plan</h4>
+          <h2 class="footer-col__title" id="footer-plan">What I plan</h2>
+          <nav aria-labelledby="footer-plan">
           <ul class="footer-links">
             <li><a href="/cruises.html">Cruises</a></li>
             <li><a href="/all-inclusive-resorts.html">All-Inclusive Resorts</a></li>
@@ -414,9 +415,11 @@
             <li><a href="/honeymoons.html">Honeymoons & Romance</a></li>
             <li><a href="/lgbtq-travel.html">LGBTQ+ Travel</a></li>
           </ul>
+          </nav>
         </div>
         <div>
-          <h4>Explore</h4>
+          <h2 class="footer-col__title" id="footer-explore">Explore</h2>
+          <nav aria-labelledby="footer-explore">
           <ul class="footer-links">
             <li><a href="/index.html">Home</a></li>
             <li><a href="/ways-to-travel.html">Ways to Travel</a></li>
@@ -426,15 +429,18 @@
             <li><a href="/refer.html">Refer</a></li>
             <li><a href="/journal.html">Journal</a></li>
           </ul>
+          </nav>
         </div>
         <div>
-          <h4>Get in touch</h4>
+          <h2 class="footer-col__title" id="footer-touch">Get in touch</h2>
+          <nav aria-labelledby="footer-touch">
           <ul class="footer-links">
             <li><a href="mailto:hello@boraborabound.com">hello@boraborabound.com</a></li>
             <li><a href="tel:+16562015022">(656) 201-5022</a></li>
             <li><a href="https://app.tern.travel/public/forms/YSXCa_LTnTtBehDg0Kty1Q/responses/new" target="_blank" rel="noopener" data-cta="footer-consult">Book a free consultation</a></li>
             <li><a href="/contact.html">All the ways to reach me</a></li>
           </ul>
+          </nav>
         </div>
       </div>
       <div class="footer-bottom">
