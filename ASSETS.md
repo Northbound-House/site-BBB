@@ -49,9 +49,18 @@ describing the photo that used to be there.
 | Several | Bottom CTA band | `IMG_HERO_HOME` | `cta-band.jpg` | Landscape, ~1920×1080 |
 | 404 | Error page background | `IMG_HERO_404` | `notfound.jpg` | Landscape, ~1920×1080 |
 
-**The `IMG_CARD_HONEYMOON` slot is the urgent one.** Its Unsplash photo was
-withdrawn, so it is currently pointing at `bermuda.jpg` — a real photo, but one
-already used elsewhere on the site. A genuine honeymoon shot would replace it.
+**Two slots are urgent.** Both had their Unsplash photo withdrawn upstream, and
+both now point at a photo already used elsewhere on the site so the card is not
+blank:
+
+| Slot | Standing in with | Why it needs replacing |
+| --- | --- | --- |
+| `IMG_CARD_HONEYMOON` | `bermuda.jpg` | A cove, on a card selling honeymoons. |
+| `IMG_CARD_LGBTQ` | `stkitts-coastline.jpg` | Third use of the same coastline, and it says nothing about LGBTQ+ travel. |
+
+Two withdrawn photos out of eight, one of them found only once the check ran on a
+network that could reach Unsplash. That is the argument for real photography in
+one line: **a hotlink is a photo someone else can delete.**
 
 ## 2. Logo → `assets/img/`
 

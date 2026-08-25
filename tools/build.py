@@ -89,9 +89,16 @@ IMAGES = {
     "IMG_CARD_HONEYMOON": (
         "/assets/img/bermuda.jpg",
         "A sheltered turquoise cove in Bermuda, photographed by Zac Sweet-Wright"),
+    # Was unsplash("1561612217-e5dbc7b4b1ab") -- withdrawn upstream, found by
+    # tools/audit running in CI where the host actually resolves. Pointed at a
+    # photo in the repo so the card is not blank, but this is the third use of
+    # that coastline shot and it says nothing about LGBTQ+ travel. It is a
+    # stopgap: replacing it is the most urgent item in ASSETS.md after
+    # IMG_CARD_HONEYMOON. The alt text describes the photo that is actually
+    # there, not the one that used to be.
     "IMG_CARD_LGBTQ": (
-        unsplash("1561612217-e5dbc7b4b1ab"),
-        "A couple walking hand in hand along a palm-lined waterfront promenade"),
+        "/assets/img/stkitts-coastline.jpg",
+        "Caribbean coastline seen from a hillside above the water"),
 
     # Full-bleed page and hero backgrounds -- drawn in CSS, so no alt text
     "IMG_HERO_HOME":          (unsplash("1505228395891-9a51e7e86bf6", 1920), None),
