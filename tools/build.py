@@ -116,13 +116,31 @@ IMAGES = {
 }
 
 
+def image_url(slot):
+    """The URL behind an IMAGES slot key."""
+    if slot not in IMAGES:
+        raise SystemExit(f"unknown image slot {slot}")
+    return IMAGES[slot][0]
+
+
+def absolute_image_url(slot):
+    """Same, but absolute — structured data needs a full URL.
+
+    A slot may hold either a repo-relative path or an already-absolute remote
+    one, so prefixing SITE_URL unconditionally would emit a malformed URL the
+    moment a post pointed at a hotlinked photo.
+    """
+    url = image_url(slot)
+    return url if url.startswith(("http://", "https://")) else f"{SITE_URL}{url}"
+
+
 def image_tokens():
     """{{IMG_X}} is the URL, {{IMG_X_ALT}} the description that goes with it."""
     out = {}
     for slot, (url, alt) in IMAGES.items():
         out[slot] = url
         if alt is not None:
-            out[f"{slot}_ALT"] = esc(alt)
+            out[f"{slot}_ALT"] = attr_esc(alt)
     return out
 
 # --- Analytics ----------------------------------------------------------
@@ -193,8 +211,7 @@ POSTS = [
         ),
         date="2026-08-11",
         minutes=6,
-        image="/assets/img/stkitts-coastline.jpg",
-        image_alt="Caribbean coastline seen from a hillside, the kind of view a first cruise is built around",
+        image="IMG_COASTLINE",
     ),
     dict(
         slug="what-all-inclusive-actually-includes",
@@ -209,8 +226,7 @@ POSTS = [
         ),
         date="2026-08-11",
         minutes=6,
-        image="/assets/img/bermuda.jpg",
-        image_alt="Turquoise water and a sheltered cove in Bermuda, photographed by Zac Sweet-Wright",
+        image="IMG_BERMUDA",
     ),
     dict(
         slug="alaska-may-july-september",
@@ -225,8 +241,7 @@ POSTS = [
         ),
         date="2026-08-11",
         minutes=5,
-        image="/assets/img/stkitts-coastline.jpg",
-        image_alt="Coastal water and headland — the kind of scenic cruising Alaska is booked for",
+        image="IMG_COASTLINE",
     ),
     dict(
         slug="reading-a-small-group-tour-inclusion-list",
@@ -241,8 +256,7 @@ POSTS = [
         ),
         date="2026-08-11",
         minutes=6,
-        image="/assets/img/bermuda.jpg",
-        image_alt="A coastal viewpoint with a footpath below — the kind of stop a good small group tour builds in",
+        image="IMG_BERMUDA",
     ),
     dict(
         slug="cabin-categories-worth-paying-for",
@@ -257,8 +271,7 @@ POSTS = [
         ),
         date="2026-08-11",
         minutes=6,
-        image="/assets/img/stkitts-coastline.jpg",
-        image_alt="Open water and coastline from height, the view a balcony cabin is bought for",
+        image="IMG_COASTLINE",
     ),
 ]
 
@@ -286,7 +299,7 @@ def blogposting_schema(post):
         "author": {"@id": PERSON_ID},
         "publisher": {"@id": AGENCY_ID},
         "mainEntityOfPage": post_url(post),
-        "image": f"{SITE_URL}{post['image']}",
+        "image": absolute_image_url(post["image"]),
         "isPartOf": {"@id": f"{SITE_URL}/journal.html#blog"},
     }
 
@@ -309,7 +322,7 @@ def render_post_list():
         out.append(
             f'        <li class="post-card">\n'
             f'          <a class="post-card__media" href="/journal/{post["slug"]}.html" tabindex="-1" aria-hidden="true">'
-            f'<img src="{post["image"]}" alt="" width="1400" height="788" loading="lazy" /></a>\n'
+            f'<img src="{image_url(post["image"])}" alt="" width="1400" height="788" loading="lazy" /></a>\n'
             f'          <div class="post-card__body">\n'
             f'            <p class="post-card__meta"><time datetime="{post["date"]}">'
             f'{pretty_date(post["date"])}</time> &middot; {post["minutes"]} min read</p>\n'
@@ -337,7 +350,18 @@ BRAND_MARK_WHITE = (
 
 
 def esc(text):
+    """Escape for HTML text content."""
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def attr_esc(text):
+    """Escape for an HTML attribute value.
+
+    esc() is not enough here: it leaves quotes alone, and alt text goes straight
+    into alt="...". One ship name in quotes would close the attribute early and
+    silently break the markup.
+    """
+    return esc(text).replace('"', "&quot;").replace("'", "&#39;")
 
 
 PAGES = {
@@ -832,24 +856,30 @@ def footer_block():
           </div>
         </div>
         <div>
-          <h2 class="footer-col__title">What I plan</h2>
+          <h2 class="footer-col__title" id="footer-plan">What I plan</h2>
+          <nav aria-labelledby="footer-plan">
           <ul class="footer-links">
 {plan}          </ul>
+          </nav>
         </div>
         <div>
-          <h2 class="footer-col__title">Explore</h2>
+          <h2 class="footer-col__title" id="footer-explore">Explore</h2>
+          <nav aria-labelledby="footer-explore">
           <ul class="footer-links">
 {explore}            <li><a href="/journal.html">Journal</a></li>
           </ul>
+          </nav>
         </div>
         <div>
-          <h2 class="footer-col__title">Get in touch</h2>
+          <h2 class="footer-col__title" id="footer-touch">Get in touch</h2>
+          <nav aria-labelledby="footer-touch">
           <ul class="footer-links">
             <li><a href="mailto:{EMAIL}">{EMAIL}</a></li>
             <li><a href="tel:{PHONE_E164}">{PHONE_DISPLAY}</a></li>
             <li><a href="{TERN_SCHEDULING}" target="_blank" rel="noopener" data-cta="footer-consult">Book a free consultation</a></li>
             <li><a href="/contact.html">All the ways to reach me</a></li>
           </ul>
+          </nav>
         </div>
       </div>
       <div class="footer-bottom">

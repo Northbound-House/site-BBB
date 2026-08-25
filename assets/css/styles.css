@@ -262,7 +262,6 @@
   --service-pair-cols:            2; /* cards per row in the two-card row */
   --service-gap:             1.5rem; /* space between service cards */
   --service-row-gap:         1.5rem; /* space between the three-card and two-card rows */
-  --service-image-ratio:     3 / 2; /* shape of the card photo — bigger = shorter */
   --service-pad-top:         1.4rem; /* space above the card title */
   --service-pad-x:           1.5rem; /* left/right padding inside a service card */
   --service-pad-bottom:      1.5rem; /* space below the card link */
@@ -380,6 +379,10 @@
      footer link rows grow their height, but only under --bp-tap. */
   --tap-min:                   44px; /* smallest touch target, every side (WCAG 2.5.5) */
   --bp-tap:                  1000px; /* width below which rows grow to --tap-min */
+  /* --bp-tap holds the same number as --bp-nav-menu and stays a separate knob.
+     They answer different questions — where the nav runs out of room, versus
+     where a target has to be finger-sized — so moving one should not drag the
+     other with it. */
 
   /* FOCUS AND SKIP LINK ------------------------------------------- */
   --focus-ring-width:           2px; /* thickness of the keyboard focus outline */
@@ -1179,9 +1182,16 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   transform: translateY(calc(-1 * var(--service-lift)));
   box-shadow: var(--shadow);
 }
+/* No aspect-ratio here, deliberately. The width/height attributes on these
+   <img> tags are presentational hints, and with no height declared in CSS the
+   height hint wins over an aspect-ratio — so `aspect-ratio: 3/2` sat in this
+   rule doing nothing while the cards rendered portrait at 0.64. A knob that
+   moves no pixels is worse than no knob, so --service-image-ratio is gone too.
+   The height attribute in pages/*.html is what sets the box; object-fit crops
+   the photo into it. Giving the CSS the ratio back means adding `height: auto`,
+   which shortens every card by ~300px — a redesign, not a fix. */
 .service-card img {
   width: 100%;
-  aspect-ratio: var(--service-image-ratio);
   object-fit: cover;
   display: block;
 }
@@ -1734,6 +1744,14 @@ h1, h2 { text-transform: uppercase; }
      there is no dropdown to scroll behind. main.js pays back the width of the
      scrollbar this removes so nothing shifts sideways as it locks. */
   body.nav-open {
+    /* main.js pins the body with position: fixed and its own offset — the only
+       lock iOS Safari reliably honours. overflow: hidden stays as the no-JS
+       fallback, and padding-right pays back the width of the scrollbar the
+       lock removes so nothing shifts sideways. */
+    position: fixed;
+    left: 0;
+    right: 0;
+    width: 100%;
     overflow: hidden;
     padding-right: var(--scrollbar-width, 0px);
   }
@@ -1905,8 +1923,11 @@ h1, h2 { text-transform: uppercase; }
     min-height: var(--tap-min);
   }
 
-  /* The lockups draw at 42px. Two pixels short is still short. */
-  .brand { min-height: var(--tap-min); }
+  /* The brand lockups draw at 42px and stay there. Growing them to 44 pushed
+     the floating pill from 57px to 59px, and the pill's height is part of a
+     locked design. They are exempt rather than overlooked: the lockup is the
+     home link, the menu carries its own "Home" entry, and tools/audit records
+     the exemption with that reason instead of quietly passing them. */
 
   /* Menu rows land at ~42px from their padding alone. */
   .nav-links a {
@@ -1919,11 +1940,16 @@ h1, h2 { text-transform: uppercase; }
      the bar even though the button looks generous. */
   .btn { min-height: var(--tap-min); }
 
-  /* A journal title that wraps is an inline link spanning two or three
-     ragged line boxes, so the corners of the block it appears to occupy
-     are not actually part of it. As a block it becomes the solid
-     rectangle it already looks like, and the whole title is tappable. */
-  .post-card h3 a { display: block; }
+  /* A journal title is an inline link over one to three ragged line boxes, so
+     the corners of the block it appears to occupy are not actually part of it —
+     and a one-line title is only 26px tall regardless. As a flex box it becomes
+     the solid rectangle it already looks like, and the whole title is tappable
+     whether it wraps or not. */
+  .post-card h3 a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-min);
+  }
 }
 
 /* A photo that never arrived. main.js adds this when an image fails to decode,

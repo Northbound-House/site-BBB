@@ -118,6 +118,20 @@ alt text beside it, so replacing one is a single line. `tools/audit`'s
 can reach `images.unsplash.com`, or it reports them UNVERIFIED rather than
 passing them.
 
+### Known, deliberately deferred: the service card crop
+
+`.service-card img` carried `aspect-ratio: 3/2` that had never applied. The
+`width`/`height` attributes on an `<img>` are presentational hints, and with no
+`height` declared in CSS the height hint beats an aspect-ratio — so the cards
+render portrait at 0.64, and the honeymoon card at 0.99 because its row is
+two-up. The inert declaration and its `--service-image-ratio` knob have been
+removed, and the rule now says the height attribute is what sets the box.
+
+**Giving the CSS the ratio back is a one-line change** (`height: auto` on
+`.service-card img`) that shortens every card by roughly 300px. That is a
+redesign of the homepage rhythm, not a defect fix, so it is a decision waiting
+rather than something overlooked.
+
 Two Drive folders were reviewed and **cannot** be used: `JustBooked` is
 1080×1080 social graphics with "JUST BOOKED", your name and the URL baked into
 the pixels; `Supplier Images` is cruise line logos and supplier marketing shots

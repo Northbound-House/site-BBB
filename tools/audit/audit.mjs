@@ -28,11 +28,52 @@ const PORT = 4173; // matches .claude/launch.json
 
 /* ---- Policy ------------------------------------------------------------- */
 
-// Pages that are SUPPOSED to carry noindex even in production.
-const ALWAYS_NOINDEX = new Set(["terms.html", "404.html"]);
+// Pages that are SUPPOSED to carry noindex even in production. Read out of
+// build.py rather than restated here: two copies of the policy the guard exists
+// to enforce is the same defect this suite is meant to catch.
+let ALWAYS_NOINDEX = new Set();
 
 // WCAG 2.5.5 Target Size (Enhanced). The site's own bar.
 const TAP_MIN = 44;
+
+// Targets held below TAP_MIN on purpose. A finding removed from the report has
+// to be removed on the record, with the reason attached — an exemption nobody
+// can see is indistinguishable from a detector that missed something.
+const TAP_EXEMPT = [
+  {
+    selector: ".brand",
+    reason:
+      "The brand lockup draws at 42px and the floating pill's height is part " +
+      "of a locked design. It is the home link, and the menu carries its own " +
+      "Home entry, so the destination is not reachable only here.",
+  },
+];
+
+// How long to wait on any third-party request (photos, webfonts) before giving
+// up on it. Without a bound, a network that black-holes a host instead of
+// refusing it turns a two-minute run into nine minutes of idle waiting — nearly
+// all of this suite's wall time, and none of its work.
+const EXTERNAL_TIMEOUT = 4000;
+
+// Google Fonts is blocked for the measuring pass, always — not because it is
+// unreachable, but so that the answer does not depend on whether it is.
+//
+// Bebas Neue is condensed: with it loaded a journal title fits one 26px line;
+// without it the same title wraps to two and measures 52px. That flipped a
+// tap-target finding between runs on different networks, which makes a green
+// result meaningless. The fallback face is the deterministic choice and a state
+// the site explicitly supports — main.js only adds .display-face-ready once
+// Bebas is confirmed present, and the stylesheet carries a whole phone headline
+// curve scoped to the stand-in.
+//
+// Pass B leaves fonts alone: it is checking images, and there the real page is
+// what matters.
+const WEBFONT_HOSTS = /(^|\.)(fonts\.googleapis\.com|fonts\.gstatic\.com)$/;
+
+// Two test widths. 390px is the phone the 26 original findings came from; 768px
+// is a touch device sitting in a band nothing else checks — above the phone
+// breakpoints, below the 1000px nav collapse.
+const TAP_WIDTHS = [390, 768];
 
 // Custom properties may share a value only when the duplication is deliberate
 // and the roles are genuinely distinct. Each group needs a reason here, so a
@@ -70,6 +111,44 @@ const MIME = {
   ".xml": "application/xml", ".txt": "text/plain; charset=utf-8",
 };
 
+/** Route every off-origin request through a timeout, recording what each one
+ *  actually answered.
+ *
+ *  The status matters more than the failure: an egress proxy that denies a host
+ *  answers 403 as an ordinary HTTP response rather than throwing, so "the
+ *  request failed" cannot tell a withdrawn photo from one this network simply
+ *  refused to fetch. Getting that backwards is worse than not checking — it
+ *  sends someone hunting for replacements for photos that are perfectly fine.
+ *
+ *    404 / 410            the photo is genuinely gone
+ *    403 / 407 / 5xx      a gateway refused; we learned nothing about the photo
+ *    thrown / timed out   same
+ */
+function boundExternal(ctx, seen) {
+  return ctx.route((url) => url.host !== `127.0.0.1:${PORT}`, async (route) => {
+    const url = route.request().url();
+    try {
+      const res = await route.fetch({ timeout: EXTERNAL_TIMEOUT });
+      seen.set(url, res.status());
+      return await route.fulfill({ response: res });
+    } catch {
+      seen.set(url, "unreachable");
+      return route.abort();
+    }
+  });
+}
+
+/** Did we actually learn anything about this URL? */
+const GONE = new Set([404, 410]);
+function externalVerdict(seen, url) {
+  const status = seen.get(url);
+  if (status === undefined) return { known: false, why: "no response recorded" };
+  if (status === "unreachable") return { known: false, why: "the request timed out or was refused" };
+  if (GONE.has(status)) return { known: true, why: `the host answered ${status}` };
+  if (status >= 400) return { known: false, why: `a gateway answered ${status}` };
+  return { known: true, why: `the host answered ${status}` };
+}
+
 function serve() {
   const server = createServer(async (req, res) => {
     let rel = decodeURIComponent(new URL(req.url, "http://x").pathname);
@@ -100,6 +179,13 @@ async function pageList() {
   const posts = [...src.matchAll(/^\s+slug="([^"]+)"/gm)].map((m) => `journal/${m[1]}.html`);
   if (!pages.length) throw new Error("could not read PAGES from tools/build.py");
   return [...pages, ...posts];
+}
+
+async function deliberateNoindex() {
+  const src = await readFile(path.join(ROOT, "tools/build.py"), "utf-8");
+  const m = src.match(/^DELIBERATE_NOINDEX = \{([^}]*)\}/m);
+  if (!m) throw new Error("could not read DELIBERATE_NOINDEX from tools/build.py");
+  return new Set([...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]));
 }
 
 async function stagingFlag() {
@@ -141,28 +227,42 @@ async function detectStagingLeak(page, url, staging) {
 /** #2 — an <img> that did not decode. Cross-origin images that never reached
  *  the network are reported UNVERIFIED, never PASS: a detector that goes green
  *  because it could not reach the host is worse than no detector at all. */
-async function detectBrokenImages(page, url, blockedHosts) {
+async function detectBrokenImages(page, url, externalSeen) {
   const name = url.replace(/^\//, "") || "index.html";
   const imgs = await page.$$eval("img", (els) =>
     els.map((el) => ({
       src: el.currentSrc || el.src,
       ok: el.complete && el.naturalWidth > 0,
-      alt: el.getAttribute("alt") || "",
+      // main.js moves alt to title when an image fails, so read both — the
+      // description is what identifies which photo died.
+      alt: el.getAttribute("alt") || el.getAttribute("title") || "",
+      handled: el.classList.contains("img-missing"),
     })));
   for (const img of imgs) {
     let host = "";
     try { host = new URL(img.src).host; } catch { /* data: or empty */ }
     const external = host && host !== `127.0.0.1:${PORT}`;
     if (img.ok) { pass("broken-images", name, img.src); continue; }
-    if (external && blockedHosts.has(host)) {
+    const verdict = external ? externalVerdict(externalSeen, img.src) : null;
+    if (external && !verdict.known) {
       unver("broken-images", name,
-        `${img.src} — ${host} is unreachable from this environment ` +
-        `(the proxy denied CONNECT). Re-run where the host resolves to check ` +
-        `for hotlink rot.`);
+        `${img.src} — not checked: ${verdict.why}. This says nothing about ` +
+        `whether the photo is still there. Re-run somewhere ${host} resolves.`);
+    } else if (external) {
+      // A photo a third party withdrew. Reported loudly, but it must not fail
+      // the build: blocking an unrelated merge on a stranger's decision gets
+      // the check disabled, not the photo replaced. tools/audit's caller
+      // decides what to do with these — see ROTTED below.
+      record("broken-images", "ROTTED", name,
+        `${img.src} did not decode. ${verdict.why}, so this photo is gone ` +
+        `upstream. The page shows ${img.handled ? "the fallback tile" : "its alt text"} ` +
+        `where "${img.alt}" should be. Repoint the slot in the IMAGES table ` +
+        `in tools/build.py.`);
     } else {
       fail("broken-images", name,
-        `${img.src} did not decode — the page renders the alt text ` +
-        `"${img.alt}" in its place`);
+        `${img.src} did not decode. The page shows ` +
+        `${img.handled ? "the fallback tile" : "its alt text"} where ` +
+        `"${img.alt}" should be.`);
     }
   }
 }
@@ -315,6 +415,24 @@ async function detectMenuA11y(page, url) {
     fail("menu-a11y", name, `the page scrolled ${scrolled}px behind the open menu`);
   }
 
+  // The symptom check above passes on overflow: hidden alone, which iOS Safari
+  // often ignores — and this runs in Chromium, so it cannot see that. Assert the
+  // mechanism as well: only the position: fixed lock holds on the browser most
+  // at risk, and the browser most at risk is not the one under test.
+  const lock = await page.evaluate(() => {
+    const cs = getComputedStyle(document.body);
+    return { position: cs.position, top: cs.top };
+  });
+  if (lock.position === "fixed" && /^-?\d/.test(lock.top)) {
+    pass("menu-a11y", name,
+      `body is position: fixed at ${lock.top} — the lock iOS Safari honours`);
+  } else {
+    fail("menu-a11y", name,
+      `body is position: ${lock.position} (top: ${lock.top}) while open. ` +
+      `overflow: hidden alone is unreliable on iOS Safari, where the page ` +
+      `keeps scrolling behind the panel.`);
+  }
+
   // Escape closes and hands focus back.
   await page.keyboard.press("Escape");
   await page.waitForTimeout(350);
@@ -338,7 +456,7 @@ async function detectMenuA11y(page, url) {
  *  enough but whose corners are covered by a neighbour. */
 async function detectTapTargets(page, url, label, scope) {
   const name = (url.replace(/^\//, "") || "index.html") + label;
-  const small = await page.evaluate(({ MIN, scope }) => {
+  const small = await page.evaluate(({ MIN, scope, exempt }) => {
     const sel = 'a[href], button, input:not([type="hidden"]), select, textarea,' +
       ' [tabindex]:not([tabindex="-1"])';
     const root = scope ? document.querySelector(scope) : document;
@@ -402,36 +520,42 @@ async function detectTapTargets(page, url, label, scope) {
         [...(el.parentElement?.childNodes || [])].some(
           (n) => n.nodeType === 3 && n.textContent.trim().length > 0);
 
+      // Held below the bar on purpose, with a reason recorded in TAP_EXEMPT.
+      const held = exempt.find((x) => el.matches(x.selector));
+
       const cls = typeof el.className === "string" && el.className.trim()
         ? `.${el.className.trim().split(/\s+/).join(".")}` : "";
       out.push({
         tag: el.tagName.toLowerCase(),
         cls,
         inline,
+        exemptReason: held ? held.reason : null,
         text: (el.textContent || el.getAttribute("aria-label") || "").trim().slice(0, 40),
         w: Math.round(r.width), h: Math.round(r.height),
       });
     }
     window.scrollTo({ top: 0, behavior: "instant" });
     return out;
-  }, { MIN: TAP_MIN, scope });
+  }, { MIN: TAP_MIN, scope, exempt: TAP_EXEMPT });
 
-  const real = small.filter((s) => !s.inline);
-  const exempt = small.filter((s) => s.inline);
+  const real = small.filter((s) => !s.inline && !s.exemptReason);
+  const exempt = small.filter((s) => s.inline || s.exemptReason);
 
   if (!real.length) {
     pass("tap-targets", name,
       `every target offers ${TAP_MIN}x${TAP_MIN}` +
-      (exempt.length ? ` (${exempt.length} inline-in-a-sentence, exempt)` : ""));
+      (exempt.length ? ` (${exempt.length} exempt)` : ""));
   }
   for (const s of real) {
     fail("tap-targets", name,
       `${s.tag}${s.cls} "${s.text}" — ${s.w}x${s.h}, under ${TAP_MIN}x${TAP_MIN}`);
   }
   for (const s of exempt) {
+    const why = s.exemptReason
+      ? s.exemptReason
+      : "inside a sentence (WCAG 2.5.5 inline exception)";
     record("tap-targets", "EXEMPT", name,
-      `${s.tag}${s.cls} "${s.text}" — ${s.w}x${s.h}, inside a sentence ` +
-      `(WCAG 2.5.5 inline exception)`);
+      `${s.tag}${s.cls} "${s.text}" — ${s.w}x${s.h}, ${why}`);
   }
 }
 
@@ -494,51 +618,55 @@ async function main() {
     shotsIdx > -1 ? process.argv[shotsIdx + 1] : ".shots");
 
   const staging = await stagingFlag();
+  ALWAYS_NOINDEX = await deliberateNoindex();
   const pages = await pageList();
   const server = await serve();
   const browser = await chromium.launch(launchOptions());
-  const blockedHosts = new Set();
+  const externalSeen = new Map();
 
   try {
     /* Pass A — layout and semantics, with external images stubbed so the boxes
        are the right size even though the host is unreachable here. */
-    const ctxA = await browser.newContext({ viewport: { width: 390, height: 844 } });
-    await ctxA.route("**unsplash.com/**", (route) => {
-      try { blockedHosts.add(new URL(route.request().url()).host); } catch { /* ignore */ }
-      return route.fulfill({ status: 200, contentType: "image/png", body: STUB_PNG });
-    });
-    const a = await ctxA.newPage();
+    for (const width of TAP_WIDTHS) {
+      const ctxA = await browser.newContext({ viewport: { width, height: 844 } });
+      // Photos are stubbed here so boxes are the right size regardless of
+      // reachability; the stub must be registered before the general handler.
+      await ctxA.route("**unsplash.com/**", (route) =>
+        route.fulfill({ status: 200, contentType: "image/png", body: STUB_PNG }));
+      await ctxA.route((url) => WEBFONT_HOSTS.test(url.host), (route) => route.abort());
+      await boundExternal(ctxA, externalSeen);
+      const a = await ctxA.newPage();
 
-    for (const file of pages) {
-      const url = `http://127.0.0.1:${PORT}/${file === "index.html" ? "" : file}`;
-      await a.goto(url, { waitUntil: "load" });
-      await detectStagingLeak(a, `/${file}`, staging);
-      await detectHeadingOrder(a, `/${file}`);
-      await detectTapTargets(a, `/${file}`, " [menu closed]", null);
-      await detectMenuA11y(a, `/${file}`);
-      // Re-open so the menu's own links get measured too.
-      const t = await a.$(".nav-toggle");
-      if (t) {
-        await t.click();
-        await a.waitForTimeout(350);
-        // Scope to the header: the open dropdown covers page content, and a
-        // target hidden behind it is not a tap-target defect.
-        await detectTapTargets(a, `/${file}`, " [menu open]", ".site-header");
-        await a.keyboard.press("Escape");
-        await a.waitForTimeout(200);
+      for (const file of pages) {
+        const url = `http://127.0.0.1:${PORT}/${file === "index.html" ? "" : file}`;
+        await a.goto(url, { waitUntil: "load" });
+        // Page-level semantics do not vary by viewport; run them once.
+        if (width === TAP_WIDTHS[0]) {
+          await detectStagingLeak(a, `/${file}`, staging);
+          await detectHeadingOrder(a, `/${file}`);
+          await detectMenuA11y(a, `/${file}`);
+        }
+        await detectTapTargets(a, `/${file}`, ` [${width}px, menu closed]`, null);
+        // Re-open so the menu's own links get measured too.
+        const t = await a.$(".nav-toggle");
+        if (t) {
+          await t.click();
+          await a.waitForTimeout(350);
+          // Scope to the header: the open dropdown covers page content, and a
+          // target hidden behind it is not a tap-target defect.
+          await detectTapTargets(a, `/${file}`, ` [${width}px, menu open]`, ".site-header");
+          await a.keyboard.press("Escape");
+          await a.waitForTimeout(200);
+        }
+        if (file === "index.html" && width === TAP_WIDTHS[0]) await detectTokenTruth(a);
       }
-      if (file === "index.html") await detectTokenTruth(a);
+      await ctxA.close();
     }
-    await ctxA.close();
 
     /* Pass B — images, unstubbed, so a genuinely dead URL is visible. */
     const ctxB = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+    await boundExternal(ctxB, externalSeen);
     const b = await ctxB.newPage();
-    b.on("requestfailed", (req) => {
-      if (req.resourceType() === "image") {
-        try { blockedHosts.add(new URL(req.url()).host); } catch { /* ignore */ }
-      }
-    });
     for (const file of pages) {
       const url = `http://127.0.0.1:${PORT}/${file === "index.html" ? "" : file}`;
       await b.goto(url, { waitUntil: "load" });
@@ -548,8 +676,14 @@ async function main() {
         window.scrollTo(0, document.body.scrollHeight);
         await new Promise((r) => setTimeout(r, 250));
       });
-      await b.waitForTimeout(500);
-      await detectBrokenImages(b, `/${file}`, blockedHosts);
+      // Wait for every image to settle before judging it. Lazy images only
+      // start loading after the forced eager pass above, so a fixed 500ms wait
+      // caught them mid-flight and reported still-pending photos as withdrawn.
+      await b.waitForFunction(
+        () => [...document.images].every((i) => i.complete),
+        null, { timeout: EXTERNAL_TIMEOUT + 3000 },
+      ).catch(() => { /* something never settled; judged on its merits below */ });
+      await detectBrokenImages(b, `/${file}`, externalSeen);
 
       if (wantShots) {
         await mkdir(shotsDir, { recursive: true });
@@ -565,26 +699,29 @@ async function main() {
     server.close();
   }
 
-  report(staging, wantShots ? shotsDir : null);
+  await report(staging, wantShots ? shotsDir : null, externalSeen);
 }
 
-function report(staging, shotsDir) {
+async function report(staging, shotsDir, unreachable) {
   const detectors = [...new Set(results.map((r) => r.detector))].sort();
   const counts = (d, s) =>
     results.filter((r) => r.detector === d && r.status === s).length;
 
-  console.log(`\nBora Bora Bound — detector suite   (STAGING=${staging})\n`);
-  let failed = 0;
+  console.log(`\nBora Bora Bound — detector suite   (STAGING=${staging})`);
+  console.log(`Measured in the fallback face; the webfont is blocked so the ` +
+    `result cannot vary\nwith whether Google Fonts is reachable.\n`);
+  let failed = 0, rotted = 0;
   for (const d of detectors) {
     const f = counts(d, "FAIL"), u = counts(d, "UNVERIFIED"),
-      p = counts(d, "PASS"), e = counts(d, "EXEMPT");
+      p = counts(d, "PASS"), e = counts(d, "EXEMPT"), r = counts(d, "ROTTED");
     failed += f;
-    const mark = f ? "FAIL" : u ? "WARN" : "PASS";
+    rotted += r;
+    const mark = f ? "FAIL" : (u || r) ? "WARN" : "PASS";
     console.log(`${mark.padEnd(5)} ${d.padEnd(16)} ${p} pass  ${f} fail  ` +
-      `${u} unverified${e ? `  ${e} exempt` : ""}`);
+      `${u} unverified${e ? `  ${e} exempt` : ""}${r ? `  ${r} rotted` : ""}`);
   }
 
-  for (const status of ["FAIL", "UNVERIFIED", "EXEMPT"]) {
+  for (const status of ["FAIL", "ROTTED", "UNVERIFIED", "EXEMPT"]) {
     const rows = results.filter((r) => r.status === status);
     if (!rows.length) continue;
     console.log(`\n--- ${status} (${rows.length}) ---`);
@@ -604,7 +741,39 @@ function report(staging, shotsDir) {
   }
 
   if (shotsDir) console.log(`\nScreenshots: ${shotsDir}`);
+
+  const unreached = new Set();
+  for (const [url, status] of unreachable) {
+    if (status === "unreachable" || (typeof status === "number" && status >= 400 && !GONE.has(status))) {
+      try { unreached.add(new URL(url).host); } catch { /* ignore */ }
+    }
+  }
+  if (unreached.size) {
+    console.log(`\nNot reachable from this network: ${[...unreached].sort().join(", ")}` +
+      `\n  Nothing served by those hosts was checked, and a green run above does` +
+      `\n  not cover them. Re-run somewhere they resolve.`);
+  }
+
+  if (rotted) {
+    console.log(
+      `\n${"=".repeat(70)}\n` +
+      `${rotted} hotlinked photo${rotted === 1 ? " has" : "s have"} been ` +
+      `withdrawn upstream and ${rotted === 1 ? "is" : "are"} rendering alt ` +
+      `text on the live site.\nFix by repointing the slot in the IMAGES table ` +
+      `in tools/build.py. This does NOT fail the\nbuild — a third party's ` +
+      `decision should not block an unrelated merge — but it is\nnot optional ` +
+      `either.\n${"=".repeat(70)}`);
+  }
   console.log(failed ? `\n${failed} findings.\n` : "\nAll detectors green.\n");
+
+  // Machine-readable tail, so CI can comment on rot without re-parsing the log.
+  if (process.env.GITHUB_OUTPUT) {
+    const { appendFileSync } = await import("node:fs");
+    const lines = results.filter((r) => r.status === "ROTTED")
+      .map((r) => `- \`${r.where}\` — ${r.detail}`).join("\n");
+    appendFileSync(process.env.GITHUB_OUTPUT,
+      `rotted=${rotted}\nrotted_body<<EOF\n${lines}\nEOF\n`);
+  }
   process.exit(failed ? 1 : 0);
 }
 

@@ -245,12 +245,72 @@ node audit.mjs --screenshots   # plus 1280x800 stills, for before/after diffs
 | `tap-targets` | Every control offers 44x44, per WCAG 2.5.5 |
 | `heading-order` | Every page starts at `h1` and skips no level |
 
-Two behaviours worth knowing. Images on a host the current network cannot reach
-are reported **UNVERIFIED**, never PASS — a detector that goes green because it
-could not check is worse than no detector. And `tap-targets` reports links that
-sit inside a sentence as **EXEMPT** rather than failing them: WCAG excludes
-targets whose size is constrained by the line-height of the text around them,
-and enlarging one would open up the leading of the paragraph it sits in.
+Runs at 390px and 768px — phone, and the touch band between the phone
+breakpoints and the 1000px nav collapse.
+
+**It blocks Google Fonts while measuring, on purpose.** Bebas is condensed: with
+it loaded a journal title fits one 26px line, without it the same title wraps to
+two and measures 52px. That flipped a tap-target finding between runs on
+different networks, which makes a green result worth nothing. The fallback face
+is the deterministic choice and a state the site explicitly supports — see
+`.display-face-ready` in `main.js` and the phone headline curve scoped to the
+stand-in.
+
+Three behaviours worth knowing:
+
+- **A result you could not check is never a pass.** An image is judged by what
+  the host actually answered: 404 or 410 means the photo is gone, but 403, 407
+  or a 5xx means a gateway refused and we learned nothing, so it is reported
+  **UNVERIFIED**. This distinction is not cosmetic — an egress proxy answers 403
+  as an ordinary HTTP response rather than failing, so "the request didn't work"
+  cannot tell a withdrawn photo from one this network declined to fetch. Getting
+  it backwards sends someone hunting for replacements for photos that are fine.
+- **A withdrawn remote photo warns; it does not fail.** Reported as **ROTTED**
+  with a non-fatal exit. Blocking an unrelated merge on a stranger's decision
+  gets the check disabled, not the photo replaced. The weekly `hotlink-watch`
+  workflow chases them instead. A broken image in `assets/img/` does fail — that
+  one is ours.
+- **Anything held below the bar is held on the record.** `tap-targets` reports
+  **EXEMPT** rather than quietly passing: links inside a sentence (WCAG excludes
+  targets constrained by the line-height around them) and anything listed in
+  `TAP_EXEMPT` with a written reason. An exemption nobody can see is
+  indistinguishable from a detector that missed something.
+
+### `tools/audit/compare.mjs`
+
+Answers one question: did this change move anything it was not supposed to?
+
+```bash
+git worktree add --detach /tmp/before HEAD~1
+node compare.mjs /tmp/before "$PWD/../.." 1280 index.html contact.html
+```
+
+It compares the box, colour and type of every laid-out element between two
+checkouts, so an intended image swap does not drown out an accidental
+two-pixel shift elsewhere. Two details it took a wrong answer to learn:
+
+- **It freezes transitions before measuring.** Scroll-reveal blocks fade and
+  translate into place, so measuring mid-transition reports positions that
+  differ by a pixel or two between two runs of the *same* build. That noise
+  buries the signal completely.
+- **Check the baseline is the branch's actual parent.** A stale local `main` ref
+  once made it report a header regression that did not exist. `git log` the
+  worktree before trusting a diff.
+
+### `.github/workflows/`
+
+`checks.yml` runs on every pull request and every push to `main`: the build
+(which fails on a robots/`STAGING` mismatch), a check that the committed HTML
+matches what `build.py` generates, then the full detector sweep. No reduced
+mode for PRs — the shared nav and footer mean a `build.py` change touches all
+twenty pages, so "changed pages only" is misleading for exactly the edits most
+likely to break something.
+
+`hotlink-watch.yml` runs weekly and opens (or closes) an issue when a hotlinked
+photo stops resolving. It exists because PR checks only run when someone opens
+a PR, and rot on a launched site is precisely what nobody notices in a quiet
+month. It becomes unnecessary the day the placeholders are replaced with real
+photography.
 
 ### `tools/set-domain.sh`
 

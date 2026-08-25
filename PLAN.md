@@ -41,7 +41,7 @@ Tern trip-request form.
 | **Tern referral form URL** | `TERN_REFERRAL_FORM` | Same fallback. A dedicated form would capture referrer and friend separately. |
 | **8–10 attributed reviews** | `pages/reviews.html` + `REVIEWS` in build.py | Name, what they booked, month and year. "Becky G. — Royal Caribbean Alaska, June 2025" is worth ten anonymous quotes. |
 | **Off-site review URLs** | `pages/reviews.html` | Trustpilot, The Knot, WeddingWire, Google Business Profile. |
-| **More of your own photos** | `assets/img/` | Clean, unbranded, **landscape**. Ships, resort grounds, you and Chad on the road. Two photos are currently doing the work of thirty-three. |
+| **More of your own photos** | `assets/img/` + `IMAGES` in build.py | **The highest-value item on this table.** Clean, unbranded, **landscape**. Ships, resort grounds, you and Chad on the road. Two photos are doing the work of thirty-three, and the rest are hotlinked to Unsplash — where one had already been withdrawn, leaving three places on the site rendering a caption where a photo should have been. A hotlink is a photo someone else can delete. [ASSETS.md](ASSETS.md) lists every slot and what it needs; `IMG_CARD_HONEYMOON` is the most urgent, since it currently reuses `bermuda.jpg` from elsewhere on the site. |
 
 After setting any of these: `python3 tools/build.py`, commit, push.
 

@@ -51,15 +51,40 @@
   if (toggle && panel) {
     var isOpen = function () { return document.body.classList.contains("nav-open"); };
 
+    /* Where the page was when the menu opened, so it can be put back.
+       null means "not currently locked". */
+    var lockedAt = null;
+
+    /* iOS Safari ignores overflow: hidden on the body often enough that it
+       cannot be relied on — the page keeps scrolling behind the panel, which is
+       the defect this is here to fix. Pinning the body at its own offset with
+       position: fixed is the technique that actually holds, and it works
+       everywhere else too. The stylesheet keeps overflow: hidden as well, so a
+       visitor with JS disabled gets the better-than-nothing version. */
+    var lockScroll = function () {
+      lockedAt = window.scrollY;
+      /* Fixing the body removes the scrollbar, which would shunt the page
+         sideways. Hand its width to the stylesheet to pay back as padding. */
+      var gap = window.innerWidth - document.documentElement.clientWidth;
+      document.documentElement.style.setProperty("--scrollbar-width", gap + "px");
+      document.body.style.top = -lockedAt + "px";
+    };
+
+    var unlockScroll = function () {
+      if (lockedAt === null) return;
+      var y = lockedAt;
+      lockedAt = null;
+      document.body.style.top = "";
+      document.documentElement.style.removeProperty("--scrollbar-width");
+      /* The sheet sets scroll-behavior: smooth, which would animate the
+         restore into a visible jump back up the page. */
+      window.scrollTo({ top: y, behavior: "instant" });
+    };
+
     var setOpen = function (open, returnFocus) {
       if (open === isOpen()) return;
 
-      if (open) {
-        /* Locking the body removes the scrollbar, which would shunt the page
-           sideways. Hand its width to the stylesheet to pay back as padding. */
-        var gap = window.innerWidth - document.documentElement.clientWidth;
-        document.documentElement.style.setProperty("--scrollbar-width", gap + "px");
-      }
+      if (open) lockScroll();
 
       document.body.classList.toggle("nav-open", open);
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
@@ -74,7 +99,7 @@
           if (first && isOpen()) first.focus();
         });
       } else {
-        document.documentElement.style.removeProperty("--scrollbar-width");
+        unlockScroll();
         if (returnFocus !== false) toggle.focus();
       }
     };
