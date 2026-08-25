@@ -32,14 +32,23 @@
   --rose-deep:   #b02a59;
   --blush:       #f8f0f7;   /* very light tint of --pink, for section grounds */
 
-  /* --- Semantic aliases. The rest of the sheet is written against these. --- */
-  --navy:      var(--purple-deep);
-  --deep-sea:  var(--purple);
-  --lagoon:    var(--purple);
-  --sand:      var(--aqua);
-  --gold:      var(--rose);
-  --cream:     var(--blush);
-  --paper:     var(--off-white);
+  /* --- Semantic aliases. The rest of the sheet is written against these. ---
+     Named for the ROLE each one plays, never for the colour it currently holds.
+     These were previously nautical — --navy, --gold, --sand, --lagoon — mapped
+     onto a purple/rose palette, so --gold painted pink and --navy painted
+     purple. A name that states a hue is a name that goes stale the moment the
+     palette moves, and it misleads whoever edits this sheet next. Role names
+     stay true through a re-theme. tools/audit's token-truth detector fails the
+     build if one of these ever starts lying again. */
+  --ground-deep:   var(--purple-deep); /* dark section grounds and the footer */
+  --brand:         var(--purple);      /* brand grounds and heading text */
+  --link:          var(--purple);      /* links, focus rings, interactive text */
+  /* --brand and --link deliberately hold the same purple today. They stay two
+     names so either can move without dragging the other with it. */
+  --accent-bright: var(--aqua);        /* bright accent on dark grounds */
+  --cta:           var(--rose);        /* the primary call to action */
+  --surface-tint:  var(--blush);       /* the tinted section ground */
+  --paper:         var(--off-white);   /* card and page surfaces */
   --muted:     #6b6b73;
   --line:      rgba(70, 34, 162, 0.14);
 
@@ -363,6 +372,15 @@
   --footer-bottom-size:      0.8rem; /* fine-print size */
   --footer-underline-offset:    2px; /* drop from a fine-print link to its underline */
 
+  /* TAP TARGETS ---------------------------------------------------
+     Added after the 24 August lock, per the rule above: new knobs rather than
+     retuned ones. Nothing here moves a visible pixel on a desktop window —
+     these grow the area a finger can hit, not the area the design draws. The
+     small controls keep their drawn size and gain an invisible overlay; the
+     footer link rows grow their height, but only under --bp-tap. */
+  --tap-min:                   44px; /* smallest touch target, every side (WCAG 2.5.5) */
+  --bp-tap:                  1000px; /* width below which rows grow to --tap-min */
+
   /* FOCUS AND SKIP LINK ------------------------------------------- */
   --focus-ring-width:           2px; /* thickness of the keyboard focus outline */
   --focus-ring-offset:          2px; /* gap between the element and that outline */
@@ -460,7 +478,7 @@ p { margin: 0 0 var(--para-gap); }
   font-weight: 500;
   text-transform: uppercase;
   font-size: var(--eyebrow-size);
-  color: var(--lagoon);
+  color: var(--link);
   margin: 0 0 var(--eyebrow-gap);
   display: inline-block;
 }
@@ -476,7 +494,7 @@ p { margin: 0 0 var(--para-gap); }
 
 /* --------------------------- Buttons ---------------------------- */
 .btn {
-  --btn-bg: var(--lagoon);
+  --btn-bg: var(--link);
   --btn-fg: #fff;
   display: inline-flex;
   align-items: center;
@@ -497,7 +515,7 @@ p { margin: 0 0 var(--para-gap); }
 .btn:hover { transform: translateY(calc(-1 * var(--btn-lift))); box-shadow: var(--shadow-sm); }
 .btn:active { transform: translateY(calc(-1 * var(--btn-press))); }
 
-.btn--gold { --btn-bg: linear-gradient(135deg, var(--sand), var(--gold)); --btn-fg: #ffffff; }
+.btn--primary { --btn-bg: linear-gradient(135deg, var(--accent-bright), var(--cta)); --btn-fg: #ffffff; }
 .btn--ghost {
   --btn-bg: transparent;
   --btn-fg: #fff;
@@ -506,10 +524,10 @@ p { margin: 0 0 var(--para-gap); }
 .btn--ghost:hover { background: rgba(255, 255, 255, 0.12); }
 .btn--outline {
   --btn-bg: transparent;
-  --btn-fg: var(--lagoon);
-  border-color: var(--lagoon);
+  --btn-fg: var(--link);
+  border-color: var(--link);
 }
-.btn--outline:hover { background: var(--lagoon); color: #fff; }
+.btn--outline:hover { background: var(--link); color: #fff; }
 
 /* ----------------------------- Nav ------------------------------ */
 /* Floating "liquid glass" nav bar — always frosted so it reads on any background */
@@ -606,7 +624,7 @@ p { margin: 0 0 var(--para-gap); }
 .nav-links a.active::after { width: 100%; }
 .is-scrolled .nav-links a,
 .inner-page .nav-links a { color: var(--ink); }
-.nav-links a.active { color: var(--lagoon); }
+.nav-links a.active { color: var(--link); }
 
 .nav-cta { display: flex; align-items: center; gap: var(--nav-cta-gap); }
 
@@ -644,7 +662,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   background:
     linear-gradient(180deg, rgba(30, 14, 70,0.55), rgba(30, 14, 70,0.35) 40%, rgba(30, 14, 70,0.7)),
     radial-gradient(120% 80% at 50% 0%, rgba(118, 239, 225,0.25), transparent 60%),
-    var(--deep-sea);
+    var(--brand);
   background-size: cover;
   background-position: center;
 }
@@ -719,7 +737,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   position: absolute; inset: 0; z-index: -1;
   background:
     linear-gradient(180deg, rgba(30, 14, 70,0.65), rgba(30, 14, 70,0.55)),
-    var(--page-img, none), var(--deep-sea);
+    var(--page-img, none), var(--brand);
   background-size: cover; background-position: center;
 }
 /* Size is set once in the brand typography block below. */
@@ -729,15 +747,15 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 
 /* ---------------------------- Sections -------------------------- */
 .section { padding: clamp(var(--section-pad-min), var(--section-pad-base) + var(--section-pad-vw), var(--section-pad-max)) 0; }
-.section--cream { background: var(--cream); }
-.section--navy { background: var(--navy); color: #fff; }
-.section--navy .eyebrow { color: var(--aqua); }
-.section--navy .muted { color: rgba(255,255,255,0.7); }
+.section--tint { background: var(--surface-tint); }
+.section--deep { background: var(--ground-deep); color: #fff; }
+.section--deep .eyebrow { color: var(--aqua); }
+.section--deep .muted { color: rgba(255,255,255,0.7); }
 
 .section-head { max-width: var(--section-head-width); margin: 0 auto var(--section-head-gap); text-align: center; }
 /* Section heading sizes are set once in the brand typography block below. */
 .section-head p { color: var(--muted); font-size: var(--section-lede-size); }
-.section--navy .section-head p { color: rgba(255,255,255,0.78); }
+.section--deep .section-head p { color: rgba(255,255,255,0.78); }
 
 .muted { color: var(--muted); }
 
@@ -779,15 +797,15 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   width: var(--card-icon-size); height: var(--card-icon-size); border-radius: var(--card-icon-radius);
   display: grid; place-items: center; margin-bottom: var(--card-icon-gap);
   background: linear-gradient(135deg, var(--aqua-soft), var(--blush));
-  color: var(--lagoon);
+  color: var(--link);
 }
 .card .icon svg { width: var(--card-icon-glyph); height: var(--card-icon-glyph); }
 /* Card title size is set once in the brand typography block below. */
 .card h3 { margin-bottom: var(--card-title-gap); }
 .card p { color: var(--muted); margin: 0; font-size: var(--card-text-size); }
-.section--navy .card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.12); }
-.section--navy .card p { color: rgba(255,255,255,0.72); }
-.section--navy .card .icon { background: rgba(118, 239, 225,0.18); color: var(--aqua); }
+.section--deep .card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.12); }
+.section--deep .card p { color: rgba(255,255,255,0.72); }
+.section--deep .card .icon { background: rgba(118, 239, 225,0.18); color: var(--aqua); }
 
 /* numbered promise list */
 .promise-grid { counter-reset: promise; }
@@ -796,7 +814,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   content: "0" counter(promise);
   font-family: var(--serif);
   font-size: 0.95rem;
-  color: var(--sand);
+  color: var(--accent-bright);
   letter-spacing: 0.1em;
   display: block;
   margin-bottom: 0.6rem;
@@ -833,16 +851,16 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   font-size: var(--quote-text-size);
   font-weight: 500;
   line-height: var(--quote-text-leading);
-  color: var(--deep-sea);
+  color: var(--brand);
 }
-.quote .stars { color: var(--sand); letter-spacing: var(--quote-stars-tracking); margin-bottom: var(--quote-stars-gap); }
+.quote .stars { color: var(--accent-bright); letter-spacing: var(--quote-stars-tracking); margin-bottom: var(--quote-stars-gap); }
 .quote cite {
   font-style: normal;
   font-weight: 500;
   letter-spacing: var(--quote-cite-tracking);
   text-transform: uppercase;
   font-size: var(--quote-cite-size);
-  color: var(--lagoon);
+  color: var(--link);
 }
 
 /* ---------------------------- Stats ----------------------------- */
@@ -855,7 +873,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .stat .num {
   font-family: var(--serif);
   font-size: clamp(2.2rem, 1.6rem + 2.4vw, 3.4rem);
-  color: var(--sand);
+  color: var(--accent-bright);
   line-height: 1;
 }
 .stat .label {
@@ -877,7 +895,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   font-size: 0.82rem;
   letter-spacing: 0.05em;
   background: var(--paper);
-  color: var(--deep-sea);
+  color: var(--brand);
 }
 .badge strong { font-weight: 600; }
 
@@ -893,7 +911,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   position: absolute; inset: 0; z-index: -1;
   background:
     linear-gradient(135deg, rgba(52, 25, 122,0.82), rgba(70, 34, 162,0.78)),
-    var(--cta-img, none), var(--lagoon);
+    var(--cta-img, none), var(--link);
   background-size: cover; background-position: center;
 }
 /* The band's heading size is set once in the brand typography block below. */
@@ -902,7 +920,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 
 /* ---------------------------- Footer ---------------------------- */
 .site-footer {
-  background: var(--navy);
+  background: var(--ground-deep);
   color: rgba(255,255,255,0.8);
   padding: var(--footer-pad-top) 0 var(--footer-pad-bottom);
   font-size: var(--footer-size);
@@ -914,8 +932,12 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   margin-bottom: var(--footer-grid-gap-bottom);
 }
 .site-footer .brand { color: #fff; margin-bottom: var(--footer-brand-gap); }
-.site-footer h4 {
+.footer-col__title {
   font-family: var(--sans);
+  /* These are h2s so the heading order does not skip a level, but they used to
+     be h4s and must still draw identically. h1/h2 and h3/h4 carry different
+     leading, so pin the h4 value or the swap quietly tightens the footer. */
+  line-height: var(--subhead-leading);
   text-transform: uppercase;
   letter-spacing: var(--footer-head-tracking);
   font-size: var(--footer-head-size);
@@ -932,7 +954,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   border: var(--border-width) solid rgba(255,255,255,0.2);
   transition: var(--hover-ms) var(--ease);
 }
-.socials a:hover { background: var(--aqua); border-color: var(--aqua); color: var(--navy); transform: translateY(calc(-1 * var(--social-lift))); }
+.socials a:hover { background: var(--aqua); border-color: var(--aqua); color: var(--ground-deep); transform: translateY(calc(-1 * var(--social-lift))); }
 .socials svg { width: var(--social-glyph); height: var(--social-glyph); }
 .footer-bottom {
   border-top: var(--footer-rule-width) solid rgba(255,255,255,0.12);
@@ -950,7 +972,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .legal > .updated { color: var(--muted); font-size: 0.9rem; letter-spacing: 0.04em; margin-bottom: 2.2rem; }
 .legal h2 {
   font-size: clamp(1.35rem, 1.1rem + 1.1vw, 1.85rem);
-  color: var(--deep-sea);
+  color: var(--brand);
   margin-top: 2.6rem;
   padding-top: 1.4rem;
   border-top: 1px solid var(--line);
@@ -960,10 +982,10 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .legal p, .legal li { color: var(--ink); }
 .legal ul { padding-left: 1.2rem; margin: 0 0 1.1em; }
 .legal li { margin-bottom: 0.45rem; }
-.legal a { color: var(--lagoon); text-decoration: underline; text-underline-offset: 2px; }
+.legal a { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
 .legal .callout {
-  background: var(--cream);
-  border-left: 3px solid var(--sand);
+  background: var(--surface-tint);
+  border-left: 3px solid var(--accent-bright);
   padding: 1rem 1.3rem;
   border-radius: 8px;
   margin: 1.6rem 0;
@@ -1005,7 +1027,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .field label {
   display: block;
   font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--lagoon); margin-bottom: 0.45rem; font-weight: 500;
+  color: var(--link); margin-bottom: 0.45rem; font-weight: 500;
 }
 .field input,
 .field textarea,
@@ -1091,7 +1113,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 }
 .skip-link:focus {
   left: 0;
-  outline: var(--focus-ring-width) solid var(--lagoon);
+  outline: var(--focus-ring-width) solid var(--link);
   outline-offset: var(--focus-ring-offset);
 }
 
@@ -1104,8 +1126,8 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 
 /* ------------------------- Trust strip -------------------------- */
 .trust-strip {
-  background: var(--deep-sea);
-  color: var(--cream);
+  background: var(--brand);
+  color: var(--surface-tint);
   padding: var(--trust-pad-y) 0;
 }
 .trust-strip ul {
@@ -1126,7 +1148,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 }
 /* Face, size and tracking for the credential names are set once in the brand
    typography block below. */
-.trust-strip strong { color: var(--sand); }
+.trust-strip strong { color: var(--accent-bright); }
 .trust-strip span { font-size: var(--trust-note-size); opacity: 0.85; }
 
 /* ------------------------- Service cards ------------------------ */
@@ -1176,7 +1198,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .service-card .arrow {
   margin-top: auto;
   padding-top: var(--service-arrow-gap);
-  color: var(--lagoon);
+  color: var(--link);
   font-weight: 500;
   font-size: var(--service-arrow-size);
   letter-spacing: var(--service-arrow-tracking);
@@ -1222,7 +1244,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: var(--lagoon);
+  background: var(--link);
   color: #fff;
   font-family: var(--serif);
   font-size: var(--process-number-text);
@@ -1252,8 +1274,8 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 
 /* ------------------------- Callout box -------------------------- */
 .callout-box {
-  background: var(--cream);
-  border-left: 3px solid var(--sand);
+  background: var(--surface-tint);
+  border-left: 3px solid var(--accent-bright);
   border-radius: 0 var(--radius) var(--radius) 0;
   padding: 1.3rem 1.6rem;
   margin: 2rem 0;
@@ -1263,7 +1285,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .callout-box ul:last-child { margin-bottom: 0; }
 .callout-box ul { padding-left: 1.1rem; }
 .callout-box li { margin-bottom: 0.5rem; }
-.section--cream .callout-box { background: var(--paper); }
+.section--tint .callout-box { background: var(--paper); }
 
 /* ------------------------- Credentials -------------------------- */
 .credential-list {
@@ -1277,7 +1299,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   border-radius: var(--radius);
   padding: 1.5rem 1.6rem;
 }
-.credential h3 { margin: 0 0 0.4rem; font-size: 1.15rem; color: var(--deep-sea); }
+.credential h3 { margin: 0 0 0.4rem; font-size: 1.15rem; color: var(--brand); }
 .credential__what {
   font-size: 0.88rem;
   color: var(--muted);
@@ -1307,13 +1329,13 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.4rem;
-  color: var(--lagoon);
+  color: var(--link);
   line-height: 1;
   transition: transform 0.25s var(--ease);
 }
 .faq__item[open] summary::after { content: "−"; }
 .faq__item summary:focus-visible {
-  outline: 2px solid var(--lagoon);
+  outline: 2px solid var(--link);
   outline-offset: 2px;
 }
 .faq__body { padding: 0 2.5rem 1.3rem 0; }
@@ -1338,7 +1360,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .contact-method .icon {
   width: 2.4rem;
   height: 2.4rem;
-  color: var(--lagoon);
+  color: var(--link);
   margin-bottom: 0.3rem;
 }
 .contact-method .icon svg { width: 100%; height: 100%; }
@@ -1348,7 +1370,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   margin-top: auto;
   padding-top: 0.6rem;
   font-weight: 500;
-  color: var(--lagoon);
+  color: var(--link);
   word-break: break-word;
 }
 .socials--lg { justify-content: center; }
@@ -1378,8 +1400,8 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 
 /* ------------------------- Referral ----------------------------- */
 .referral-banner {
-  background: var(--deep-sea);
-  color: var(--cream);
+  background: var(--brand);
+  color: var(--surface-tint);
   padding: var(--referral-pad-y) 0;
 }
 .referral-banner .shell {
@@ -1391,8 +1413,8 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   text-align: center;
 }
 .referral-banner p { margin: 0; font-size: var(--referral-text-size); }
-.referral-banner strong { color: var(--sand); }
-.referral-banner .btn--outline { border-color: rgba(255,255,255,0.5); color: var(--cream); }
+.referral-banner strong { color: var(--accent-bright); }
+.referral-banner .btn--outline { border-color: rgba(255,255,255,0.5); color: var(--surface-tint); }
 .referral-banner .btn--outline:hover { background: rgba(255,255,255,0.12); }
 
 .referral-actions {
@@ -1628,8 +1650,8 @@ strong, b { font-weight: 600; }
 
 /* Primary CTA: solid brand rose. It has to read as the action on both the
    white sections and the purple bands, which an aqua→rose gradient did not. */
-.btn--gold { --btn-bg: var(--rose); --btn-fg: #ffffff; }
-.btn--gold:hover { --btn-bg: var(--rose-deep); }
+.btn--primary { --btn-bg: var(--rose); --btn-fg: #ffffff; }
+.btn--primary:hover { --btn-bg: var(--rose-deep); }
 .btn--outline { --btn-fg: var(--purple); border-color: var(--purple); }
 .btn--outline:hover { background: var(--purple); color: #fff; }
 
@@ -1689,13 +1711,31 @@ h1, h2 { text-transform: uppercase; }
     transform: translateY(calc(-1 * var(--menu-rise)));
     opacity: 0;
     visibility: hidden;
+    /* visibility switches instantly, delayed only on the way OUT so the panel
+       stays rendered while it fades. Transitioning visibility over the whole
+       duration instead left it computing to hidden for the first quarter
+       second of opening — long enough that a link inside it could not take
+       focus yet, which is why moving focus into the menu silently did nothing.
+       Delay-on-close is the idiom precisely because it keeps the open panel
+       focusable from frame one. */
     transition: opacity var(--hover-fast) var(--ease), transform var(--hover-fast) var(--ease),
-      visibility var(--hover-fast) linear;
+      visibility 0s linear var(--hover-fast);
   }
   body.nav-open .nav-links {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
+    transition: opacity var(--hover-fast) var(--ease), transform var(--hover-fast) var(--ease),
+      visibility 0s linear 0s;
+  }
+  /* The page used to keep scrolling behind the open dropdown, which drags the
+     menu off the pill it is anchored to and leaves the reader somewhere they
+     did not ask to be. Locked here rather than globally: above --bp-nav-menu
+     there is no dropdown to scroll behind. main.js pays back the width of the
+     scrollbar this removes so nothing shifts sideways as it locks. */
+  body.nav-open {
+    overflow: hidden;
+    padding-right: var(--scrollbar-width, 0px);
   }
   .nav-links a {
     display: block;
@@ -1746,7 +1786,7 @@ h1, h2 { text-transform: uppercase; }
 .post-card h3 a { color: var(--ink); }
 .post-card:hover h3 a { color: var(--purple); }
 .post-card p { margin: 0; color: var(--muted); font-size: 0.94rem; }
-.post-card .arrow { margin-top: auto; padding-top: 0.4rem; color: var(--lagoon); font-weight: 500; font-size: 0.88rem; }
+.post-card .arrow { margin-top: auto; padding-top: 0.4rem; color: var(--link); font-weight: 500; font-size: 0.88rem; }
 .post-card .arrow::after { content: " →"; }
 
 /* ------------------------- Article ------------------------------ */
@@ -1787,3 +1827,110 @@ h1, h2 { text-transform: uppercase; }
   .post-card__media img { aspect-ratio: 16 / 9; }
 }
 .post-card__media img { object-position: center 55%; }
+
+/* =================================================================
+   Tap targets
+   -----------------------------------------------------------------
+   WCAG 2.5.5 asks for 44x44 on every control. Twenty-six of them were
+   under it: the hamburger at 30x24, the social circles at 40x40, the
+   brand lockups at 42px tall, and every footer link at its 16px line
+   box.
+
+   Two techniques, chosen per element:
+
+   1. An invisible centred ::before on controls whose drawn size is
+      part of the design (hamburger, social circles). The art keeps
+      its exact dimensions; only the hit box grows. The gaps around
+      both are wider than the expansion, so no two targets overlap —
+      overlapping hit areas cause mis-taps and are worse than small
+      ones.
+
+   2. A grown row height on text links, under --bp-tap only. An
+      overlay will not work there: --footer-link-gap is 0.55rem, so a
+      44px overlay on each link would collide with its neighbours.
+      Growing the row is the honest fix, and confining it to narrow
+      windows leaves the locked desktop footer untouched.
+
+   Verified by tools/audit's tap-targets detector, which hit-tests the
+   rendered page rather than reading boxes off the stylesheet — so it
+   sees technique 1 as the real fix it is.
+   ================================================================= */
+
+/* --- 1. Overlay: drawn size unchanged, hit box grown --- */
+.nav-toggle,
+.socials a { position: relative; }
+
+.nav-toggle::before,
+.socials a::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  transform: translate(-50%, -50%);
+  /* Purely a hit area. No paint, and it must never intercept the
+     pointer from an ancestor that legitimately sits above it. */
+  background: transparent;
+}
+
+/* The bars are absolutely positioned against the button, so the
+   overlay must not become their containing block reference point. It
+   does not — ::before is a sibling, not an ancestor — but the bars
+   need to stay above it in paint order to remain visible. */
+.nav-toggle span { z-index: 1; }
+.socials svg { position: relative; z-index: 1; }
+
+/* --- 2. Grown rows on touch-sized windows --- */
+@media (max-width: 1000px) { /* --bp-tap */
+  /* Footer rows fill their column: "Home" and "Refer" are only ~38px of text,
+     so a height-only fix still leaves them narrower than a fingertip. The row
+     paints nothing, so a wider hit area is invisible. */
+  .footer-links a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-min);
+  }
+
+  /* Links that stand alone on their own line — the "More on ... ->"
+     continuations and the fine-print row. Not prose: nothing sits beside them
+     on the line, so growing them costs no leading. */
+  .footer-bottom a,
+  .cta-band__direct a,
+  .contact-method__link,
+  .link-cta,
+  .inline-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-min);
+  }
+
+  /* The lockups draw at 42px. Two pixels short is still short. */
+  .brand { min-height: var(--tap-min); }
+
+  /* Menu rows land at ~42px from their padding alone. */
+  .nav-links a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-min);
+  }
+
+  /* A button label that wraps to one short line can still fall under
+     the bar even though the button looks generous. */
+  .btn { min-height: var(--tap-min); }
+
+  /* A journal title that wraps is an inline link spanning two or three
+     ragged line boxes, so the corners of the block it appears to occupy
+     are not actually part of it. As a block it becomes the solid
+     rectangle it already looks like, and the whole title is tappable. */
+  .post-card h3 a { display: block; }
+}
+
+/* A photo that never arrived. main.js adds this when an image fails to decode,
+   after moving its alt text to a title. A quiet brand tile reads as a
+   deliberate blank; a sentence of alt text splashed across a card reads as a
+   broken site. The box keeps its reserved size either way. */
+.img-missing {
+  background: linear-gradient(135deg, var(--surface-tint), var(--pink-soft));
+  object-fit: cover;
+}

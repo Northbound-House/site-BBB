@@ -27,7 +27,13 @@ copy of the brand would compete with the live site for its own terms.
 - Every page carries `<meta name="robots" content="noindex, nofollow">`
 - All canonicals, `og:url` and schema `@id`s point at the test subdomain
 
-Three locks, any one of which would be enough. All three flip together via
+Three locks, any one of which would be enough. The per-page `noindex` is the one
+with no visible symptom if it ships — the site would look perfect and simply
+never appear in search — so `tools/build.py` now refuses to write a production
+build that still carries it (`verify_indexability()`), and verifying it is an
+explicit line on the cutover checklist.
+
+All three flip together via
 `./tools/set-domain.sh production`. **Do not hand-edit the domain** — it appears
 in roughly forty places.
 
@@ -101,9 +107,16 @@ PWA icons and the Open Graph card are all generated from it on brand purple.
 | `stkitts-coastline.jpg` | Your St Kitts coastline shot — the same image the brand guide uses as its own header. Homepage and journal heroes. |
 | `bermuda.jpg` | Your Bermuda shot, cropped above the wordmark so card thumbnails don't slice it |
 
-**33 hotlinked Unsplash references remain** for scenery. They have real `alt`
-text and are `<img>` elements, but they are stock and load from a third-party
-CDN.
+**Hotlinked Unsplash references remain** for scenery. They have real `alt` text,
+but they are stock, they load from a third-party CDN, and **they rot**: one photo
+was withdrawn upstream and three places on the site were rendering its alt text
+where the picture should have been. That slot now points at `bermuda.jpg`.
+
+Every photo is keyed by slot in the `IMAGES` table in `tools/build.py`, with its
+alt text beside it, so replacing one is a single line. `tools/audit`'s
+`broken-images` detector catches the next withdrawal — run it from a network that
+can reach `images.unsplash.com`, or it reports them UNVERIFIED rather than
+passing them.
 
 Two Drive folders were reviewed and **cannot** be used: `JustBooked` is
 1080×1080 social graphics with "JUST BOOKED", your name and the URL baked into

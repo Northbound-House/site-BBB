@@ -71,15 +71,39 @@ Then, in order:
 2. [ ] **Settings → Pages** → custom domain `boraborabound.com`, tick
        **Enforce HTTPS** once the cert issues.
 3. [ ] **Verify `boraborabound.com/robots.txt` no longer says `Disallow: /`.**
-       This is the single most important post-cutover check.
-4. [ ] Spot-check every legacy URL redirects correctly.
-5. [ ] **Google Search Console:** add and verify the property, submit
+4. [ ] **Verify no page still carries `noindex`.** Of the three staging locks
+       this is the one with no visible symptom — the site looks perfect and
+       simply never appears in search, and nothing surfaces it until the
+       traffic does not arrive. `set-domain.sh` flips it and `build.py` now
+       refuses to write a production build that gets it wrong, so this is a
+       confirmation rather than a hope:
+
+       ```bash
+       grep -l noindex *.html journal/*.html
+       # must list terms.html and 404.html, and nothing else
+       curl -s https://boraborabound.com/ | grep -i 'name="robots"'
+       # must say index, follow
+       ```
+
+       Together with step 3 this is the most important check on the list.
+5. [ ] **Re-run the detectors against the live domain**, which checks the same
+       invariant end to end plus the other five:
+
+       ```bash
+       cd tools/audit && npm install && node audit.mjs
+       ```
+
+       Run it from a network that can reach `images.unsplash.com`, so the
+       hotlinked placeholders are actually checked instead of reported
+       UNVERIFIED. One of them had already been withdrawn upstream.
+6. [ ] Spot-check every legacy URL redirects correctly.
+7. [ ] **Google Search Console:** add and verify the property, submit
        `sitemap.xml`, then file a **Change of Address** from the old Travefy
        property. Don't skip the Change of Address — it's what moves the ranking
        signal.
-6. [ ] **Bing Webmaster Tools:** same.
-7. [ ] Re-run the **Facebook Sharing Debugger** so the new Open Graph tags cache.
-8. [ ] Confirm GA4 is receiving `generate_lead` events, and **mark it a key
+8. [ ] **Bing Webmaster Tools:** same.
+9. [ ] Re-run the **Facebook Sharing Debugger** so the new Open Graph tags cache.
+10. [ ] Confirm GA4 is receiving `generate_lead` events, and **mark it a key
        event** in the GA4 admin panel so it counts as a conversion.
 
 **If the cutover slips more than a couple of weeks,** re-date the five journal

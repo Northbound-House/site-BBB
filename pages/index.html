@@ -1,13 +1,13 @@
   <!-- ============ HERO ============ -->
   <main id="main">
   <section class="hero">
-    <div class="hero__bg has-img" style="--hero-img: url('/assets/img/stkitts-coastline.jpg')"></div>
+    <div class="hero__bg has-img" style="--hero-img: url('{{IMG_COASTLINE}}')"></div>
     <div class="hero__inner shell">
       <p class="tagline">Cruises · All-Inclusives · Small Group Tours</p>
       <h1>The good trips, without the <span class="script">guesswork</span></h1>
       <p class="lede">Hi, I'm Zac. Cruises, all-inclusive resorts, and small group tours — that's what I do, and I do it properly. You get the right ship, the right room, and perks you can't book on your own. On most trips, you pay me nothing for it.</p>
       <div class="hero__actions">
-        <a href="#plan" class="btn btn--gold" data-cta="hero-primary">Book a free consultation</a>
+        <a href="#plan" class="btn btn--primary" data-cta="hero-primary">Book a free consultation</a>
         <a href="/ways-to-travel.html" class="btn btn--ghost">See what I plan</a>
       </div>
     </div>
@@ -36,7 +36,7 @@
       </div>
       <div class="service-cards">
         <a class="service-card reveal" href="/cruises.html">
-          <img src="https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=800&q=80" alt="A cruise ship at anchor in calm turquoise water beside a green island" width="800" height="533" loading="lazy" />
+          <img src="{{IMG_CARD_CRUISES}}" alt="{{IMG_CARD_CRUISES_ALT}}" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>Cruises</h3>
             <p>Ocean, river, and expedition. The difference between a good cruise and a disappointing one is almost always the ship and the cabin — not the itinerary.</p>
@@ -44,7 +44,7 @@
           </div>
         </a>
         <a class="service-card reveal d1" href="/all-inclusive-resorts.html">
-          <img src="https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=800&q=80" alt="Palm-shaded infinity pool at a Caribbean all-inclusive resort at golden hour" width="800" height="533" loading="lazy" />
+          <img src="{{IMG_CARD_ALL_INCLUSIVE}}" alt="{{IMG_CARD_ALL_INCLUSIVE_ALT}}" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>All-Inclusive Resorts</h3>
             <p>One price, nothing to decide once you land. I match the resort to the trip — adults-only, swim-up, family-friendly — and get the perks attached before you arrive.</p>
@@ -52,7 +52,7 @@
           </div>
         </a>
         <a class="service-card reveal d2" href="/small-group-tours.html">
-          <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=80" alt="A small group of travelers walking a narrow cobbled street in a hilltop village" width="800" height="533" loading="lazy" />
+          <img src="{{IMG_CARD_SMALL_GROUP}}" alt="{{IMG_CARD_SMALL_GROUP_ALT}}" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>Small Group Tours</h3>
             <p>Guided itineraries with the transfers, entries, and logistics already handled — and a group small enough that you're not following a flag through a parking lot.</p>
@@ -62,7 +62,7 @@
       </div>
       <div class="service-cards service-cards--pair">
         <a class="service-card reveal" href="/honeymoons.html">
-          <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80" alt="Two champagne glasses on a balcony railing overlooking the ocean at sunset" width="800" height="533" loading="lazy" />
+          <img src="{{IMG_CARD_HONEYMOON}}" alt="{{IMG_CARD_HONEYMOON_ALT}}" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>Honeymoons &amp; Romance</h3>
             <p>Built on the same three foundations, with the upgrades and romance amenities arranged in advance rather than requested at check-in.</p>
@@ -70,7 +70,7 @@
           </div>
         </a>
         <a class="service-card reveal d1" href="/lgbtq-travel.html">
-          <img src="https://images.unsplash.com/photo-1561612217-e5dbc7b4b1ab?auto=format&fit=crop&w=800&q=80" alt="A couple walking hand in hand along a palm-lined waterfront promenade" width="800" height="533" loading="lazy" />
+          <img src="{{IMG_CARD_LGBTQ}}" alt="{{IMG_CARD_LGBTQ_ALT}}" width="800" height="533" loading="lazy" />
           <div class="service-card__body">
             <h3>LGBTQ+ Travel</h3>
             <p>NGLCC-certified and personally invested. I'll tell you which ships and resorts are genuinely welcoming — and which ones just say so in the brochure.</p>
@@ -82,7 +82,7 @@
   </section>
 
   <!-- ============ WHY AN ADVISOR ============ -->
-  <section class="section section--cream">
+  <section class="section section--tint">
     <div class="shell">
       <div class="section-head reveal">
         <span class="eyebrow">Why use an advisor at all</span>
@@ -140,10 +140,10 @@
   </section>
 
   <!-- ============ MEET ZAC ============ -->
-  <section class="section section--cream">
+  <section class="section section--tint">
     <div class="shell split">
       <div class="split__media is-portrait reveal">
-        <img src="/assets/img/zac-headshot.png" alt="Zac Sweet-Wright, founder and travel advisor at Bora Bora Bound" width="560" height="560" loading="lazy" />
+        <img src="{{IMG_ZAC_HEADSHOT}}" alt="{{IMG_ZAC_HEADSHOT_ALT}}" width="560" height="560" loading="lazy" />
       </div>
       <div class="reveal d1">
         <span class="eyebrow">Meet your advisor</span>
@@ -187,12 +187,12 @@
 
   <!-- ============ CTA BAND ============ -->
   <section class="cta-band" id="plan">
-    <div class="cta-band__bg" style="--cta-img: url('https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="cta-band__bg" style="--cta-img: url('{{IMG_HERO_HOME}}')"></div>
     <div class="shell reveal">
       <h2>Ready when you are</h2>
       <p>Tell me roughly where, and roughly when. I'll take it from there.</p>
       <div class="cta-band__actions">
-        <a href="{{TERN_SCHEDULING}}" target="_blank" rel="noopener" class="btn btn--gold" data-cta="home-consult">Book a free consultation</a>
+        <a href="{{TERN_SCHEDULING}}" target="_blank" rel="noopener" class="btn btn--primary" data-cta="home-consult">Book a free consultation</a>
         <a href="/contact.html" class="btn btn--ghost">Email or call instead</a>
       </div>
       <p class="cta-band__direct">

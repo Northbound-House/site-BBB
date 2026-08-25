@@ -49,6 +49,82 @@ TERN_TRIP_FORM = "https://app.tern.travel/public/forms/YSXCa_LTnTtBehDg0Kty1Q/re
 TERN_SCHEDULING = TERN_TRIP_FORM   # TODO: swap for the Tern consultation booking link
 TERN_REFERRAL_FORM = TERN_TRIP_FORM  # TODO: swap for a dedicated Tern referral form
 
+# --- Imagery ------------------------------------------------------------
+# Every photo the site renders, keyed by the SLOT it fills rather than by what
+# the photo happens to show. Fragments reference these as {{IMG_CARD_HONEYMOON}},
+# so swapping a placeholder for one of Zac's own shots is a one-line edit here
+# instead of a hunt through fifteen files — and a slot name never goes stale
+# when the photo behind it changes. See ASSETS.md for the filenames to drop in.
+#
+# The Unsplash entries are placeholders. They are hotlinks, so they rot without
+# warning: IMG_CARD_HONEYMOON pointed at a photo that had been withdrawn, and
+# three places on the site rendered its alt text instead. Run tools/audit from
+# a network that can reach images.unsplash.com to catch the next one.
+
+def unsplash(photo_id, w=800):
+    return f"https://images.unsplash.com/photo-{photo_id}?auto=format&fit=crop&w={w}&q=80"
+
+
+# Each slot carries its URL and its alt text together. Alt that lives in the
+# fragment goes stale the moment the photo behind it changes — swapping the
+# withdrawn honeymoon photo for one from the repo left two cards describing
+# champagne glasses over a picture of a cove. Keeping the pair here means a
+# swap is still one edit, and the description cannot drift from the picture.
+# alt=None marks a slot used only as a CSS background, which has no alt.
+IMAGES = {
+    # Service cards -- home and ways-to-travel
+    "IMG_CARD_CRUISES": (
+        unsplash("1548574505-5e239809ee19"),
+        "A cruise ship at anchor in calm turquoise water beside a green island"),
+    "IMG_CARD_ALL_INCLUSIVE": (
+        unsplash("1571003123894-1f0594d2b5d9"),
+        "Palm-shaded infinity pool at a Caribbean all-inclusive resort at golden hour"),
+    "IMG_CARD_SMALL_GROUP": (
+        unsplash("1533105079780-92b9be482077"),
+        "A small group of travelers walking a narrow cobbled street in a hilltop village"),
+    # Was unsplash("1519741497674-611481863552") -- withdrawn upstream, so the
+    # card rendered its alt text. Pointed at a photo in the repo, which cannot
+    # rot. Swap for a real honeymoon shot when there is one, and rewrite the alt
+    # in the same edit.
+    "IMG_CARD_HONEYMOON": (
+        "/assets/img/bermuda.jpg",
+        "A sheltered turquoise cove in Bermuda, photographed by Zac Sweet-Wright"),
+    "IMG_CARD_LGBTQ": (
+        unsplash("1561612217-e5dbc7b4b1ab"),
+        "A couple walking hand in hand along a palm-lined waterfront promenade"),
+
+    # Full-bleed page and hero backgrounds -- drawn in CSS, so no alt text
+    "IMG_HERO_HOME":          (unsplash("1505228395891-9a51e7e86bf6", 1920), None),
+    "IMG_HERO_404":           (unsplash("1473116763249-2faaef81ccda", 1920), None),
+    "IMG_PAGEHERO_GENERIC":   (unsplash("1468413253725-0d5181091126", 1920), None),
+    "IMG_PAGEHERO_ABOUT":     (unsplash("1488646953014-85cb44e25828", 1920), None),
+    "IMG_PAGEHERO_CONTACT":   (unsplash("1507525428034-b723cf961d3e", 1920), None),
+    "IMG_PAGEHERO_REVIEWS":   (unsplash("1559599189-fe84dea4eb79", 1920), None),
+    "IMG_PAGEHERO_REFER":     (unsplash("1544644181-1484b3fdfc62", 1920), None),
+    "IMG_PAGEHERO_HONEYMOON": ("/assets/img/bermuda.jpg", None),  # same withdrawn photo
+
+    # Repo assets
+    "IMG_ZAC_HEADSHOT": (
+        "/assets/img/zac-headshot.png",
+        f"{ADVISOR}, founder and travel advisor at {BUSINESS_NAME}"),
+    "IMG_COASTLINE": (
+        "/assets/img/stkitts-coastline.jpg",
+        "Caribbean coastline seen from a hillside above the water"),
+    "IMG_BERMUDA": (
+        "/assets/img/bermuda.jpg",
+        "Turquoise water and a sheltered cove in Bermuda"),
+}
+
+
+def image_tokens():
+    """{{IMG_X}} is the URL, {{IMG_X_ALT}} the description that goes with it."""
+    out = {}
+    for slot, (url, alt) in IMAGES.items():
+        out[slot] = url
+        if alt is not None:
+            out[f"{slot}_ALT"] = esc(alt)
+    return out
+
 # --- Analytics ----------------------------------------------------------
 # TODO: copy these two values off the live Travefy site (view source, or read
 # them from the GA4 and Meta Events Manager admin panels). Reusing the existing
@@ -708,18 +784,21 @@ def nav_block(current, hero=False):
         f"        {BRAND_MARK}\n"
         f"        <span>{BUSINESS_NAME}<small>Cruises · All-Inclusives · Small Groups</small></span>\n"
         "      </a>\n"
-        '      <ul class="nav-links">\n'
+        # The toggle names the panel it controls, so a screen reader can say
+        # what just expanded. main.js also moves focus into it on open.
+        '      <ul class="nav-links" id="primary-menu">\n'
         f"{links}"
         # The pinned header CTA is hidden below 720px, so the same action is
         # repeated inside the slide-in menu rather than lost on mobile.
         '        <li class="nav-cta-mobile">'
-        f'<a href="{TERN_TRIP_FORM}" target="_blank" rel="noopener" class="btn btn--gold" '
+        f'<a href="{TERN_TRIP_FORM}" target="_blank" rel="noopener" class="btn btn--primary" '
         'data-cta="mobile-plan-your-trip">Plan Your Trip</a></li>\n'
         "      </ul>\n"
         '      <div class="nav-cta">\n'
-        f'        <a href="{TERN_TRIP_FORM}" target="_blank" rel="noopener" class="btn btn--gold" '
+        f'        <a href="{TERN_TRIP_FORM}" target="_blank" rel="noopener" class="btn btn--primary" '
         'data-cta="nav-plan-your-trip">Plan Your Trip</a>\n'
-        '        <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">'
+        '        <button class="nav-toggle" type="button" aria-label="Toggle menu" '
+        'aria-controls="primary-menu" aria-expanded="false">'
         "<span></span><span></span><span></span></button>\n"
         "      </div>\n"
         "    </nav>\n"
@@ -753,18 +832,18 @@ def footer_block():
           </div>
         </div>
         <div>
-          <h4>What I plan</h4>
+          <h2 class="footer-col__title">What I plan</h2>
           <ul class="footer-links">
 {plan}          </ul>
         </div>
         <div>
-          <h4>Explore</h4>
+          <h2 class="footer-col__title">Explore</h2>
           <ul class="footer-links">
 {explore}            <li><a href="/journal.html">Journal</a></li>
           </ul>
         </div>
         <div>
-          <h4>Get in touch</h4>
+          <h2 class="footer-col__title">Get in touch</h2>
           <ul class="footer-links">
             <li><a href="mailto:{EMAIL}">{EMAIL}</a></li>
             <li><a href="tel:{PHONE_E164}">{PHONE_DISPLAY}</a></li>
@@ -819,6 +898,7 @@ def tokens():
         "INSTAGRAM": INSTAGRAM,
         "LINKEDIN": LINKEDIN,
         "POST_LIST": render_post_list(),
+        **image_tokens(),
     }
 
 
@@ -930,6 +1010,42 @@ def write_robots():
     print("  robots.txt")
 
 
+# Pages that carry noindex on purpose, in staging and in production alike.
+DELIBERATE_NOINDEX = {"terms.html", "404.html"}
+
+
+def verify_indexability():
+    """Fail the build if the robots meta disagrees with STAGING.
+
+    The staging posture is three locks — CNAME, robots.txt, and a per-page
+    noindex — and set-domain.sh flips all three together. The failure that
+    matters is asymmetric: shipping staging's `noindex, nofollow` to
+    boraborabound.com would drop the site out of search entirely, and nothing
+    would surface it until traffic vanished. A cutover checklist is a reminder;
+    this is a stop. It reads back what was actually written rather than
+    trusting the flag, so an edit to head_block() cannot quietly defeat it.
+    """
+    wrong = []
+    for filename in PAGES:
+        html = (ROOT / filename).read_text(encoding="utf-8")
+        noindex = 'content="noindex' in html
+        if STAGING:
+            if not noindex:
+                wrong.append(f"{filename}: staging build is missing noindex")
+        elif noindex and filename not in DELIBERATE_NOINDEX:
+            wrong.append(f"{filename}: PRODUCTION build still carries noindex")
+        elif not noindex and filename in DELIBERATE_NOINDEX:
+            wrong.append(f"{filename}: expected a deliberate noindex")
+    if wrong:
+        raise SystemExit(
+            "\nrobots meta does not match STAGING=%s:\n  %s\n"
+            % (STAGING, "\n  ".join(wrong))
+        )
+    where = "staging (every page noindex)" if STAGING else \
+        "production (only %s noindex)" % ", ".join(sorted(DELIBERATE_NOINDEX))
+    print(f"  indexability OK - {where}")
+
+
 def main():
     print("pages:")
     for filename, cfg in PAGES.items():
@@ -942,6 +1058,7 @@ def main():
     print("other:")
     write_sitemap()
     write_robots()
+    verify_indexability()
     print(f"\nStaging={STAGING}  Site={SITE_URL}")
     if not GA4_ID or not META_PIXEL_ID:
         print("WARNING: analytics IDs not set — GA4/Meta tags are inert. See CONFIG in this file.")

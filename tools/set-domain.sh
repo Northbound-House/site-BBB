@@ -56,11 +56,21 @@ Cutover checklist — the parts this script cannot do:
   1. Point the apex DNS at GitHub Pages (A records or ALIAS) and CNAME www.
   2. Settings -> Pages: set the custom domain to boraborabound.com, tick Enforce HTTPS.
   3. Verify boraborabound.com/robots.txt no longer says "Disallow: /".
-  4. Google Search Console: add + verify the property, submit sitemap.xml,
+  4. Verify no page still carries noindex. build.py refuses to write a
+     production build that gets this wrong, so confirm what actually shipped:
+         grep -l noindex *.html journal/*.html   # only terms.html and 404.html
+         curl -s https://boraborabound.com/ | grep -i 'name="robots"'
+     Of the three staging locks this is the one with no visible symptom: the
+     site looks perfect and simply never appears in search.
+  5. Run the detectors against the live domain:
+         cd tools/audit && npm install && node audit.mjs
+     Run it somewhere images.unsplash.com resolves, so the hotlinked
+     placeholders get checked rather than reported UNVERIFIED.
+  6. Google Search Console: add + verify the property, submit sitemap.xml,
      and file a Change of Address from the old Travefy property.
-  5. Bing Webmaster Tools: same.
-  6. Spot-check the legacy URLs land correctly:
+  7. Bing Webmaster Tools: same.
+  8. Spot-check the legacy URLs land correctly:
      /about /promise /ourpromise /testimonials /refer
-  7. Re-run the Facebook Sharing Debugger so the new Open Graph tags are cached.
+  9. Re-run the Facebook Sharing Debugger so the new Open Graph tags are cached.
 EOF
 fi
