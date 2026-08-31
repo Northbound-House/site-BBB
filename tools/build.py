@@ -151,11 +151,17 @@ def image_tokens():
     return out
 
 # --- Analytics ----------------------------------------------------------
-# TODO: copy these two values off the live Travefy site (view source, or read
-# them from the GA4 and Meta Events Manager admin panels). Reusing the existing
-# IDs keeps historical data continuous through the migration. Both tags stay
-# inert while these are None, so the site is safe to ship without them.
-GA4_ID = None          # e.g. "G-XXXXXXXXXX"
+# GA4_ID was recovered from the live Travefy site by tools/archive before the
+# cutover could destroy it -- see the archive/boraborabound.com-* branch. It is
+# the SAME property the old site used, which is the point: a new one would
+# restart history at zero and make the launch unmeasurable.
+#
+# META_PIXEL_ID is still unset. The old site carries a Google Tag Manager
+# container, GTM-K9ZZ8MZZ, and no Pixel snippet in its markup -- so if a Pixel
+# exists it is configured inside that container and has to be read from there.
+# The Meta tag stays inert while this is None, so the site ships safely without
+# it.
+GA4_ID = "G-9Z8GSNE92E"
 META_PIXEL_ID = None   # e.g. "123456789012345"
 
 LICENSES = [
@@ -985,6 +991,16 @@ LEGACY_REDIRECTS = {
     # staging domain and are linked from the earlier draft.
     "promise.html": "how-i-work.html",
     "testimonials.html": "reviews.html",
+    # Travefy served every page at a second, internal address as well as its
+    # readable one. tools/archive found ten URLs serving five pages, paired by
+    # content checksum. These are the twins: without them, half of what the old
+    # site published 404s the moment DNS moves, and a flat list of URLs would
+    # never have shown the duplication.
+    "get-page/ywtar32qeeycrq2": "index.html",       # twin of /
+    "get-page/ywtar32qdq4kzq2": "about.html",       # twin of /about
+    "get-page/ywtar32qdq4q2q2": "how-i-work.html",  # twin of /promise
+    "get-page/ywtar32qdq4w2q2": "reviews.html",     # twin of /testimonials
+    "get-page/ywtar32qdq4x2q2": "refer.html",       # twin of /refer
 }
 
 REDIRECT_TEMPLATE = """<!DOCTYPE html>
@@ -1011,15 +1027,21 @@ def write_redirects():
         # cannot emit invalid markup in the stub.
         raw = PAGES[target]["title"].split(" | ")[0]
         title = esc(raw.replace("&amp;", "&"))
-        html = REDIRECT_TEMPLATE.format(site=SITE_URL, target=target, title=title)
+        # Send homepage redirects to "/" rather than "/index.html": the real
+        # homepage declares "/" as its canonical, so redirecting to the longer
+        # form lands visitors on a URL that immediately points elsewhere.
+        dest = "" if target == "index.html" else target
+        html = REDIRECT_TEMPLATE.format(site=SITE_URL, target=dest, title=title)
         if old.endswith(".html"):
             (ROOT / old).write_text(html, encoding="utf-8")
-            print(f"  redirect {old} -> /{target}")
+            print(f"  redirect {old} -> /{dest}")
         else:
             d = ROOT / old
-            d.mkdir(exist_ok=True)
+            # parents=True: the /get-page/<id> aliases are nested, and the
+            # parent directory does not exist until the first one creates it.
+            d.mkdir(parents=True, exist_ok=True)
             (d / "index.html").write_text(html, encoding="utf-8")
-            print(f"  redirect {old}/ -> /{target}")
+            print(f"  redirect {old}/ -> /{dest}")
 
 
 def write_sitemap():
