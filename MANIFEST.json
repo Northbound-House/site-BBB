@@ -1,0 +1,292 @@
+{
+  "source": "https://boraborabound.com",
+  "captured": "2026-08-31T22:59:54.743Z",
+  "tool": "tools/archive/archive.mjs",
+  "pages": [
+    {
+      "url": "https://boraborabound.com/",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 63761,
+      "error": null,
+      "sha256": "ec359e787bc3d184"
+    },
+    {
+      "url": "https://boraborabound.com/get-page/ywtar32qdq4kzq2",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 94836,
+      "error": null,
+      "sha256": "76e64da480ce36f5"
+    },
+    {
+      "url": "https://boraborabound.com/get-page/ywtar32qdq4q2q2",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 57870,
+      "error": null,
+      "sha256": "e7e40e28180d6c74"
+    },
+    {
+      "url": "https://boraborabound.com/get-page/ywtar32qdq4w2q2",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 51903,
+      "error": null,
+      "sha256": "2c0158542f6586bf"
+    },
+    {
+      "url": "https://boraborabound.com/get-page/ywtar32qdq4x2q2",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 52982,
+      "error": null,
+      "sha256": "1b50a82266ed5c96"
+    },
+    {
+      "url": "https://boraborabound.com/about",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 94836,
+      "error": null,
+      "sha256": "76e64da480ce36f5"
+    },
+    {
+      "url": "https://boraborabound.com/get-page/ywtar32qeeycrq2",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 63761,
+      "error": null,
+      "sha256": "ec359e787bc3d184"
+    },
+    {
+      "url": "https://boraborabound.com/promise",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 57860,
+      "error": null,
+      "sha256": "197baa4667e85e73"
+    },
+    {
+      "url": "https://boraborabound.com/testimonials",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 51903,
+      "error": null,
+      "sha256": "2c0158542f6586bf"
+    },
+    {
+      "url": "https://boraborabound.com/refer",
+      "status": 200,
+      "contentType": "text/html",
+      "bytes": 52982,
+      "error": null,
+      "sha256": "1b50a82266ed5c96"
+    }
+  ],
+  "assets": [
+    {
+      "url": "https://www.googletagmanager.com/gtag/js?id=AW-992323273",
+      "status": 200,
+      "bytes": 628204,
+      "sha256": "38bf683bab952751"
+    },
+    {
+      "url": "https://www.googletagmanager.com/gtm.js?id=GTM-K9ZZ8MZZ",
+      "status": 200,
+      "bytes": 352140,
+      "sha256": "58d24257819c66e5"
+    },
+    {
+      "url": "https://connect.facebook.net/signals/config/3686201931662346",
+      "status": 200,
+      "bytes": 307635,
+      "sha256": "ad5a3df30fc4cf22"
+    },
+    {
+      "url": "https://connect.facebook.net/en_US/fbevents.js",
+      "status": 200,
+      "bytes": 411990,
+      "sha256": "7458d475e2bd711a"
+    },
+    {
+      "url": "https://d1h0qti89a78h.cloudfront.net/client-discover/assets/vendor-ed9ff6dbf6c9d6d21b03c8c110be580b.css",
+      "status": 200,
+      "bytes": 443440,
+      "sha256": "4f5bda24e92f9b86"
+    },
+    {
+      "url": "https://d1h0qti89a78h.cloudfront.net/client-discover/assets/travefy-discover-53d32e60e88c5c43e8b70cfaf3700224.css",
+      "status": 200,
+      "bytes": 76553,
+      "sha256": "48824b7a92338045"
+    },
+    {
+      "url": "https://fonts.googleapis.com/css",
+      "status": 400,
+      "bytes": 0
+    },
+    {
+      "url": "https://googleads.g.doubleclick.net/pagead/viewthroughconversion/992323273/",
+      "status": 200,
+      "bytes": 42,
+      "sha256": "ef1955ae757c8b96"
+    },
+    {
+      "url": "https://use.typekit.net/nuk5goj.js",
+      "status": 200,
+      "bytes": 20638,
+      "sha256": "f6724f311a3392eb"
+    },
+    {
+      "url": "https://d1h0qti89a78h.cloudfront.net/client-discover/assets/vendor-4eef7624c24aaf2cbe11d14c13293d2a.js",
+      "status": 200,
+      "bytes": 2471115,
+      "sha256": "384dc30c0d5a6e5e"
+    },
+    {
+      "url": "https://d1h0qti89a78h.cloudfront.net/client-discover/assets/chunk.8.a24f61c579ed87f21abc.js",
+      "status": 200,
+      "bytes": 391393,
+      "sha256": "965b0748b95e6a84"
+    },
+    {
+      "url": "https://d1h0qti89a78h.cloudfront.net/client-discover/assets/chunk.524.89b484d1f157d754a392.js",
+      "status": 200,
+      "bytes": 3750,
+      "sha256": "a5b5cd4994fb9f5f"
+    },
+    {
+      "url": "https://d1h0qti89a78h.cloudfront.net/client-discover/assets/travefy-discover-56d88afe2436d8da5c4d4ac8d54ff49f.js",
+      "status": 200,
+      "bytes": 569072,
+      "sha256": "e9a82cb09d61a733"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h100/i_h8396f69931ad9bdd1bc650ae3f31904fd096edbb.png",
+      "status": 200,
+      "bytes": 9105,
+      "sha256": "613384d0a05418a6"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h17ac3afabb4c436a4ff9309b01b8d63eff3ef831.png",
+      "status": 200,
+      "bytes": 330647,
+      "sha256": "a9da815f556047a2"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h9c4d3e7365e285a98d82597e9322ce825c8612a5.png",
+      "status": 200,
+      "bytes": 249573,
+      "sha256": "60f1858ac9f149e9"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h3b27a9d812e87f42399d70205619494cfdc5fa50.png",
+      "status": 200,
+      "bytes": 290381,
+      "sha256": "bec9ba16fdc70873"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h4ee0cf8a8431da8753cfdaadc24a579f72b2dac5.png",
+      "status": 200,
+      "bytes": 61354,
+      "sha256": "629c833f51a1e9d8"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_ha22a1a64d1da7bf60838b20c5dfe1c5d0840096d.png",
+      "status": 200,
+      "bytes": 528525,
+      "sha256": "f61b4661ebf4aa4e"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h4d9b6224dcaef2624efbfe47e4253e44a67191d7.png",
+      "status": 200,
+      "bytes": 336988,
+      "sha256": "befe4f75350a8c8d"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h8bdb5f0d4993a80848e7292ef2723da1ff315651.png",
+      "status": 200,
+      "bytes": 567749,
+      "sha256": "d8d7853a40c42eda"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h0c6514061df7692752deb5db708032f85ecbad49.png",
+      "status": 200,
+      "bytes": 711145,
+      "sha256": "a0925b936b0f360c"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_hfddbf4757ff232fc7062514890c68392e97d2171.png",
+      "status": 200,
+      "bytes": 564149,
+      "sha256": "cbbdb1b0c3faa497"
+    },
+    {
+      "url": "https://assets.calendly.com/assets/external/widget.js",
+      "status": 200,
+      "bytes": 11933,
+      "sha256": "2ab1c4e5467cc511"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h5480bbb4d344a11d9d4eef33e5f6ddc635d561b3.png",
+      "status": 200,
+      "bytes": 2230284,
+      "sha256": "ec44b845a77da865"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h69f462d95b6586d0b636ddb19ab7052cd5d01f2e.png",
+      "status": 200,
+      "bytes": 143501,
+      "sha256": "6aba0c33f4ee8d6c"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_he515ce8fbc7392aa4c072e3dc3c90363ddb6bdac.png",
+      "status": 200,
+      "bytes": 163052,
+      "sha256": "022b137c1ec72ecb"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h31d155ba219a55b9ef1160e3a4cfa339404c40ac.png",
+      "status": 200,
+      "bytes": 164018,
+      "sha256": "fd89d5c4c7930c71"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_he5ebbdad28fc6c25665cafd501a37a70057786b7.png",
+      "status": 200,
+      "bytes": 170455,
+      "sha256": "5925a5500b7b9f11"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h5dd058396af7e58b1200872edb9b90770bb3628b.png",
+      "status": 200,
+      "bytes": 171662,
+      "sha256": "76e3c17c6c790f1c"
+    },
+    {
+      "url": "https://www.googletagmanager.com/gtag/js?id=G-9Z8GSNE92E",
+      "status": 200,
+      "bytes": 517724,
+      "sha256": "2fdc269181f01c85"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h2bb1be154db10abc57482e8dd376c2359abfcdc6.png",
+      "status": 200,
+      "bytes": 205805,
+      "sha256": "e9a50d77e427c108"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_h4c2eb553cacf1a15cd143cb5675806f43755b93e.png",
+      "status": 200,
+      "bytes": 227164,
+      "sha256": "053ba50ea36c15cb"
+    },
+    {
+      "url": "https://d6ham14n5a27z.cloudfront.net/img/s_h1200/i_hac5582c42990b52dcbbd61b5bccdd0cfcf1b0bbc.png",
+      "status": 200,
+      "bytes": 201996,
+      "sha256": "f93d0a8e64f9adee"
+    }
+  ]
+}
