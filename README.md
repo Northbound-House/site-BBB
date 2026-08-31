@@ -312,6 +312,20 @@ a PR, and rot on a launched site is precisely what nobody notices in a quiet
 month. It becomes unnecessary the day the placeholders are replaced with real
 photography.
 
+### `tools/archive`
+
+A one-shot crawler that preserves a live site before it stops existing. Written
+for the Travefy site at `boraborabound.com`, which the DNS cutover destroys.
+
+Run it from **Actions → archive-old-site**, not locally — it needs to reach the
+site being archived, and it commits to an orphan branch that Pages never serves.
+
+It saves the HTML exactly as the server sent it, but collects asset URLs from
+the *rendered* page, so anything JavaScript injected is captured too. It also
+extracts the analytics IDs, which is the part with a deadline: once the old site
+is gone, the GA4 and Meta Pixel IDs cannot be recovered, and reusing them is
+what keeps reporting continuous across the migration.
+
 ### `tools/set-domain.sh`
 
 Switches staging ↔ production in one command. The domain appears in ~40 places

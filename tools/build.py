@@ -201,8 +201,10 @@ SERVICES = [
 # rebuild. The index listing, BlogPosting schema, sitemap entry and prev/next
 # links are all generated from this table.
 #
-# `date` is ISO. These were written for launch, so they all carry the launch
-# date — if the cutover slips, re-date them rather than shipping stale ones.
+# `date` is ISO, and drives the index order, the sitemap and the BlogPosting
+# schema. Re-dated across launch week for the 1 September cutover: the five were
+# written in August and would otherwise have launched three weeks stale. Newest
+# first, ending on launch day. If the cutover moves, move these with it.
 
 POSTS = [
     dict(
@@ -216,7 +218,7 @@ POSTS = [
             "Adults-only and tips-included, or the biggest ships afloat with a waterpark "
             "on the back. The honest comparison, and the one question that decides it."
         ),
-        date="2026-08-11",
+        date="2026-09-01",
         minutes=6,
         image="IMG_COASTLINE",
     ),
@@ -231,7 +233,7 @@ POSTS = [
             "Meals and drinks, obviously. But premium spirits, the good restaurants, the spa, "
             "the transfers and the wifi are where it gets interesting."
         ),
-        date="2026-08-11",
+        date="2026-08-31",
         minutes=6,
         image="IMG_BERMUDA",
     ),
@@ -246,7 +248,7 @@ POSTS = [
             "Drier and cheaper in May, warmest and busiest in July, gold and quiet in "
             "September. Picking the month matters more than picking the ship."
         ),
-        date="2026-08-11",
+        date="2026-08-28",
         minutes=5,
         image="IMG_COASTLINE",
     ),
@@ -261,7 +263,7 @@ POSTS = [
             "\u201cSmall group\u201d is unregulated, \u201cfirst-class hotel\u201d means nothing, and the "
             "single supplement is where the real money hides."
         ),
-        date="2026-08-11",
+        date="2026-08-27",
         minutes=6,
         image="IMG_BERMUDA",
     ),
@@ -276,7 +278,7 @@ POSTS = [
             "An honest accounting \u2014 including the times the cheaper cabin was the better "
             "call, and the upgrade that matters more than any of them."
         ),
-        date="2026-08-11",
+        date="2026-08-26",
         minutes=6,
         image="IMG_COASTLINE",
     ),

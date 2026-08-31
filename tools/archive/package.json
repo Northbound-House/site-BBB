@@ -1,0 +1,8 @@
+{
+  "name": "bbb-archive",
+  "private": true,
+  "type": "module",
+  "description": "One-shot crawler that preserves the old Travefy site before the DNS cutover destroys it. Dev tooling; never shipped.",
+  "scripts": { "archive": "node archive.mjs https://boraborabound.com ./out" },
+  "devDependencies": { "playwright": "^1.49.0" }
+}

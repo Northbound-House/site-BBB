@@ -1,0 +1,149 @@
+name: archive-old-site
+
+# Preserve the live Travefy site before the DNS cutover destroys it.
+#
+# Run this BEFORE pointing boraborabound.com at GitHub Pages. Afterwards there
+# is no second copy and no way to make one — the old site simply stops
+# existing, taking its content, its URL structure and its analytics IDs with it.
+#
+# Manual only. It is a one-shot job against someone else's server, not
+# something that should fire on a schedule.
+#
+# The result lands on an orphan branch, never on main. GitHub Pages serves the
+# repo root, so an archive committed to main would be published as part of the
+# new site — the old pages reappearing as indexable duplicates of the very
+# content that replaced them.
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Site to archive"
+        required: true
+        default: "https://boraborabound.com"
+      max_pages:
+        description: "Stop after this many pages"
+        required: false
+        default: "500"
+      branch:
+        description: "Orphan branch to commit to (blank = archive/<host>-<date>)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: tools/archive/package-lock.json
+
+      - name: Install
+        working-directory: tools/archive
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Crawl
+        id: crawl
+        env:
+          MAX_PAGES: ${{ github.event.inputs.max_pages }}
+        run: |
+          node tools/archive/archive.mjs "${{ github.event.inputs.url }}" "$RUNNER_TEMP/archive"
+          echo "host=$(node -e 'process.stdout.write(new URL(process.argv[1]).host)' "${{ github.event.inputs.url }}")" >> "$GITHUB_OUTPUT"
+
+      # Put the findings in front of whoever ran this, rather than making them
+      # clone a branch to learn whether the analytics IDs were recoverable.
+      - name: Summarise
+        if: always()
+        run: |
+          {
+            echo "# Archive of ${{ github.event.inputs.url }}"
+            echo
+            if [ -f "$RUNNER_TEMP/archive/urls.txt" ]; then
+              echo "**$(wc -l < "$RUNNER_TEMP/archive/urls.txt") pages captured.**"
+              echo
+              cat "$RUNNER_TEMP/archive/FINDINGS.md"
+              echo
+              echo '<details><summary>Every URL captured</summary>'
+              echo
+              echo '```'
+              cat "$RUNNER_TEMP/archive/urls.txt"
+              echo '```'
+              echo '</details>'
+            else
+              echo "The crawl produced no output. Check the Crawl step's log."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Commit to an orphan branch
+        run: |
+          set -euo pipefail
+          BRANCH="${{ github.event.inputs.branch }}"
+          if [ -z "$BRANCH" ]; then
+            BRANCH="archive/${{ steps.crawl.outputs.host }}-$(date -u +%Y-%m-%d)"
+          fi
+          echo "Branch: $BRANCH"
+
+          WORK="$RUNNER_TEMP/branch"
+          git clone --depth 1 "${{ github.server_url }}/${{ github.repository }}" "$WORK"
+          cd "$WORK"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # An orphan branch has no parent, so none of the site's own files come
+          # with it — the archive stands alone and cannot be confused for the
+          # repo's content.
+          git checkout --orphan "$BRANCH"
+          git rm -rf --quiet . 2>/dev/null || true
+          cp -r "$RUNNER_TEMP/archive/." .
+
+          cat > README.md <<EOF
+          # Archive: ${{ github.event.inputs.url }}
+
+          Captured $(date -u +"%Y-%m-%d %H:%M UTC") by \`tools/archive/archive.mjs\`,
+          run from \`.github/workflows/archive-old-site.yml\`.
+
+          This is the Travefy site as it stood immediately before
+          \`boraborabound.com\` was pointed at GitHub Pages. It exists nowhere
+          else.
+
+          | Path | What |
+          | --- | --- |
+          | \`pages/\` | Every page's HTML, exactly as the server sent it |
+          | \`assets/<host>/\` | Images, CSS and JS, from any origin |
+          | \`urls.txt\` | Every URL that returned success |
+          | \`MANIFEST.json\` | Per-URL status, content type, size, checksum |
+          | \`FINDINGS.md\` | Analytics IDs recovered from the pages |
+
+          The HTML keeps its original absolute links, so this is a record rather
+          than a browsable offline copy — following a link leaves the archive.
+          That is deliberate: rewriting links would mean altering the bytes the
+          server sent, which is the one thing an archive should not do.
+
+          **This branch is never merged.** GitHub Pages serves \`main\`, and
+          these pages must not reappear as duplicates of the site that replaced
+          them.
+          EOF
+
+          git add -A
+          git commit -q -m "Archive ${{ github.event.inputs.url }} before the cutover
+
+          Captured by tools/archive/archive.mjs. The Travefy site as it stood
+          immediately before boraborabound.com moved to GitHub Pages, with the
+          URL inventory and analytics IDs the migration needs.
+
+          Orphan branch, never merged: Pages serves main, and these pages must
+          not reappear as duplicates of what replaced them."
+          git push -u origin "$BRANCH"
+
+          echo "Pushed $BRANCH" >> "$GITHUB_STEP_SUMMARY"

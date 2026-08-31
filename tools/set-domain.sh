@@ -66,9 +66,11 @@ Cutover checklist — the parts this script cannot do:
          cd tools/audit && npm install && node audit.mjs
      Run it somewhere images.unsplash.com resolves, so the hotlinked
      placeholders get checked rather than reported UNVERIFIED.
-  6. Google Search Console: add + verify the property, submit sitemap.xml,
-     and file a Change of Address from the old Travefy property.
-  7. Bing Webmaster Tools: same.
+  6. Google Search Console: submit sitemap.xml. Do NOT file a Change of
+     Address -- that is for moving between domains, and this is the same
+     domain on a different host. Then watch Coverage for 404s: each one is
+     an old URL missing from LEGACY_REDIRECTS.
+  7. Bing Webmaster Tools: submit the sitemap.
   8. Spot-check the legacy URLs land correctly:
      /about /promise /ourpromise /testimonials /refer
   9. Re-run the Facebook Sharing Debugger so the new Open Graph tags are cached.
