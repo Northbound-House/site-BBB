@@ -53,7 +53,27 @@ After setting any of these: `python3 tools/build.py`, commit, push.
 off Travefy, not a fresh launch — the old URLs and the analytics history both
 need to survive it.
 
-### Before any of this: inventory the old URLs
+### First, and with a deadline: archive the old site
+
+**Actions → archive-old-site → Run workflow**, with `https://boraborabound.com`.
+
+One run, and it must happen **before** DNS moves. It crawls the Travefy site,
+commits the result to an orphan branch (`archive/boraborabound.com-<date>`,
+never merged, never served), and prints what it found in the run summary. It
+runs on a GitHub runner because that is what can reach the site; a dev machine
+behind a restrictive proxy cannot.
+
+It also produces the two things this launch is otherwise blocked on:
+
+- `urls.txt` — the complete old-URL inventory for the redirect map below
+- `FINDINGS.md` — the GA4 and Meta Pixel IDs, recovered from the pages
+
+If `FINDINGS.md` reports a **GTM** container and no direct IDs, the tags are
+configured inside that container; open it to read them. If it finds only a
+**Universal Analytics** property, there is no history worth preserving — UA
+stopped processing data in 2023 — and a fresh GA4 property is the right answer.
+
+### Then: inventory the old URLs
 
 `LEGACY_REDIRECTS` in `tools/build.py` maps five old paths. **Every other URL
 Travefy serves 404s the moment DNS moves** — taking its inbound links and
@@ -61,8 +81,8 @@ rankings with it. This is the largest launch risk and the only one that is
 irreversible in the sense that matters: you cannot tell afterwards what you
 broke, only that traffic fell.
 
-Get the full list from `boraborabound.com/sitemap.xml` or the Travefy admin,
-map each URL to its nearest new page, and add a row per URL. Send anything with
+`urls.txt` from the archive above is that list. Map each URL to its nearest
+new page and add a row per URL. Send anything with
 no good equivalent to the closest *parent* page, never the homepage — Google
 reads a homepage redirect as a soft 404 and drops the URL anyway.
 
