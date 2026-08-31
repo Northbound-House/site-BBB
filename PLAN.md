@@ -53,6 +53,19 @@ After setting any of these: `python3 tools/build.py`, commit, push.
 off Travefy, not a fresh launch — the old URLs and the analytics history both
 need to survive it.
 
+### Before any of this: inventory the old URLs
+
+`LEGACY_REDIRECTS` in `tools/build.py` maps five old paths. **Every other URL
+Travefy serves 404s the moment DNS moves** — taking its inbound links and
+rankings with it. This is the largest launch risk and the only one that is
+irreversible in the sense that matters: you cannot tell afterwards what you
+broke, only that traffic fell.
+
+Get the full list from `boraborabound.com/sitemap.xml` or the Travefy admin,
+map each URL to its nearest new page, and add a row per URL. Send anything with
+no good equivalent to the closest *parent* page, never the homepage — Google
+reads a homepage redirect as a soft 404 and drops the URL anyway.
+
 ```bash
 ./tools/set-domain.sh production
 python3 tools/build.py    # (set-domain runs this for you)
@@ -97,17 +110,27 @@ Then, in order:
        hotlinked placeholders are actually checked instead of reported
        UNVERIFIED. One of them had already been withdrawn upstream.
 6. [ ] Spot-check every legacy URL redirects correctly.
-7. [ ] **Google Search Console:** add and verify the property, submit
-       `sitemap.xml`, then file a **Change of Address** from the old Travefy
-       property. Don't skip the Change of Address — it's what moves the ranking
-       signal.
+7. [ ] **Google Search Console:** submit the new `sitemap.xml`.
+
+       **Do not file a Change of Address.** That tool is for moving between
+       *domains*. This is the same `boraborabound.com` on a different host, so
+       there is no second property to move from and the existing property
+       carries over untouched. (An earlier version of this checklist said to
+       file one. It was wrong.) Confirm the old site was never also served from
+       its own Travefy URL; if it was, that one does need a Change of Address.
+
+       Then watch **Coverage** for 404s for a fortnight. Any old URL missing
+       from the redirect map surfaces here, and each is one row in
+       `LEGACY_REDIRECTS`.
 8. [ ] **Bing Webmaster Tools:** same.
 9. [ ] Re-run the **Facebook Sharing Debugger** so the new Open Graph tags cache.
 10. [ ] Confirm GA4 is receiving `generate_lead` events, and **mark it a key
        event** in the GA4 admin panel so it counts as a conversion.
 
-**If the cutover slips more than a couple of weeks,** re-date the five journal
-posts in `POSTS` — they all carry `2026-08-11` and will otherwise launch stale.
+**The five journal posts have been re-dated** across launch week (26 August –
+1 September), newest last on launch day. If the cutover moves, move them with
+it — one line each in `POSTS`, and the index order, sitemap and JSON-LD all
+follow.
 
 ---
 
