@@ -257,7 +257,7 @@ async function run() {
   /* ---- What the launch actually needs ----------------------------------- */
 
   const ok = [...pages.values()].filter((p) => p.status && p.status < 400);
-  const findings = await extractFindings(ok.map((p) => p.url), ctx);
+  const findings = await extractFindings(ok.map((p) => p.url), ctx, ok);
 
   await save(path.join(OUT, "MANIFEST.json"), JSON.stringify({
     source: ORIGIN,
@@ -283,7 +283,22 @@ async function run() {
 /** Pull the values out of the archive that stop being obtainable the moment
  *  the site goes away. This is why the archive has to happen before cutover
  *  and not after. */
-async function extractFindings(urls, ctx) {
+/** Group pages that returned byte-identical content. The Travefy site serves
+ *  every page at both a readable path and an internal /get-page/<id> — so the
+ *  URL count is double the page count, and each alias needs its own redirect
+ *  pointing at the same destination. Without this the duplication is invisible
+ *  in a flat URL list and half the redirects get missed. */
+function aliasGroups(ok) {
+  const bySum = new Map();
+  for (const p of ok) {
+    if (!p.sha256) continue;
+    if (!bySum.has(p.sha256)) bySum.set(p.sha256, []);
+    bySum.get(p.sha256).push(p.url);
+  }
+  return [...bySum.values()].filter((g) => g.length > 1);
+}
+
+async function extractFindings(urls, ctx, ok) {
   const ids = { ga4: new Set(), ua: new Set(), gtm: new Set(), pixel: new Set() };
   for (const url of urls.slice(0, 40)) {
     try {
@@ -320,6 +335,18 @@ configured inside it rather than in the page, and the IDs above may be empty.
 Open that container to read them. **Universal Analytics** stopped processing
 data in 2023; if that is all there is, there is no history to preserve and a
 fresh GA4 property is the right answer.
+
+## Aliased URLs
+
+${(() => {
+  const groups = aliasGroups(ok);
+  if (!groups.length) return "Every page has one URL. Nothing to reconcile.";
+  return `**${groups.length} page(s) are each served at more than one URL.** Every
+alias needs its own redirect row pointing at the same destination — miss one and
+that URL 404s even though its twin works.
+
+` + groups.map((g) => g.map((u) => `- \`${u}\``).join("\n")).join("\n\n");
+})()}
 
 ## URL inventory
 
