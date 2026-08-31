@@ -66,8 +66,13 @@
     ]
   }
   </script>
-  <!-- Analytics: set GA4_ID and META_PIXEL_ID in tools/build.py and rebuild.
-       Copy both from the live Travefy site so historical data stays continuous. -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-9Z8GSNE92E"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-9Z8GSNE92E');
+  </script>
 </head>
 <body class="inner-page">
   <a class="skip-link" href="#main">Skip to content</a>
