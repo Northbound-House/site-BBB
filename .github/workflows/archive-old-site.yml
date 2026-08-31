@@ -66,6 +66,9 @@ jobs:
       - name: Summarise
         if: always()
         run: |
+          # To stdout as well as the summary: when the commit step failed, the
+          # IDs had been recovered and were readable in neither place.
+          [ -f "$RUNNER_TEMP/archive/FINDINGS.md" ] && cat "$RUNNER_TEMP/archive/FINDINGS.md"
           {
             echo "# Archive of ${{ github.event.inputs.url }}"
             echo
@@ -94,9 +97,14 @@ jobs:
           fi
           echo "Branch: $BRANCH"
 
-          WORK="$RUNNER_TEMP/branch"
-          git clone --depth 1 "${{ github.server_url }}/${{ github.repository }}" "$WORK"
-          cd "$WORK"
+          # Work in the checkout actions/checkout already authenticated.
+          #
+          # A fresh `git clone` of the same repo carries no credentials: checkout
+          # installs its token as an http.extraheader in the local git config of
+          # THIS working copy only. A second clone has no such header, so the
+          # push failed with "could not read Username for https://github.com"
+          # after the crawl had already succeeded -- the data was captured and
+          # then thrown away.
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
