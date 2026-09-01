@@ -219,6 +219,79 @@
     }, function () { /* leave the stand-in sizes in place */ });
   }
 
+  /* ---- Review cards open full size ----
+     The cards are 1080px squares drawn at roughly 340px, so the wording inside
+     the artwork is small until it is opened.
+
+     Each card is wrapped in a real link to the image file. That is the whole
+     no-JavaScript story: the link still opens the picture. Everything below is
+     an enhancement layered on top of something that already works.
+
+     A native <dialog> does the hard parts — focus trap, Escape to close, the
+     page behind made inert, focus returned to the link on close — all of which
+     are easy to get subtly wrong by hand. Where showModal is missing the
+     listener never binds, so the link keeps its default behaviour. */
+  var zoomLinks = document.querySelectorAll("a[data-zoom]");
+  if (zoomLinks.length && typeof HTMLDialogElement === "function"
+      && HTMLDialogElement.prototype.showModal) {
+    var dialog = null;
+    var dialogImg = null;
+
+    var buildDialog = function () {
+      dialog = document.createElement("dialog");
+      dialog.className = "lightbox";
+
+      var inner = document.createElement("div");
+      inner.className = "lightbox__inner";
+
+      dialogImg = document.createElement("img");
+
+      var close = document.createElement("button");
+      close.type = "button";
+      close.className = "lightbox__close";
+      close.setAttribute("aria-label", "Close");
+      close.textContent = "✕";
+      close.addEventListener("click", function () { dialog.close(); });
+
+      inner.appendChild(dialogImg);
+      inner.appendChild(close);
+      dialog.appendChild(inner);
+
+      /* Click outside the picture closes it. The dialog fills the viewport, so
+         a click landing on the dialog itself rather than on .lightbox__inner or
+         its children is a click on the backdrop area. */
+      dialog.addEventListener("click", function (e) {
+        if (e.target === dialog) dialog.close();
+      });
+
+      /* Drop the src on close so a large PNG is not held decoded for the rest
+         of the visit, and so the next open cannot flash the previous card. */
+      dialog.addEventListener("close", function () {
+        dialogImg.removeAttribute("src");
+        dialogImg.removeAttribute("alt");
+      });
+
+      document.body.appendChild(dialog);
+    };
+
+    Array.prototype.forEach.call(zoomLinks, function (link) {
+      link.addEventListener("click", function (e) {
+        /* Leave modified clicks alone — a new tab is a reasonable thing to
+           want, and hijacking it is the sort of thing that makes people
+           distrust a page. */
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        e.preventDefault();
+        if (!dialog) buildDialog();
+        var img = link.querySelector("img");
+        dialogImg.src = link.getAttribute("href");
+        /* The card's alt carries the whole review, so the opened copy says the
+           same thing rather than being announced as an unlabelled image. */
+        dialogImg.alt = img ? img.getAttribute("alt") || "" : "";
+        dialog.showModal();
+      });
+    });
+  }
+
   /* ---- Footer year ---- */
   var yr = document.getElementById("year");
   if (yr) yr.textContent = new Date().getFullYear();
