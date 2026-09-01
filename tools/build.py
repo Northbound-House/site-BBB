@@ -1041,9 +1041,26 @@ def substitute(text, where):
     return TOKEN_RE.sub(repl, text)
 
 
+def strip_comments(html):
+    """Drop HTML comments from a page fragment.
+
+    The fragments are commented heavily -- what a section is for, and what was
+    removed from it and why. That is worth keeping where the next person edits,
+    and worth nothing to a browser: 12KB of it was being served across the site,
+    most of it explaining content the visitor cannot see because it was deleted.
+
+    Only fragment bodies go through here. The GENERATED banner that render()
+    puts at the top of every file survives, because it is added after this runs
+    and it is the one comment with a job in the output: it tells anyone who
+    opens the built file not to edit it.
+    """
+    return re.sub(r"\n?[ \t]*<!--.*?-->[ \t]*", "", html, flags=re.S)
+
+
 def render(filename, cfg):
     src = PAGES_DIR / filename
     content = substitute(src.read_text(encoding="utf-8").rstrip("\n"), src)
+    content = strip_comments(content)
 
     hero = cfg.get("hero", False)
     nav = nav_block(filename, hero=hero)

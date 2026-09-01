@@ -393,6 +393,10 @@
      everything else. */
   --media-card-ratio:           1 / 1; /* the graphics are square — holds the box before the image lands */
   --media-card-radius:  var(--radius); /* corner rounding, matched to the text cards alongside */
+  /* The brand hexagon: flat top and bottom, a point at either side. Taken from
+     the shape of the previous hexagon-cropped headshot rather than invented, so
+     the headshot matches the hexagons inside the testimonial artwork. */
+  --hex-clip: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 
   /* FOCUS AND SKIP LINK ------------------------------------------- */
   --focus-ring-width:           2px; /* thickness of the keyboard focus outline */
@@ -1703,16 +1707,25 @@ strong, b { font-weight: 600; }
 .nav-links a.active { color: var(--rose-deep); }  /* AA at nav's 0.82rem */
 .nav-links a::after { background: var(--aqua); height: var(--nav-underline-height); }
 
-/* The 2026 headshot is an opaque square photograph, so it takes the card back:
-   rounded, shadowed and cropped to fill, like every other photo on the site.
-   This is the opposite of .is-portrait below, which exists for the hexagon —
-   drawing an opaque square with no card leaves a bare photo pasted onto the
-   tint, which is how it looked before this rule. */
-.split__media.is-square {
+/* The headshot is cut to the brand hexagon, on every page that shows it.
+   The 2026 photograph is an opaque square, so the shape is done in CSS rather
+   than baked into the file the way the old hexagon PNG was — one asset, and
+   changing the shape never means re-exporting the photo.
+
+   No card, no shadow, no radius: box-shadow is drawn on the border box and
+   ignores clip-path, so a shadow here would hang behind the hexagon as a
+   rectangle. */
+.split__media.is-hex {
   background: none;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
   aspect-ratio: var(--media-card-ratio);
 }
-.split__media.is-square img { object-fit: cover; }
+.split__media.is-hex img {
+  clip-path: var(--hex-clip);
+  object-fit: cover;
+}
 
 /* The older brand headshot is a hexagon with transparent corners — no crop, no
    card, or the transparency reads as a chipped rectangle. Nothing live uses
