@@ -384,6 +384,16 @@
      where a target has to be finger-sized — so moving one should not drag the
      other with it. */
 
+  /* MEDIA CARDS ---------------------------------------------------
+     Added after the 24 August lock, per the rule above: new knobs, nothing
+     existing retuned. These size the square brand graphics — the five BOUND
+     promise cards and the three testimonial cards. The artwork carries its own
+     type, so these cards take none of the padding a text card needs; they
+     reuse --cards-cols and --quotes-cols, so they stack at --bp-cards with
+     everything else. */
+  --media-card-ratio:           1 / 1; /* the graphics are square — holds the box before the image lands */
+  --media-card-radius:  var(--radius); /* corner rounding, matched to the text cards alongside */
+
   /* FOCUS AND SKIP LINK ------------------------------------------- */
   --focus-ring-width:           2px; /* thickness of the keyboard focus outline */
   --focus-ring-offset:          2px; /* gap between the element and that outline */
@@ -821,6 +831,53 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   letter-spacing: 0.1em;
   display: block;
   margin-bottom: 0.6rem;
+}
+
+/* --------------------------- Media cards ------------------------ */
+/* A card that is wholly a brand graphic. The artwork already carries its
+   heading and body, so the card draws no type of its own — the real words sit
+   next to the image inside .visually-hidden, which is what a screen reader and
+   a crawler read. Nobody is shown them twice. */
+.media-card {
+  /* figure carries a 40px side margin from the browser's own stylesheet, the
+     same one that was eating 80px out of every .quote track. */
+  margin: 0;
+  border-radius: var(--media-card-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: var(--border-width) solid var(--line);
+  background: var(--paper);
+}
+.media-card img {
+  display: block;
+  width: 100%;
+  /* height:auto is load-bearing, not tidiness. The markup carries width="1080"
+     height="1080" so the browser can hold the box before the file lands, but
+     those attributes are PRESENTATIONAL HINTS: without a CSS height they win
+     over aspect-ratio, and the box became 1080px tall inside a ~380px column.
+     object-fit:cover then cropped a square graphic to a tall slot and sliced
+     the wording in half — "BESPOKE JOURNEYS" rendered as "SPOKE URNEYS".
+     The same attribute-over-aspect-ratio trap grew the honeymoon card by 130px
+     in August. */
+  height: auto;
+  aspect-ratio: var(--media-card-ratio);
+  object-fit: cover;
+}
+
+/* Present to assistive technology and to search, absent from the page. The
+   1px box and negative margin are the standard clipping idiom rather than
+   design measurements, so they stay here instead of becoming knobs — there is
+   no value a person would ever want to tune. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* --------------------------- Testimonials ----------------------- */
@@ -1646,7 +1703,21 @@ strong, b { font-weight: 600; }
 .nav-links a.active { color: var(--rose-deep); }  /* AA at nav's 0.82rem */
 .nav-links a::after { background: var(--aqua); height: var(--nav-underline-height); }
 
-/* The brand headshot is a hexagon with transparent corners — no crop, no card. */
+/* The 2026 headshot is an opaque square photograph, so it takes the card back:
+   rounded, shadowed and cropped to fill, like every other photo on the site.
+   This is the opposite of .is-portrait below, which exists for the hexagon —
+   drawing an opaque square with no card leaves a bare photo pasted onto the
+   tint, which is how it looked before this rule. */
+.split__media.is-square {
+  background: none;
+  aspect-ratio: var(--media-card-ratio);
+}
+.split__media.is-square img { object-fit: cover; }
+
+/* The older brand headshot is a hexagon with transparent corners — no crop, no
+   card, or the transparency reads as a chipped rectangle. Nothing live uses
+   this now; it is kept for the fuller page versions parked in pages/_full/,
+   which still reference it. */
 .split__media.is-portrait {
   background: none;
   box-shadow: none;

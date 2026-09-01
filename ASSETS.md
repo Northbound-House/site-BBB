@@ -84,17 +84,22 @@ You said you have a graphic for each of the five promises. They'll replace the l
 
 PNG/SVG with transparent background, roughly square (~600×600). If your graphics are full illustrations rather than icons, tell me — I'll switch the cards to an image-led layout instead of the small icon badge.
 
-## 4. Testimonials graphics → `assets/img/`
+## 4. Testimonials graphics → `assets/img/` — **done**
 
-You have graphics for the three testimonials. Name them by author:
+Landed 1 September 2026, pulled from your Drive folder as
+`review-michael-c.png`, `review-steven.png`, `review-becky-g.png`. They are the
+whole card, so they replaced the one-line quotes on both the homepage and
+`reviews.html` and carry the full review in their `alt`.
 
-| Testimonial | Filename |
-| --- | --- |
-| Michael C. | `testimonial-michael.jpg` |
-| Steven | `testimonial-steven.jpg` |
-| Becky G. | `testimonial-becky.jpg` |
+The BOUND promise cards landed in the same pass — `promise-bespoke.png`,
+`promise-outstanding.png`, `promise-unmatched.png`, `promise-network.png`,
+`promise-dedicated.png`. Those spell **B-O-U-N-D** and are listed in the
+`IMAGES` table in acronym order for that reason, not alphabetically.
 
-Tell me whether each graphic is **a photo/portrait** (I'll add it beside the quote), **a screenshot of the review** (I'll show it as the card), or **a decorative illustration** — the layout differs for each, so I'll match it to what you've got.
+**Two things to know before changing any of them.** The wording is baked into
+the artwork, so a copy change means re-exporting from Canva and editing the alt
+text in `tools/build.py` in the same commit. And keep them square: the cards
+are drawn with `object-fit: cover`, so a non-square export will be cropped.
 
 ---
 

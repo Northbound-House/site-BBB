@@ -107,9 +107,21 @@ Favicons, `apple-touch-icon`, the PWA icons and `og-image.png` are all generated
 from the brand mark on `--purple`. The wordmark next to the mark is live text in
 Bebas Neue rather than an image, so it stays crisp and selectable.
 
-`assets/img/zac-headshot.png` is the hexagon-cropped brand headshot. It has
-transparent corners, so it is rendered with `.split__media.is-portrait`
-(`object-fit: contain`, no card, no shadow) — do not put it in a cropped frame.
+`assets/img/zac-headshot.jpg` is the 2026 brand headshot: an opaque square
+photograph with the BB mark in the corner. Because it is opaque it takes the
+card treatment — `.split__media.is-square` (`object-fit: cover`, rounded,
+shadowed), the same as every other photo on the site.
+
+The rule it replaced is still in the stylesheet as `.split__media.is-portrait`,
+for the older hexagon headshot with transparent corners. That one must not be
+put in a cropped frame — the transparency reads as a chipped rectangle. Nothing
+live uses it; the pages parked in `pages/_full/` still reference it.
+
+The BOUND promise cards (`promise-*.png`) and testimonial cards (`review-*.png`)
+are Zac's own Canva artwork, exported 1080×1080. They carry their wording inside
+the artwork, so changing that copy means re-exporting from Canva — and the alt
+text in the `IMAGES` table has to change in the same edit, or it will describe a
+card that no longer exists.
 
 ## Tuning the layout
 

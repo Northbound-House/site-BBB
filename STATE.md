@@ -103,7 +103,9 @@ PWA icons and the Open Graph card are all generated from it on brand purple.
 
 | In use | Source |
 | --- | --- |
-| `zac-headshot.png` | Your hexagon headshot |
+| `zac-headshot.jpg` | Your 2026 square headshot with the BB mark. Delivered as a 1.6 MB PNG; re-encoded to an 89 KB progressive JPEG at 1120px, twice the 560px it draws at |
+| `promise-*.png` (×5) | Your BOUND promise cards, 1080×1080. They spell B-O-U-N-D and only read correctly in that order |
+| `review-*.png` (×3) | Your testimonial cards, 1080×1080, one per reviewer |
 | `stkitts-coastline.jpg` | Your St Kitts coastline shot — the same image the brand guide uses as its own header. Homepage and journal heroes. |
 | `bermuda.jpg` | Your Bermuda shot, cropped above the wordmark so card thumbnails don't slice it |
 
