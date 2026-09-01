@@ -260,6 +260,7 @@
   /* SERVICE CARDS (the five "what I plan" tiles) ------------------- */
   --service-cols:                 3; /* service cards per row — 5 cards read as 3 then 2 */
   --service-pair-cols:            2; /* cards per row in the two-card row */
+  --service-cols-half:            6; /* the same row counted in half-columns, so a pair can centre under three */
   --service-gap:             1.5rem; /* space between service cards */
   --service-row-gap:         1.5rem; /* space between the three-card and two-card rows */
   --service-pad-top:         1.4rem; /* space above the card title */
@@ -397,6 +398,17 @@
      the shape of the previous hexagon-cropped headshot rather than invented, so
      the headshot matches the hexagons inside the testimonial artwork. */
   --hex-clip: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+
+  /* LIGHTBOX -----------------------------------------------------
+     Added after the 24 August lock, per the rule above: new knobs, nothing
+     existing retuned. The review cards are 1080px squares drawn at about
+     340px, so the wording inside the artwork is small until it is opened. */
+  --lightbox-max:             1080px; /* cap: the artwork's own pixel size, so it is never upscaled soft */
+  --lightbox-pad:               1rem; /* breathing room between the card and the window edge */
+  --lightbox-radius: var(--radius); /* corner rounding on the opened card */
+  --lightbox-backdrop: rgba(26, 12, 46, 0.82); /* dimming behind the opened card */
+  --lightbox-close-gap:       0.5rem; /* inset of the close button from the card's corner */
+  --lightbox-fade:              0.2s; /* how fast the lightbox fades in */
 
   /* FOCUS AND SKIP LINK ------------------------------------------- */
   --focus-ring-width:           2px; /* thickness of the keyboard focus outline */
@@ -868,6 +880,75 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   object-fit: cover;
 }
 
+/* The review cards open full size. The link is a real link to the image file,
+   so it still does something useful with JavaScript off; main.js intercepts it
+   and opens the dialog instead. */
+.zoom {
+  display: block;
+  cursor: zoom-in;
+}
+.zoom:focus-visible {
+  outline: var(--focus-ring-width) solid var(--link);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* A native <dialog>, not a hand-rolled overlay: showModal() gives the focus
+   trap, the Escape key, inertness of the page behind and focus restore on
+   close, all of which are easy to implement badly. */
+.lightbox {
+  border: 0;
+  padding: var(--lightbox-pad);
+  background: transparent;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: visible;
+}
+.lightbox::backdrop { background: var(--lightbox-backdrop); }
+.lightbox__inner { position: relative; }
+/* The cards are square, so the smaller of the two viewport axes decides how big
+   they can get; height is usually the binding one on a desktop window and width
+   on a phone. Sizing off whichever actually constrains beats a single vmin
+   figure, which left ~40px of desktop height unused. Capped at the artwork's own
+   1080px so a large monitor gets it sharp rather than upscaled. */
+.lightbox img {
+  display: block;
+  width: min(
+    calc(100vw - var(--lightbox-pad) * 2),
+    calc(100vh - var(--lightbox-pad) * 2),
+    var(--lightbox-max)
+  );
+  height: auto;
+  border-radius: var(--lightbox-radius);
+}
+.lightbox__close {
+  position: absolute;
+  top: var(--lightbox-close-gap);
+  right: var(--lightbox-close-gap);
+  /* --tap-min on both axes: this is the one control in the lightbox, and it
+     sits over artwork, so it has to be findable by a thumb. */
+  width: var(--tap-min);
+  height: var(--tap-min);
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--brand);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+.lightbox__close:focus-visible {
+  outline: var(--focus-ring-width) solid var(--link);
+  outline-offset: var(--focus-ring-offset);
+}
+.lightbox[open] { animation: lightbox-in var(--lightbox-fade) ease-out; }
+@keyframes lightbox-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .lightbox[open] { animation: none; }
+}
+
 /* Present to assistive technology and to search, absent from the page. The
    1px box and negative margin are the standard clipping idiom rather than
    design measurements, so they stay here instead of becoming knobs — there is
@@ -1224,6 +1305,23 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .service-cards--pair {
   margin-top: var(--service-row-gap);
   grid-template-columns: repeat(var(--service-pair-cols), minmax(0, 1fr));
+}
+
+/* ways-to-travel puts all five trip types in a single grid. Five into three
+   leaves two cards on the last row, hard against the left edge with a hole
+   where the third would be. Counting the row in half-columns and giving every
+   card a span of two lets the last row start one half-column in, which centres
+   the pair under the three above at exactly the same card width — unlike
+   .service-cards--pair, which makes its two cards wider.
+
+   Only above --bp-cards. Below it --service-cols is 1 and there is nothing to
+   centre, so the plain .service-cards rule takes over. */
+@media (min-width: 901px) { /* just above --bp-cards */
+  .service-cards--centered {
+    grid-template-columns: repeat(var(--service-cols-half), minmax(0, 1fr));
+  }
+  .service-cards--centered > .service-card { grid-column: span 2; }
+  .service-cards--centered > .service-card:nth-child(4) { grid-column: 2 / span 2; }
 }
 
 .service-card {

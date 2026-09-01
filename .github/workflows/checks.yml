@@ -64,6 +64,15 @@ jobs:
         working-directory: tools/audit
         run: node audit.mjs
 
+      # The review cards open full size. That is interactive, so audit.mjs
+      # cannot see it -- its detectors measure a rendered page, and this only
+      # exists after a click. It is also the kind of thing that breaks quietly:
+      # a renamed class or a stray error in main.js leaves the cards looking
+      # right and doing nothing, and nobody clicks their own testimonials.
+      - name: Lightbox
+        working-directory: tools/audit
+        run: node lightbox.mjs
+
       # A photo a third party withdrew is reported, never fatal: blocking an
       # unrelated merge on a stranger's decision gets the check disabled rather
       # than the photo replaced. audit.mjs exits 0 for these and writes them to
