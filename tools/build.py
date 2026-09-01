@@ -734,7 +734,32 @@ def json_ld(objects):
 
 
 def analytics_head():
-    """GA4 + Meta Pixel loaders. Inert until the IDs are filled in."""
+    """GA4 + Meta Pixel loaders. Inert until the IDs are filled in.
+
+    Suppressed entirely on staging. GA4_ID is the property the old Travefy site
+    has been feeding for as long as it has existed, and test.boraborabound.com
+    is a real, publicly reachable host: every QA pass on it would land in that
+    property as ordinary traffic. Pageviews could be filtered out afterwards by
+    hostname, but `generate_lead` cannot -- a tester tapping the CTAs to check
+    they work would book permanent fake conversions into the history the whole
+    migration exists to preserve. GA4 does not delete events.
+
+    The cost is that the tag is never exercised before it is live. PLAN.md's
+    verification already covers it: 'GA4 realtime shows a pageview, and a CTA
+    click produces generate_lead', minutes after cutover, when the property is
+    quiet enough for that check to actually mean something.
+    """
+    if STAGING:
+        # Deliberately does not name the IDs. verify_analytics() proves this
+        # build carries no tag by searching the written HTML for them, and a
+        # comment quoting an ID defeats that -- as it did on the first run of
+        # this check, which reported all 20 pages as carrying the live GA4 tag
+        # when what they carried was this comment.
+        return (
+            "  <!-- Analytics suppressed: this is the staging build. Staging traffic\n"
+            "       would record fake conversions into the live property that the\n"
+            "       migration exists to preserve. See CONFIG in tools/build.py. -->\n"
+        )
     if not GA4_ID and not META_PIXEL_ID:
         return (
             "  <!-- Analytics: set GA4_ID and META_PIXEL_ID in tools/build.py and rebuild.\n"
@@ -1107,6 +1132,49 @@ def verify_indexability():
     print(f"  indexability OK - {where}")
 
 
+def verify_analytics():
+    """Fail the build if the analytics tags disagree with STAGING.
+
+    The same asymmetry as verify_indexability, and the same lack of a visible
+    symptom in either direction. A production build with GA4_ID set but no tag
+    on the page looks perfect and measures nothing -- the launch it exists to
+    measure passes unrecorded. A staging build that does carry the tag quietly
+    writes test traffic into the live property.
+
+    Reads back what was written rather than trusting the flag, so an edit to
+    analytics_head() cannot defeat it.
+    """
+    # Match the tag that does the sending, not the bare ID. An ID can appear in
+    # a comment or a data attribute without a byte being transmitted, and a
+    # production page could then satisfy this check while measuring nothing.
+    tags = (
+        ("GA4", GA4_ID, f"gtag('config', '{GA4_ID}')"),
+        ("Meta Pixel", META_PIXEL_ID, f"fbq('init', '{META_PIXEL_ID}')"),
+    )
+    wrong = []
+    for filename in PAGES:
+        html = (ROOT / filename).read_text(encoding="utf-8")
+        for label, want, marker in tags:
+            if not want:
+                continue
+            present = marker in html
+            if STAGING and present:
+                wrong.append(f"{filename}: staging build carries the live {label} ID")
+            elif not STAGING and not present:
+                wrong.append(f"{filename}: PRODUCTION build is missing the {label} tag")
+    if wrong:
+        raise SystemExit(
+            "\nanalytics tags do not match STAGING=%s:\n  %s\n"
+            % (STAGING, "\n  ".join(wrong))
+        )
+    if STAGING:
+        print("  analytics OK - staging (no tags; production would send to "
+              + (", ".join(x for x in (GA4_ID, META_PIXEL_ID) if x) or "nothing") + ")")
+    else:
+        live = ", ".join(x for x in (GA4_ID, META_PIXEL_ID) if x)
+        print(f"  analytics OK - production ({live or 'no IDs set'})")
+
+
 def main():
     print("pages:")
     for filename, cfg in PAGES.items():
@@ -1120,9 +1188,15 @@ def main():
     write_sitemap()
     write_robots()
     verify_indexability()
+    verify_analytics()
     print(f"\nStaging={STAGING}  Site={SITE_URL}")
-    if not GA4_ID or not META_PIXEL_ID:
-        print("WARNING: analytics IDs not set — GA4/Meta tags are inert. See CONFIG in this file.")
+    # Name only what is actually missing. The old form fired whenever EITHER ID
+    # was unset and claimed both tags were inert, so the run that set GA4_ID
+    # still printed "analytics IDs not set" over a working GA4 tag.
+    missing = [n for n, v in (("GA4_ID", GA4_ID), ("META_PIXEL_ID", META_PIXEL_ID)) if not v]
+    if missing:
+        print(f"WARNING: {' and '.join(missing)} not set — that tag is absent. "
+              "See CONFIG in this file.")
 
 
 if __name__ == "__main__":
