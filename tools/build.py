@@ -1090,7 +1090,13 @@ def write_robots():
         "# tools/set-domain.sh replaces this with the production robots.txt at cutover.\n"
         "User-agent: *\nDisallow: /\n"
     ) if STAGING else (
-        f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n"
+        # /pages/ holds the source fragments the build reads, plus the fuller
+        # versions parked in pages/_full/. The repo carries a .nojekyll, so
+        # Pages publishes every file in it verbatim -- /pages/index.html has
+        # always been reachable, and it is a bare fragment: no <head>, so no
+        # canonical and no robots meta of its own to say what it is.
+        f"User-agent: *\nAllow: /\nDisallow: /pages/\n\n"
+        f"Sitemap: {SITE_URL}/sitemap.xml\n"
     )
     (ROOT / "robots.txt").write_text(body, encoding="utf-8")
     print("  robots.txt")
