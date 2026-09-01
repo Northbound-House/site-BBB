@@ -70,7 +70,11 @@ def unsplash(photo_id, w=800):
 # withdrawn honeymoon photo for one from the repo left two cards describing
 # champagne glasses over a picture of a cove. Keeping the pair here means a
 # swap is still one edit, and the description cannot drift from the picture.
-# alt=None marks a slot used only as a CSS background, which has no alt.
+# alt=None marks a slot whose words are carried somewhere other than an alt
+# attribute: a CSS background, which has no alt at all, or a brand graphic whose
+# wording sits beside it as visually-hidden text so the page keeps a real
+# heading outline. The testimonial graphics are the opposite case -- a quote is
+# a leaf with no structure to preserve, so the alt carries the whole quote.
 IMAGES = {
     # Service cards -- home and ways-to-travel
     "IMG_CARD_CRUISES": (
@@ -110,9 +114,59 @@ IMAGES = {
     "IMG_PAGEHERO_REFER":     (unsplash("1544644181-1484b3fdfc62", 1920), None),
     "IMG_PAGEHERO_HONEYMOON": ("/assets/img/bermuda.jpg", None),  # same withdrawn photo
 
+    # --- BOUND promise cards ---------------------------------------------
+    # Zac's own Canva artwork, exported 1080x1080. The five spell B-O-U-N-D and
+    # only make sense in that order, which is why they are listed in it rather
+    # than alphabetically. Each card's heading and body are baked into the
+    # artwork, so alt is None here and the real words live in
+    # pages/how-i-work.html as visually-hidden text -- the page keeps its h3
+    # outline, the copy stays indexable, and nobody reads it twice.
+    "IMG_PROMISE_BESPOKE":     ("/assets/img/promise-bespoke.png", None),
+    "IMG_PROMISE_OUTSTANDING": ("/assets/img/promise-outstanding.png", None),
+    "IMG_PROMISE_UNMATCHED":   ("/assets/img/promise-unmatched.png", None),
+    "IMG_PROMISE_NETWORK":     ("/assets/img/promise-network.png", None),
+    "IMG_PROMISE_DEDICATED":   ("/assets/img/promise-dedicated.png", None),
+
+    # --- Testimonial cards -------------------------------------------------
+    # Also Zac's artwork. A quote has no heading structure to preserve, so
+    # unlike the promise cards these carry their wording in the alt: the image
+    # IS text, and WCAG asks the alt to say the same thing.
+    "IMG_REVIEW_MICHAEL": (
+        "/assets/img/review-michael-c.png",
+        "Effortless amazing travel. “I’ve had Zac plan over three "
+        "incredible trips for me, and each one has been nothing short of "
+        "spectacular. Zac excels at transforming my ideas into reality, "
+        "creating seamless and unforgettable experiences. Booking with him is "
+        "incredibly easy and stress-free; he handles all the planning, "
+        "allowing me to truly relax and enjoy my vacation.” — Michael C."),
+    "IMG_REVIEW_STEVEN": (
+        "/assets/img/review-steven.png",
+        "“Zachary helped personalize our trip by listening to our wants "
+        "and needs and that reflected in the options he provided for the trip. "
+        "I’m a very type A personality and let him know this, so he was "
+        "able to work with someone who can be a bit on the more detailed side "
+        "and also likes to actively find the best deals. I’d highly "
+        "recommend working with Zachary for your travel needs as he can help "
+        "find the best locations, the best excursions, and the best deals for "
+        "your trip!” — Steven"),
+    "IMG_REVIEW_BECKY": (
+        "/assets/img/review-becky-g.png",
+        "“Zachary helped to turn a dream, into reality, into life long "
+        "memories for my family. Zachary planned our entire trip, to another "
+        "country, 3 cities, 5 flights, an all inclusive resort, 3 different "
+        "hotel stays, hotel transports, bus transportation, even a hot air "
+        "balloon ride! Zachary will be my go to for all of our future "
+        "vacations. He listened to my ideas to personalize our vacation "
+        "experiences, had patience during the process, communicated trip "
+        "details, and had a positive attitude from start to finish!” "
+        "— Becky G."),
+
     # Repo assets
+    # Square brand headshot with the BB mark. Delivered as a 1.6MB PNG, which is
+    # the wrong container for a photograph; re-encoded to an 89KB progressive
+    # JPEG at 1120px, twice the 560px it is drawn at.
     "IMG_ZAC_HEADSHOT": (
-        "/assets/img/zac-headshot.png",
+        "/assets/img/zac-headshot.jpg",
         f"{ADVISOR}, founder and travel advisor at {BUSINESS_NAME}"),
     "IMG_COASTLINE": (
         "/assets/img/stkitts-coastline.jpg",
@@ -987,9 +1041,26 @@ def substitute(text, where):
     return TOKEN_RE.sub(repl, text)
 
 
+def strip_comments(html):
+    """Drop HTML comments from a page fragment.
+
+    The fragments are commented heavily -- what a section is for, and what was
+    removed from it and why. That is worth keeping where the next person edits,
+    and worth nothing to a browser: 12KB of it was being served across the site,
+    most of it explaining content the visitor cannot see because it was deleted.
+
+    Only fragment bodies go through here. The GENERATED banner that render()
+    puts at the top of every file survives, because it is added after this runs
+    and it is the one comment with a job in the output: it tells anyone who
+    opens the built file not to edit it.
+    """
+    return re.sub(r"\n?[ \t]*<!--.*?-->[ \t]*", "", html, flags=re.S)
+
+
 def render(filename, cfg):
     src = PAGES_DIR / filename
     content = substitute(src.read_text(encoding="utf-8").rstrip("\n"), src)
+    content = strip_comments(content)
 
     hero = cfg.get("hero", False)
     nav = nav_block(filename, hero=hero)
@@ -1090,7 +1161,13 @@ def write_robots():
         "# tools/set-domain.sh replaces this with the production robots.txt at cutover.\n"
         "User-agent: *\nDisallow: /\n"
     ) if STAGING else (
-        f"User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n"
+        # /pages/ holds the source fragments the build reads, plus the fuller
+        # versions parked in pages/_full/. The repo carries a .nojekyll, so
+        # Pages publishes every file in it verbatim -- /pages/index.html has
+        # always been reachable, and it is a bare fragment: no <head>, so no
+        # canonical and no robots meta of its own to say what it is.
+        f"User-agent: *\nAllow: /\nDisallow: /pages/\n\n"
+        f"Sitemap: {SITE_URL}/sitemap.xml\n"
     )
     (ROOT / "robots.txt").write_text(body, encoding="utf-8")
     print("  robots.txt")

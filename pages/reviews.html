@@ -11,31 +11,32 @@
   <section class="section">
     <div class="shell">
       <div class="quotes">
-        <figure class="quote reveal">
-          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <blockquote>Incredibly easy and stress-free.</blockquote>
-          <cite>— Michael C.</cite>
+        <figure class="media-card reveal">
+          <img src="{{IMG_REVIEW_MICHAEL}}" alt="{{IMG_REVIEW_MICHAEL_ALT}}" width="1080" height="1080" loading="lazy" />
         </figure>
-        <figure class="quote reveal d1">
-          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <blockquote>Personalized our trip by listening to our wants and needs.</blockquote>
-          <cite>— Steven</cite>
+        <figure class="media-card reveal d1">
+          <img src="{{IMG_REVIEW_STEVEN}}" alt="{{IMG_REVIEW_STEVEN_ALT}}" width="1080" height="1080" loading="lazy" />
         </figure>
-        <figure class="quote reveal d2">
-          <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
-          <blockquote>Helped to turn a dream into reality.</blockquote>
-          <cite>— Becky G.</cite>
+        <figure class="media-card reveal d2">
+          <img src="{{IMG_REVIEW_BECKY}}" alt="{{IMG_REVIEW_BECKY_ALT}}" width="1080" height="1080" loading="lazy" />
         </figure>
       </div>
       <!--
-        TODO (blocked on Zac): replace these three with eight to ten attributed
-        reviews. The format that actually persuades is:
+        TODO (blocked on Zac): still only three reviews, and still unattributed
+        beyond a first name. The cards now carry each review in full rather than
+        a one-line summary, which is a real improvement, but the format that
+        persuades adds what they booked and when:
 
           first name + last initial · what they booked · month and year
 
-        e.g. "Becky G. — Royal Caribbean, Alaska, June 2025". A photo from the
-        trip is better still. When these land, also update REVIEWS in
-        tools/build.py so the schema carries datePublished and the destination.
+        e.g. "Becky G. — Royal Caribbean, Alaska, June 2025". Eight to ten is
+        the target. When they land, also update REVIEWS in tools/build.py so the
+        schema carries datePublished and the destination.
+
+        Note for whoever does that: the wording now lives in the artwork, so a
+        change of copy means re-exporting the card from Canva, not editing HTML.
+        The alt text in the IMAGES table has to change in the same edit or it
+        will describe a card that no longer exists.
       -->
     </div>
   </section>
