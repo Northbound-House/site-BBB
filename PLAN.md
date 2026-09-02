@@ -24,6 +24,12 @@ Worth checking specifically:
       `/refer` should all land correctly.
 - [ ] **Contact routes.** Click the phone number and the email link on a phone.
 - [ ] Read the five journal posts for anything that doesn't sound like you.
+- [ ] **On a phone:** the trip cards are landscape now, the footer is two
+      columns, the review cards colour in as they reach the middle of the
+      screen, and the photo behind "Ready when you are" drifts as you scroll.
+      If any of it feels like too much, every measurement is a knob in the
+      control block at the top of `assets/css/styles.css` — `--focus-*`,
+      `--parallax-depth`, `--service-image-ratio`.
 
 ---
 
@@ -35,8 +41,8 @@ Tern trip-request form.
 
 | What's needed | Where it goes | Why it matters |
 | --- | --- | --- |
-| **GA4 measurement ID** | `GA4_ID` in `tools/build.py` | 30 tagged CTAs are wired and firing nothing. Take it from the live Travefy site so history stays continuous. |
-| **Meta Pixel ID** | `META_PIXEL_ID` | Same. |
+| ~~GA4 measurement ID~~ | `GA4_ID` | **Done** — recovered from the archive of the old site, suppressed on staging, emitted on the production build. |
+| **Meta Pixel ID** | `META_PIXEL_ID` | The old site runs it inside GTM container `GTM-K9ZZ8MZZ`. Either copy the Pixel ID out of the container, or decide to load the GTM container instead of the direct GA4 snippet — less work, and everything configured there carries over. |
 | **Tern scheduling URL** | `TERN_SCHEDULING` | "Book a free consultation" currently falls back to the trip-request form. Works, but it isn't a booking page. |
 | **Tern referral form URL** | `TERN_REFERRAL_FORM` | Same fallback. A dedicated form would capture referrer and friend separately. |
 | **8–10 attributed reviews** | `pages/reviews.html` + `REVIEWS` in build.py | Name, what they booked, month and year. "Becky G. — Royal Caribbean Alaska, June 2025" is worth ten anonymous quotes. |
@@ -147,10 +153,11 @@ Then, in order:
 10. [ ] Confirm GA4 is receiving `generate_lead` events, and **mark it a key
        event** in the GA4 admin panel so it counts as a conversion.
 
-**The five journal posts have been re-dated** across launch week (26 August –
-1 September), newest last on launch day. If the cutover moves, move them with
-it — one line each in `POSTS`, and the index order, sitemap and JSON-LD all
-follow.
+**The five journal posts were dated** across the planned launch week (26
+August – 1 September). That week has passed without the cutover. Posts dated a
+week or two back are fine for a blog; if the cutover slips past mid-September,
+re-date them — one line each in `POSTS`, and the index order, sitemap and
+JSON-LD all follow.
 
 ---
 
@@ -206,6 +213,11 @@ No code change can touch any of these, and a few take minutes.
   against the pivot to cruises, all-inclusives and small group tours. It lives
   as an honest section on the Honeymoons page instead. Easy to reverse if the
   enquiries say otherwise.
+- **The hero CTA takes two taps.** "Book a free consultation" in the hero
+  scrolls to the band at the foot of the page, where the same button is offered
+  again beside "email or call instead". Pointing it straight at
+  `TERN_SCHEDULING` removes a step; keeping it preserves the choice. Decide once
+  the real scheduling URL exists.
 - **The homepage H1** is the one H1 without a target keyword. A keyword version
   was written and measured, and it pushed the primary CTA below the fold at
   1280×800 and on mobile. CTA position won. Revisit if the homepage

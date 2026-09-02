@@ -14,6 +14,13 @@
   var SCROLLED_AT = parseFloat(knob("--header-scrolled-at", "40px"));
   var REVEAL_TRIGGER = parseFloat(knob("--reveal-trigger", "0.12"));
   var REVEAL_MARGIN = knob("--reveal-margin", "-40px");
+  var FOCUS_HOLD = parseFloat(knob("--focus-hold", "0.18"));
+  var FOCUS_BAND = parseFloat(knob("--focus-band", "0.45"));
+  var FOCUS_CENTRE = parseFloat(knob("--focus-centre", "0.5"));
+  var PARALLAX_DEPTH = parseFloat(knob("--parallax-depth", "0px"));
+
+  var reducedMotion = window.matchMedia
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---- Sticky header state ---- */
   var header = document.querySelector(".site-header");
@@ -202,6 +209,78 @@
     revealEls.forEach(function (el) { io.observe(el); });
   } else {
     revealEls.forEach(function (el) { el.classList.add("in"); });
+  }
+
+  /* ---- Scroll-linked effects ----
+     Two things move with the scroll rather than on it: the review and BOUND
+     promise cards colour in as they reach the middle of the window, and the
+     closing band's photo drifts against the page. Both are measured here and
+     drawn by the stylesheet — this writes one number per element and nothing
+     else, so the look is tuned in the control block, not in code.
+
+     One frame per scroll event, never more: the handler only asks for a frame
+     if one is not already pending. Both are skipped when the visitor has asked
+     for reduced motion; the stylesheet drops the styling too, so the cards
+     simply show at full colour and the photo stays put. */
+  var focusCards = document.querySelectorAll(".media-card");
+  var bands = document.querySelectorAll(".cta-band");
+  if (!reducedMotion && (focusCards.length || (bands.length && PARALLAX_DEPTH))) {
+    var pending = false;
+
+    var updateFocus = function (vh) {
+      var centre = vh * FOCUS_CENTRE;
+      var hold = vh * FOCUS_HOLD;
+      var reach = vh * FOCUS_BAND;
+      if (reach <= hold) reach = hold + 1;
+      focusCards.forEach(function (card) {
+        var r = card.getBoundingClientRect();
+        /* Off screen: leave it resting. */
+        if (r.bottom < 0 || r.top > vh) { card.style.setProperty("--focus", "0"); return; }
+        var mid = r.top + r.height / 2;
+        /* Fully in focus anywhere inside the hold zone around the middle, so a
+           card being read is never soft; from there it falls to rest by the
+           time it is a band's width away. */
+        var f = (reach - Math.abs(mid - centre)) / (reach - hold);
+        if (f < 0) f = 0;
+        if (f > 1) f = 1;
+        /* Ease the ends so a card settles into and out of focus rather than
+           hitting a corner at either edge of the band. */
+        f = f * f * (3 - 2 * f);
+        card.style.setProperty("--focus", f.toFixed(3));
+      });
+    };
+
+    var updateParallax = function (vh) {
+      if (!PARALLAX_DEPTH) return;
+      bands.forEach(function (band) {
+        var bg = band.querySelector(".cta-band__bg");
+        if (!bg) return;
+        var r = band.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        /* -0.5 with the band's middle at the bottom edge of the window, +0.5
+           at the top edge. The photo moves the other way, slower than the
+           page, by at most half the depth — which is what the band's overscan
+           in the stylesheet is sized to cover. */
+        var p = (r.top + r.height / 2 - vh / 2) / (vh + r.height);
+        bg.style.transform = "translate3d(0," + (-p * PARALLAX_DEPTH).toFixed(1) + "px,0)";
+      });
+    };
+
+    var frame = function () {
+      pending = false;
+      var vh = window.innerHeight;
+      updateFocus(vh);
+      updateParallax(vh);
+    };
+    var schedule = function () {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(frame);
+    };
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    window.addEventListener("load", schedule);
   }
 
   /* ---- Display face loaded? ----

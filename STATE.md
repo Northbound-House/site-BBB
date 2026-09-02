@@ -1,6 +1,6 @@
 # STATE
 
-Where the Bora Bora Bound site actually is, as of **11 August 2026**.
+Where the Bora Bora Bound site actually is, as of **2 September 2026**.
 
 For what happens next, see [PLAN.md](PLAN.md). For how to work on the site, see
 [README.md](README.md).
@@ -13,9 +13,8 @@ For what happens next, see [PLAN.md](PLAN.md). For how to work on the site, see
 | --- | --- |
 | **Live at** | https://test.boraborabound.com |
 | **Serving** | GitHub Pages, from `main`, folder `/ (root)` |
-| **Deployed commit** | `5fe6008` — *Deploy rebuild to test.boraborabound.com (#1)* |
-| **Pages build** | Succeeded 11 Aug 2026, 21:13 UTC |
-| **Production domain** | `boraborabound.com` — still the old Travefy site, untouched |
+| **Head of `main`** | `fe82930` — *Open the review cards full size (#10)*, merged 1 September 2026 |
+| **Production domain** | `boraborabound.com` — still the old Travefy site, untouched. The 1 September cutover has not happened. |
 
 ### The staging posture is deliberate
 
@@ -77,8 +76,10 @@ on the page, which is a Google policy problem, not just untidiness.
 
 30 distinct CTA locations carry `data-cta="<location>"`. A click fires a GA4
 `generate_lead` event and a Meta Pixel `Lead` event tagged with its location, so
-it will be possible to tell which page produces consultations. **Currently inert
-— the IDs are not set.** See PLAN.
+it will be possible to tell which page produces consultations. **GA4 is set**
+(`G-9Z8GSNE92E`, the property the old site feeds) and deliberately suppressed on
+the staging build so QA taps never land in the live history. **The Meta Pixel is
+not set** — it lives inside the old site's GTM container. See PLAN.
 
 ---
 
@@ -120,19 +121,38 @@ alt text beside it, so replacing one is a single line. `tools/audit`'s
 can reach `images.unsplash.com`, or it reports them UNVERIFIED rather than
 passing them.
 
-### Known, deliberately deferred: the service card crop
+### The service card crop: fixed on phones, still a decision on desktop
 
 `.service-card img` carried `aspect-ratio: 3/2` that had never applied. The
 `width`/`height` attributes on an `<img>` are presentational hints, and with no
 `height` declared in CSS the height hint beats an aspect-ratio — so the cards
-render portrait at 0.64, and the honeymoon card at 0.99 because its row is
-two-up. The inert declaration and its `--service-image-ratio` knob have been
-removed, and the rule now says the height attribute is what sets the box.
+rendered portrait at 0.64: a 533px photo in a 350px phone column, five times
+over, which put the homepage at 10,946px on a 390px phone.
 
-**Giving the CSS the ratio back is a one-line change** (`height: auto` on
-`.service-card img`) that shortens every card by roughly 300px. That is a
-redesign of the homepage rhythm, not a defect fix, so it is a decision waiting
-rather than something overlooked.
+**Below `--bp-cards` the photo now follows `--service-image-ratio` (3/2)**, a
+new knob in the control block, and each stacked card is 453px instead of 754px.
+The desktop cards are untouched: there the height attribute still sets the box,
+and the same one-line change (`height: auto` on the desktop rule) would shorten
+every card by roughly 300px. That is a redesign of the homepage rhythm rather
+than a defect fix, so it stays a decision waiting.
+
+### Motion added 2 September 2026
+
+All of it is driven by knobs in the control block and switched off under
+`prefers-reduced-motion`. `main.js` only measures; the stylesheet draws.
+
+- **Scroll focus** on the review cards (homepage, `reviews.html`) and the five
+  BOUND promise cards (`how-i-work.html`). A card sits back — grey, soft, faded,
+  slightly smaller — and colours in, sharpens and grows as it reaches the middle
+  of the window, so the card being read is the legible one. `--focus-*`.
+- **Parallax** on the closing band's photo, on every page that carries the band.
+  `--parallax-depth`; the band clips its own overhang.
+- **Phone footer.** The two link columns sit side by side under `--bp-mobile`
+  and the rows lose their gap; the footer is 1,020px on a phone instead of
+  1,462px.
+- **Reveal is gated on scripting.** A one-line script in the head marks `<html>`
+  with `.js`; the fade-in only hides content when that class is present, so a
+  visitor with scripts off, or a broken `main.js`, sees the page.
 
 Two Drive folders were reviewed and **cannot** be used: `JustBooked` is
 1080×1080 social graphics with "JUST BOOKED", your name and the URL baked into
@@ -140,6 +160,40 @@ the pixels; `Supplier Images` is cruise line logos and supplier marketing shots
 carrying their own usage terms — a licensing decision, not one to assume.
 
 ---
+
+## Launch readiness — 2 September 2026
+
+Nothing technical blocks the cutover. What remains is decisions and content.
+
+**Verified this pass** (build environment; the deployed site is still
+unreachable from here):
+
+- `./tools/set-domain.sh production` in a scratch copy: `noindex` survives only
+  on `terms.html` and `404.html`, `robots.txt` allows and names the sitemap, the
+  GA4 tag lands on all 20 pages, no `test.boraborabound.com` URL survives, and
+  the production build is idempotent.
+- Six detectors and the lightbox check green after the changes above.
+- Homepage at 390px: 8,999px tall, down from 10,946px.
+
+**Decisions waiting on Zac** — each blocks nothing but changes the launch:
+
+| Decision | Why it matters |
+| --- | --- |
+| **Cutover date.** | The five journal posts were dated 26 August – 1 September for a launch that did not happen. Dates in the past are fine for a blog; if the cutover slips past mid-September, re-date them in `POSTS`. |
+| **Meta Pixel: read it out of GTM, or load the container.** | The old site runs `GTM-K9ZZ8MZZ`, not a bare Pixel. Either open the container and copy the Pixel ID into `META_PIXEL_ID`, or replace the direct GA4 snippet with the GTM container so everything configured there carries over unchanged. The second is less work and loses nothing. |
+| **Hero CTA is two taps.** | "Book a free consultation" in the hero links to `#plan`, the band at the foot of the page, where the same button is offered again. Pointing it straight at `TERN_SCHEDULING` removes a step (Hick's and Fitts's laws both argue for it), at the cost of the band's "email or call instead" alternative. |
+| **Desktop trip-card crop.** | See above. One line, roughly 300px per card. |
+
+**Degraded but shipping:**
+
+- Three homepage trip cards and every page hero are still hotlinked Unsplash
+  placeholders. Two of eight have already been withdrawn upstream. The site
+  survives a withdrawal (a brand tile replaces the photo) but each one is a
+  blank card until someone repoints the slot. Real photography is the fix;
+  self-hosting the current placeholders is the fallback.
+- Three reviews, first names only. The cards are Zac's artwork and read well
+  full size, but eight to ten attributed reviews is the target.
+- `TERN_SCHEDULING` and `TERN_REFERRAL_FORM` fall back to the trip-request form.
 
 ## Audit status — all 30 findings
 
@@ -216,6 +270,9 @@ None of these were in the audit.
 Last run against the deployed commit:
 
 - 20 pages × 3 viewport widths — no horizontal overflow, no JS errors
+- Scroll focus, parallax and the phone footer measured in a real browser at
+  390px and 1280px, with and without `prefers-reduced-motion`
+- Production cutover dry-run in a scratch copy (see Launch readiness)
 - JSON-LD parses on every page that has it
 - 20 distinct titles, descriptions and `og:url`s
 - Exactly one `<h1>` per page
