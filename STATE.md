@@ -141,15 +141,25 @@ than a defect fix, so it stays a decision waiting.
 All of it is driven by knobs in the control block and switched off under
 `prefers-reduced-motion`. `main.js` only measures; the stylesheet draws.
 
-- **Scroll focus** on the review cards (homepage, `reviews.html`) and the five
-  BOUND promise cards (`how-i-work.html`). A card sits back — grey, soft, faded,
-  slightly smaller — and colours in, sharpens and grows as it reaches the middle
-  of the window, so the card being read is the legible one. `--focus-*`.
+- **The words lift off the cards.** On the review cards (homepage,
+  `reviews.html`) and the five BOUND promise cards (`how-i-work.html`) the
+  artwork shows as it is at rest. As a card reaches the middle of the window,
+  or is hovered, the artwork blurs, dims and grows a little behind a brand
+  tint, and the same words rise over it as real HTML text — larger, sharp,
+  selectable. The review copy lives in `REVIEWS` in `tools/build.py` and is
+  rendered onto both pages by `render_review_cards()`, so it feeds the cards
+  and the `Review` schema from one table and the images carry an empty alt.
+  Sizes read `cqw`, measured against the card, and the lifted panel may grow
+  past a narrow card rather than clip a sentence. `--focus-*`, `--overlay-*`.
 - **Parallax** on the closing band's photo, on every page that carries the band.
-  `--parallax-depth`; the band clips its own overhang.
-- **Phone footer.** The two link columns sit side by side under `--bp-mobile`
-  and the rows lose their gap; the footer is 1,020px on a phone instead of
-  1,462px.
+  `--parallax-depth` is 400px, about a third of scroll speed; the band clips
+  its own overhang.
+- **Phone footer.** Under `--bp-mobile` the wordmark and the social buttons
+  share a row, "What I plan" and "Explore" fold shut behind their headings
+  (`<details>`, opened into rows of chips by a tap; `main.js` folds them by
+  breakpoint and the desktop fold is inert), and the contact links share
+  two-column rows. 659px on a phone folded, 945px with both open, against
+  1,462px originally.
 - **Reveal is gated on scripting.** A one-line script in the head marks `<html>`
   with `.js`; the fade-in only hides content when that class is present, so a
   visitor with scripts off, or a broken `main.js`, sees the page.

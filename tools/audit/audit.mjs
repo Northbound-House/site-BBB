@@ -475,6 +475,12 @@ async function detectTapTargets(page, url, label, scope) {
       const cs = getComputedStyle(el);
       if (cs.visibility === "hidden" || cs.display === "none") continue;
       if (Number(cs.opacity) === 0) continue;
+      // Inside a closed <details>: not rendered, so not a target until the
+      // disclosure is opened. Chromium still lays the contents out, so a rect
+      // check cannot tell, and elementFromPoint lands on whatever is drawn
+      // there instead. The runner measures these in a separate pass with the
+      // folds open, the way it re-measures the mobile menu.
+      if (el.closest("details:not([open])")) continue;
       // Parked outside the viewport on purpose (a skip link) — not a tap target.
       if (r.right < 0 || r.left > document.documentElement.clientWidth) continue;
 
@@ -657,6 +663,19 @@ async function main() {
           await detectTapTargets(a, `/${file}`, ` [${width}px, menu open]`, ".site-header");
           await a.keyboard.press("Escape");
           await a.waitForTimeout(200);
+        }
+        // The footer's folded columns. main.js closes them on a phone, so
+        // their links are not targets until a tap opens them -- measure them
+        // open, then close them again so the next check sees the page as it
+        // loads. Scoped to the footer: the open folds push nothing else about.
+        const folded = await a.$$("details.footer-col__fold:not([open])");
+        if (folded.length) {
+          await a.evaluate(() => document.querySelectorAll("details.footer-col__fold")
+            .forEach((d) => { d.open = true; }));
+          await a.waitForTimeout(100);
+          await detectTapTargets(a, `/${file}`, ` [${width}px, footer open]`, ".site-footer");
+          await a.evaluate(() => document.querySelectorAll("details.footer-col__fold")
+            .forEach((d) => { d.open = false; }));
         }
         if (file === "index.html" && width === TAP_WIDTHS[0]) await detectTokenTruth(a);
       }

@@ -89,7 +89,9 @@ PNG/SVG with transparent background, roughly square (~600×600). If your graphic
 Landed 1 September 2026, pulled from your Drive folder as
 `review-michael-c.png`, `review-steven.png`, `review-becky-g.png`. They are the
 whole card, so they replaced the one-line quotes on both the homepage and
-`reviews.html` and carry the full review in their `alt`.
+`reviews.html`. The wording is also in `REVIEWS` in `tools/build.py`, rendered
+as real text that lifts over the card as it scrolls into focus — so a copy
+change means re-exporting the card **and** editing that row, in one commit.
 
 The BOUND promise cards landed in the same pass — `promise-bespoke.png`,
 `promise-outstanding.png`, `promise-unmatched.png`, `promise-network.png`,
@@ -97,9 +99,11 @@ The BOUND promise cards landed in the same pass — `promise-bespoke.png`,
 `IMAGES` table in acronym order for that reason, not alphabetically.
 
 **Two things to know before changing any of them.** The wording is baked into
-the artwork, so a copy change means re-exporting from Canva and editing the alt
-text in `tools/build.py` in the same commit. And keep them square: the cards
-are drawn with `object-fit: cover`, so a non-square export will be cropped.
+the artwork, so a copy change means re-exporting from Canva and editing the
+matching text in the same commit — `REVIEWS` in `tools/build.py` for a review,
+the figcaption in `pages/how-i-work.html` for a promise. And keep them square:
+the cards are drawn with `object-fit: cover`, so a non-square export will be
+cropped.
 
 ---
 

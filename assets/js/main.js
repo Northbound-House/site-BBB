@@ -235,7 +235,7 @@
       focusCards.forEach(function (card) {
         var r = card.getBoundingClientRect();
         /* Off screen: leave it resting. */
-        if (r.bottom < 0 || r.top > vh) { card.style.setProperty("--focus", "0"); return; }
+        if (r.bottom < 0 || r.top > vh) { card.style.setProperty("--focus-scroll", "0"); return; }
         var mid = r.top + r.height / 2;
         /* Fully in focus anywhere inside the hold zone around the middle, so a
            card being read is never soft; from there it falls to rest by the
@@ -246,7 +246,9 @@
         /* Ease the ends so a card settles into and out of focus rather than
            hitting a corner at either edge of the band. */
         f = f * f * (3 - 2 * f);
-        card.style.setProperty("--focus", f.toFixed(3));
+        /* --focus-scroll rather than --focus: the stylesheet derives --focus
+           from it, and lets a hovered or keyboard-focused card override. */
+        card.style.setProperty("--focus-scroll", f.toFixed(3));
       });
     };
 
@@ -363,12 +365,37 @@
         if (!dialog) buildDialog();
         var img = link.querySelector("img");
         dialogImg.src = link.getAttribute("href");
-        /* The card's alt carries the whole review, so the opened copy says the
-           same thing rather than being announced as an unlabelled image. */
-        dialogImg.alt = img ? img.getAttribute("alt") || "" : "";
+        /* The card's caption carries the whole review as text, so the opened
+           copy says the same thing rather than being announced as an
+           unlabelled image. */
+        var figure = link.closest("figure");
+        var caption = figure && figure.querySelector("figcaption");
+        var words = caption ? caption.textContent.replace(/\s+/g, " ").trim() : "";
+        dialogImg.alt = words || (img ? img.getAttribute("alt") || "" : "");
         dialog.showModal();
       });
     });
+  }
+
+  /* ---- Footer folds ----
+     Two footer columns are <details> so they can fold shut on a phone, where
+     four stacked lists ran to two screens. The markup ships them open, so
+     without this the lists simply show everywhere. Under --bp-mobile they
+     start folded and the heading row is the control; above it the fold is
+     inert and its summary leaves the tab order, so a desktop reader cannot
+     collapse a footer column by accident. */
+  var folds = document.querySelectorAll("details.footer-col__fold");
+  if (folds.length && window.matchMedia) {
+    var foldQuery = window.matchMedia("(max-width: " + knob("--bp-mobile", "720px") + ")");
+    var applyFolds = function () {
+      folds.forEach(function (fold) {
+        fold.open = !foldQuery.matches;
+        var summary = fold.querySelector("summary");
+        if (summary) summary.tabIndex = foldQuery.matches ? 0 : -1;
+      });
+    };
+    applyFolds();
+    if (foldQuery.addEventListener) foldQuery.addEventListener("change", applyFolds);
   }
 
   /* ---- Footer year ---- */
