@@ -450,6 +450,35 @@
   /* PHONE-ONLY KNOBS (the rest are re-set inside the breakpoints) -- */
   --process-indent:          3.2rem; /* how far step text sits right of its number on phones */
   --process-number-rise:   -0.15rem; /* fine vertical nudge of that number on phones */
+  /* Added 2 September 2026, per the lock rule: a new knob, nothing retuned.
+     Below --bp-cards the trip cards stack one per row, and each drew its photo
+     at the full 533px the markup reserves — a whole phone screen per card,
+     five cards deep. Once they stack the photo follows this shape instead. The
+     desktop cards are untouched: there the height attribute still sets the box. */
+  --service-image-ratio:      3 / 2; /* photo shape once trip cards stack — bigger = shorter */
+
+  /* SCROLL FOCUS (review cards and BOUND promise cards) ------------
+     Added 2 September 2026, per the lock rule: new knobs, nothing retuned.
+     The brand graphics carry their own wording, drawn small. As a card
+     scrolls toward the middle of the window it colours in, sharpens and
+     grows, so the card being read is the legible one and the rest sit
+     back. main.js measures where each card is and writes --focus (0 away
+     from the middle, 1 centred); everything visible is derived from these. */
+  --focus-scale-rest:            0.94; /* how small a card sits away from the middle */
+  --focus-scale-peak:            1.02; /* how big it grows once it is centred */
+  --focus-grey-rest:                1; /* how much colour drains from a resting card — 1 = fully grey */
+  --focus-blur-rest:            1.5px; /* how soft a resting card is — 0 turns the sharpening off */
+  --focus-dim-rest:               0.7; /* how faded a resting card is — 1 = not at all */
+  --focus-hold:                  0.18; /* how far from the middle a card stays fully sharp, as a share of window height */
+  --focus-band:                  0.45; /* how far from the middle a card is fully at rest, as a share of window height */
+  --focus-centre:                 0.5; /* where in the window a card counts as centred — 0.5 = halfway down */
+  --focus-ms:                    0.2s; /* how quickly a card catches up with the scroll */
+
+  /* PARALLAX (the closing band's photo) ----------------------------
+     Added 2 September 2026, per the lock rule: new knobs, nothing retuned.
+     main.js slides the photo against the scroll while the band is on screen. */
+  --parallax-depth:             120px; /* how far the band's photo drifts as the page scrolls past — 0 turns it off */
+  --parallax-overscan: var(--parallax-depth); /* extra photo drawn above and below the band so the drift never shows an edge — tracks depth */
 
   /* BREAKPOINTS — the numbers are repeated in the @media conditions
      further down, because @media cannot read a custom property.
@@ -965,6 +994,30 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   border: 0;
 }
 
+/* --------------------------- Scroll focus ----------------------- */
+/* main.js writes --focus on every .media-card as the page scrolls: 0 when the
+   card is a band's width from the middle of the window, 1 when it is centred.
+   The look is derived from that one number here, so it is tuned in the
+   control block and the script only measures. Scoped to .in so this and the
+   reveal never fight over transform; before the reveal lands the card keeps
+   its reveal state. opacity() is a filter here, not the property, because the
+   property belongs to the reveal fade. */
+.media-card { --focus: 0; }
+/* No rise on entry for these: the scale below is their entrance. */
+.js .media-card.reveal { transform: none; }
+.media-card.reveal.in {
+  transform: scale(calc(var(--focus-scale-rest) + (var(--focus-scale-peak) - var(--focus-scale-rest)) * var(--focus)));
+  filter:
+    grayscale(calc(var(--focus-grey-rest) * (1 - var(--focus))))
+    blur(calc(var(--focus-blur-rest) * (1 - var(--focus))))
+    opacity(calc(var(--focus-dim-rest) + (1 - var(--focus-dim-rest)) * var(--focus)));
+  transition: opacity var(--reveal-ms) var(--ease), transform var(--focus-ms) linear, filter var(--focus-ms) linear;
+  will-change: transform, filter;
+}
+@media (prefers-reduced-motion: reduce) {
+  .media-card.reveal.in { transform: none; filter: none; transition: none; }
+}
+
 /* --------------------------- Testimonials ----------------------- */
 .quotes {
   display: grid;
@@ -1051,9 +1104,17 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   color: #fff;
   padding: clamp(var(--cta-pad-min), var(--cta-pad-base) + var(--cta-pad-vw), var(--cta-pad-max)) var(--cta-pad-x);
   isolation: isolate;
+  /* The photo is drawn taller than the band so it can drift; the overhang
+     must not paint over the sections either side of it. */
+  overflow: hidden;
 }
+/* The photo overhangs the band by half the overscan top and bottom. main.js
+   slides it by up to half --parallax-depth either way as the band crosses the
+   window, so the overhang is exactly what keeps an edge from ever showing. */
 .cta-band__bg {
-  position: absolute; inset: 0; z-index: -1;
+  position: absolute; z-index: -1;
+  inset: calc(-1 * var(--parallax-overscan) / 2) 0;
+  will-change: transform;
   background:
     linear-gradient(135deg, rgba(52, 25, 122,0.82), rgba(70, 34, 162,0.78)),
     var(--cta-img, none), var(--link);
@@ -1211,7 +1272,10 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 }
 
 /* --------------------------- Reveal anim ------------------------ */
-.reveal { opacity: 0; transform: translateY(var(--reveal-rise)); transition: opacity var(--reveal-ms) var(--ease), transform var(--reveal-ms) var(--ease); }
+/* Hidden only once <html> carries .js, which a one-line script in the head
+   adds before anything paints. Without that gate a visitor with scripts off,
+   or a main.js that fails to run, gets a page of invisible sections. */
+.js .reveal { opacity: 0; transform: translateY(var(--reveal-rise)); transition: opacity var(--reveal-ms) var(--ease), transform var(--reveal-ms) var(--ease); }
 .reveal.in { opacity: 1; transform: none; }
 .reveal.d1 { transition-delay: var(--reveal-step); }                    /* one stagger step */
 .reveal.d2 { transition-delay: calc(var(--reveal-step) * 2); }          /* two steps behind */
@@ -1233,9 +1297,19 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 }
 @media (max-width: 720px) { /* --bp-mobile */
   :root {
-    --footer-grid-gap:      1.8rem; /* space between footer columns once they stack */
+    --footer-pad-top:          2.5rem; /* space above the footer on a phone */
+    --footer-pad-bottom:       1.5rem; /* space under the fine print on a phone */
+    --footer-grid-gap:         1.4rem; /* space between footer blocks once they stack */
+    --footer-grid-gap-bottom:  1.6rem; /* space under the blocks, above the fine print, on a phone */
+    --footer-head-gap:         0.4rem; /* space under a column heading on a phone */
+    --footer-link-gap:         0.2rem; /* rows are already finger-height on a phone; a hairline keeps two taps apart */
   }
-  .footer-grid { grid-template-columns: 1fr; }
+  /* Four blocks stacked one under another ran to two phone screens. The two
+     link columns sit side by side; the brand and the contact block, whose
+     lines are too long to share a half-width column, keep the full width. */
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid > :first-child,
+  .footer-grid > :last-child { grid-column: 1 / -1; }
   .form-grid-2 { grid-template-columns: 1fr; }
 }
 
@@ -1652,6 +1726,11 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
     --process-detailed-cols:        1; /* the five-step version stacks */
     --contact-cols:                 1; /* contact cards stack */
   }
+  /* Stacked cards take their photo shape from --service-image-ratio. height:auto
+     is what lets the ratio apply at all: the height attribute on the <img> is a
+     presentational hint that otherwise wins, which is how these cards came to
+     draw a 533px portrait photo in a 350px column. */
+  .service-card img { height: auto; aspect-ratio: var(--service-image-ratio); }
 }
 
 /* ------------------------- Nav fit ------------------------------ */
