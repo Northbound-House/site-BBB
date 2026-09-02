@@ -371,6 +371,20 @@
   --footer-bottom-gap-x:     1.5rem; /* space between fine-print items across */
   --footer-bottom-size:      0.8rem; /* fine-print size */
   --footer-underline-offset:    2px; /* drop from a fine-print link to its underline */
+  /* Added 2 September 2026, per the lock rule: new knobs for the phone
+     footer, nothing retuned. Above --bp-mobile none of these draw. */
+  --footer-brand-social-gap:   1rem; /* phone: space between the wordmark and the social buttons on their shared row */
+  --footer-blurb-gap:        0.9rem; /* phone: space between that row and the one-line blurb under it */
+  --fold-chevron:               9px; /* size of the open/close chevron on a folded footer column */
+  --fold-chevron-stroke:        2px; /* thickness of that chevron */
+  --fold-chevron-inset:      0.5rem; /* how far the chevron sits in from the right edge */
+  --fold-pad-top:            0.3rem; /* space between a fold's heading row and its links */
+  --fold-pad-bottom:           1rem; /* space under a fold's links */
+  --chip-gap:                0.5rem; /* space between link chips in an open fold */
+  --chip-pad-x:              0.9rem; /* width of a link chip either side of its label */
+  --chip-min-width:         4.75rem; /* narrowest a chip gets — a pill this round needs the width for a finger to own a 44px square inside it */
+  --touch-cols: minmax(0, 1.4fr) minmax(0, 1fr); /* phone: how the contact links share a row — the wider track holds the email */
+  --touch-col-gap:          0.75rem; /* space between the two contact tracks */
 
   /* TAP TARGETS ---------------------------------------------------
      Added after the 24 August lock, per the rule above: new knobs rather than
@@ -379,6 +393,7 @@
      small controls keep their drawn size and gain an invisible overlay; the
      footer link rows grow their height, but only under --bp-tap. */
   --tap-min:                   44px; /* smallest touch target, every side (WCAG 2.5.5) */
+  --tap-comfort:               48px; /* height of the phone footer's chips and fold headings — over --tap-min so a half-pixel offset can never round one under it */
   --bp-tap:                  1000px; /* width below which rows grow to --tap-min */
   /* --bp-tap holds the same number as --bp-nav-menu and stays a separate knob.
      They answer different questions — where the nav runs out of room, versus
@@ -460,24 +475,49 @@
   /* SCROLL FOCUS (review cards and BOUND promise cards) ------------
      Added 2 September 2026, per the lock rule: new knobs, nothing retuned.
      The brand graphics carry their own wording, drawn small. As a card
-     scrolls toward the middle of the window it colours in, sharpens and
-     grows, so the card being read is the legible one and the rest sit
-     back. main.js measures where each card is and writes --focus (0 away
-     from the middle, 1 centred); everything visible is derived from these. */
-  --focus-scale-rest:            0.94; /* how small a card sits away from the middle */
+     scrolls toward the middle of the window the artwork behind it blurs and
+     dims, and the same words lift off it as real text — larger, sharp and
+     selectable. main.js measures where each card is and writes --focus
+     (0 away from the middle, 1 centred); a hovered or keyboard-focused card
+     counts as centred. Everything visible is derived from these. */
+  --focus-scale-rest:               1; /* how big a card sits away from the middle */
   --focus-scale-peak:            1.02; /* how big it grows once it is centred */
-  --focus-grey-rest:                1; /* how much colour drains from a resting card — 1 = fully grey */
-  --focus-blur-rest:            1.5px; /* how soft a resting card is — 0 turns the sharpening off */
-  --focus-dim-rest:               0.7; /* how faded a resting card is — 1 = not at all */
-  --focus-hold:                  0.18; /* how far from the middle a card stays fully sharp, as a share of window height */
+  --focus-hold:                  0.18; /* how far from the middle a card stays fully lifted, as a share of window height */
   --focus-band:                  0.45; /* how far from the middle a card is fully at rest, as a share of window height */
   --focus-centre:                 0.5; /* where in the window a card counts as centred — 0.5 = halfway down */
   --focus-ms:                    0.2s; /* how quickly a card catches up with the scroll */
 
+  /* TEXT OVERLAY (the words that lift off a focused card) -----------
+     Sizes that read cqw are measured against the card's own width, so a
+     review fits a 345px desktop card and grows on a 690px tablet card. */
+  --overlay-blur:                 8px; /* how soft the artwork goes behind the lifted text */
+  --overlay-grey:                 0.5; /* how much colour drains from the artwork behind the text — 1 = fully grey */
+  --overlay-zoom:                0.06; /* how much the artwork grows as it blurs, so its softened edges never show */
+  --overlay-scrim:               0.74; /* darkness of the brand tint over the artwork once the text has lifted — 1 = opaque */
+  --overlay-pad-min:           0.9rem; /* least breathing room around the lifted text, on a narrow card */
+  --overlay-pad-cqw:             5cqw; /* how that breathing room grows with the card's width */
+  --overlay-pad-max:           1.6rem; /* most breathing room, on a wide card */
+  --overlay-rise:                24px; /* how far the text travels up as it lifts */
+  --overlay-scale-rest:          0.88; /* text size before it lifts, relative to its full size */
+  --overlay-quote-min:        0.72rem; /* smallest a review or promise body gets, on a narrow card */
+  --overlay-quote-cqw:         3.7cqw; /* how that body grows with the card's width */
+  --overlay-quote-max:         1.05rem; /* largest that body gets, on a wide card */
+  --overlay-quote-leading:        1.4; /* line spacing in that body */
+  --overlay-title-min:         1.3rem; /* smallest a promise title gets */
+  --overlay-title-cqw:           8cqw; /* how a promise title grows with the card's width */
+  --overlay-title-max:         2.2rem; /* largest a promise title gets */
+  --overlay-title-gap:         0.5rem; /* space under a promise title */
+  --overlay-kicker-size:      0.68rem; /* the small line above a review that has one */
+  --overlay-kicker-tracking:   0.16em; /* how spread out that line reads */
+  --overlay-kicker-gap:        0.6rem; /* space under it */
+  --overlay-cite-size:        0.72rem; /* the reviewer's name */
+  --overlay-cite-tracking:     0.12em; /* how spread out the name reads */
+  --overlay-cite-gap:          0.9rem; /* space above the name */
+
   /* PARALLAX (the closing band's photo) ----------------------------
      Added 2 September 2026, per the lock rule: new knobs, nothing retuned.
      main.js slides the photo against the scroll while the band is on screen. */
-  --parallax-depth:             120px; /* how far the band's photo drifts as the page scrolls past — 0 turns it off */
+  --parallax-depth:             400px; /* how far the band's photo drifts as the page scrolls past — 0 turns it off */
   --parallax-overscan: var(--parallax-depth); /* extra photo drawn above and below the band so the drift never shows an edge — tracks depth */
 
   /* BREAKPOINTS — the numbers are repeated in the @media conditions
@@ -888,10 +928,17 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
      same one that was eating 80px out of every .quote track. */
   margin: 0;
   border-radius: var(--media-card-radius);
-  overflow: hidden;
+  /* No overflow: hidden here. The lifted text panel is allowed to grow past
+     the card when a long review needs more height than a narrow card offers,
+     so the artwork clips itself inside .media-card__art instead. */
   box-shadow: var(--shadow-sm);
   border: var(--border-width) solid var(--line);
   background: var(--paper);
+}
+.media-card__art {
+  display: block;
+  overflow: hidden;
+  border-radius: var(--media-card-radius);
 }
 .media-card img {
   display: block;
@@ -995,27 +1042,108 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 }
 
 /* --------------------------- Scroll focus ----------------------- */
-/* main.js writes --focus on every .media-card as the page scrolls: 0 when the
-   card is a band's width from the middle of the window, 1 when it is centred.
-   The look is derived from that one number here, so it is tuned in the
-   control block and the script only measures. Scoped to .in so this and the
-   reveal never fight over transform; before the reveal lands the card keeps
-   its reveal state. opacity() is a filter here, not the property, because the
-   property belongs to the reveal fade. */
-.media-card { --focus: 0; }
+/* main.js writes --focus-scroll on every .media-card as the page scrolls: 0
+   when the card is a band's width from the middle of the window, 1 when it is
+   centred. --focus is that number, or 1 while the card is hovered or holds
+   keyboard focus. Everything visible derives from --focus here, so the look is
+   tuned in the control block and the script only measures.
+
+   The artwork carries its own wording, drawn small. At rest it shows as it is.
+   As --focus rises the artwork blurs, dims and grows a little (so its softened
+   edges never show), a brand tint comes up over it, and the figcaption — the
+   same words as real text — lifts up into place. It is real text at every
+   focus, so a screen reader and a crawler read it regardless; only the sighted
+   presentation moves. pointer-events: none keeps a click falling through to
+   the review card's link beneath. Scoped to .in so this and the reveal never
+   fight over the card's transform. */
+.media-card {
+  --focus-scroll: 0;
+  --focus: var(--focus-scroll);
+  position: relative;
+  container-type: inline-size;
+}
+@media (hover: hover) {
+  .media-card:hover { --focus: 1; }
+}
+.media-card:focus-within { --focus: 1; }
 /* No rise on entry for these: the scale below is their entrance. */
 .js .media-card.reveal { transform: none; }
 .media-card.reveal.in {
   transform: scale(calc(var(--focus-scale-rest) + (var(--focus-scale-peak) - var(--focus-scale-rest)) * var(--focus)));
+  transition: opacity var(--reveal-ms) var(--ease), transform var(--focus-ms) linear;
+  will-change: transform;
+}
+.media-card img {
   filter:
-    grayscale(calc(var(--focus-grey-rest) * (1 - var(--focus))))
-    blur(calc(var(--focus-blur-rest) * (1 - var(--focus))))
-    opacity(calc(var(--focus-dim-rest) + (1 - var(--focus-dim-rest)) * var(--focus)));
-  transition: opacity var(--reveal-ms) var(--ease), transform var(--focus-ms) linear, filter var(--focus-ms) linear;
-  will-change: transform, filter;
+    blur(calc(var(--overlay-blur) * var(--focus)))
+    grayscale(calc(var(--overlay-grey) * var(--focus)));
+  transform: scale(calc(1 + var(--overlay-zoom) * var(--focus)));
+  transition: filter var(--focus-ms) linear, transform var(--focus-ms) linear;
+  will-change: filter, transform;
+}
+/* Centred on the card and at least as tall as it. Between roughly 900px and
+   1060px wide the three-column row leaves a review card under 300px, and the
+   two longest reviews need more height than that, so the panel is free to
+   grow past the card's top and bottom edges rather than clip a sentence. */
+.media-card__text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  min-height: 100%;
+  margin: 0;
+  padding: clamp(var(--overlay-pad-min), var(--overlay-pad-cqw), var(--overlay-pad-max));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  border-radius: var(--media-card-radius);
+  background: rgb(from var(--purple-ink) r g b / calc(var(--overlay-scrim) * var(--focus)));
+  opacity: var(--focus);
+  transform:
+    translateY(-50%)
+    translateY(calc(var(--overlay-rise) * (1 - var(--focus))))
+    scale(calc(var(--overlay-scale-rest) + (1 - var(--overlay-scale-rest)) * var(--focus)));
+  transition: opacity var(--focus-ms) linear, transform var(--focus-ms) linear, background-color var(--focus-ms) linear;
+  pointer-events: none;
+  z-index: 1;
+}
+.media-card__text blockquote,
+.media-card__text p { margin: 0; }
+.media-card__text blockquote p,
+.media-card__text > p:not(.media-card__kicker) {
+  font-size: clamp(var(--overlay-quote-min), var(--overlay-quote-cqw), var(--overlay-quote-max));
+  line-height: var(--overlay-quote-leading);
+}
+.media-card__kicker {
+  font-family: var(--sans);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: var(--overlay-kicker-size);
+  letter-spacing: var(--overlay-kicker-tracking);
+  color: var(--accent-bright);
+  margin-bottom: var(--overlay-kicker-gap);
+}
+.media-card__text cite {
+  font-style: normal;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: var(--overlay-cite-size);
+  letter-spacing: var(--overlay-cite-tracking);
+  color: var(--accent-bright);
+  margin-top: var(--overlay-cite-gap);
+}
+.media-card__text h3 {
+  font-size: clamp(var(--overlay-title-min), var(--overlay-title-cqw), var(--overlay-title-max));
+  color: var(--accent-bright);
+  margin: 0 0 var(--overlay-title-gap);
 }
 @media (prefers-reduced-motion: reduce) {
-  .media-card.reveal.in { transform: none; filter: none; transition: none; }
+  .media-card.reveal.in,
+  .media-card img,
+  .media-card__text { transition: none; }
 }
 
 /* --------------------------- Testimonials ----------------------- */
@@ -1125,6 +1253,17 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .cta-band p { max-width: var(--cta-text-width); margin: 0 auto var(--cta-text-gap); opacity: 0.92; }
 
 /* ---------------------------- Footer ---------------------------- */
+/* Two footer columns are <details> so they can fold shut on a phone. Above
+   --bp-mobile the fold is inert: the summary takes no pointer and draws no
+   marker, and main.js keeps the details open and its summary out of the tab
+   order. The phone rules are in the --bp-mobile block further down. */
+.footer-col__fold > summary {
+  display: block;
+  list-style: none;
+  pointer-events: none;
+}
+.footer-col__fold > summary::-webkit-details-marker { display: none; }
+
 .site-footer {
   background: var(--ground-deep);
   color: rgba(255,255,255,0.8);
@@ -1299,17 +1438,67 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   :root {
     --footer-pad-top:          2.5rem; /* space above the footer on a phone */
     --footer-pad-bottom:       1.5rem; /* space under the fine print on a phone */
-    --footer-grid-gap:         1.4rem; /* space between footer blocks once they stack */
+    --footer-grid-gap:           1rem; /* space between footer blocks once they stack */
     --footer-grid-gap-bottom:  1.6rem; /* space under the blocks, above the fine print, on a phone */
+    --footer-brand-gap:             0; /* the wordmark shares a row with the social buttons, so no space under it */
     --footer-head-gap:         0.4rem; /* space under a column heading on a phone */
     --footer-link-gap:         0.2rem; /* rows are already finger-height on a phone; a hairline keeps two taps apart */
   }
-  /* Four blocks stacked one under another ran to two phone screens. The two
-     link columns sit side by side; the brand and the contact block, whose
-     lines are too long to share a half-width column, keep the full width. */
-  .footer-grid { grid-template-columns: 1fr 1fr; }
-  .footer-grid > :first-child,
-  .footer-grid > :last-child { grid-column: 1 / -1; }
+  /* Four blocks stacked one under another ran to two phone screens. The
+     wordmark and the social buttons share one row; the two link columns fold
+     shut behind their headings and open into rows of chips; the contact links
+     share two-column rows. */
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-grid > :first-child {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--footer-brand-social-gap);
+  }
+  .footer-grid > :first-child .socials { margin-top: 0; }
+  .footer-grid > :first-child p {
+    grid-column: 1 / -1;
+    margin: var(--footer-blurb-gap) 0 0;
+  }
+  .footer-col__fold { border-top: var(--footer-rule-width) solid rgba(255,255,255,0.12); }
+  .footer-col__fold > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--tap-comfort);
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  .footer-col__fold > summary .footer-col__title { margin: 0; }
+  .footer-col__fold > summary::after {
+    content: "";
+    width: var(--fold-chevron);
+    height: var(--fold-chevron);
+    margin-right: var(--fold-chevron-inset);
+    border-right: var(--fold-chevron-stroke) solid var(--aqua);
+    border-bottom: var(--fold-chevron-stroke) solid var(--aqua);
+    transform: translateY(-25%) rotate(45deg);
+    transition: transform var(--hover-ms) var(--ease);
+  }
+  .footer-col__fold[open] > summary::after { transform: translateY(25%) rotate(-135deg); }
+  .footer-col__fold > nav { padding: var(--fold-pad-top) 0 var(--fold-pad-bottom); }
+  .footer-col__fold .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--chip-gap);
+  }
+  .footer-col__fold .footer-links a {
+    min-height: var(--tap-comfort);
+    min-width: var(--chip-min-width);
+    justify-content: center;
+    border: var(--border-width) solid rgba(255,255,255,0.18);
+    border-radius: var(--btn-radius);
+    padding: 0 var(--chip-pad-x);
+  }
+  .footer-grid > :last-child .footer-links {
+    grid-template-columns: var(--touch-cols);
+    column-gap: var(--touch-col-gap);
+  }
   .form-grid-2 { grid-template-columns: 1fr; }
 }
 

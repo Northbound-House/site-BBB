@@ -128,38 +128,13 @@ IMAGES = {
     "IMG_PROMISE_DEDICATED":   ("/assets/img/promise-dedicated.png", None),
 
     # --- Testimonial cards -------------------------------------------------
-    # Also Zac's artwork. A quote has no heading structure to preserve, so
-    # unlike the promise cards these carry their wording in the alt: the image
-    # IS text, and WCAG asks the alt to say the same thing.
-    "IMG_REVIEW_MICHAEL": (
-        "/assets/img/review-michael-c.png",
-        "Effortless amazing travel. “I’ve had Zac plan over three "
-        "incredible trips for me, and each one has been nothing short of "
-        "spectacular. Zac excels at transforming my ideas into reality, "
-        "creating seamless and unforgettable experiences. Booking with him is "
-        "incredibly easy and stress-free; he handles all the planning, "
-        "allowing me to truly relax and enjoy my vacation.” — Michael C."),
-    "IMG_REVIEW_STEVEN": (
-        "/assets/img/review-steven.png",
-        "“Zachary helped personalize our trip by listening to our wants "
-        "and needs and that reflected in the options he provided for the trip. "
-        "I’m a very type A personality and let him know this, so he was "
-        "able to work with someone who can be a bit on the more detailed side "
-        "and also likes to actively find the best deals. I’d highly "
-        "recommend working with Zachary for your travel needs as he can help "
-        "find the best locations, the best excursions, and the best deals for "
-        "your trip!” — Steven"),
-    "IMG_REVIEW_BECKY": (
-        "/assets/img/review-becky-g.png",
-        "“Zachary helped to turn a dream, into reality, into life long "
-        "memories for my family. Zachary planned our entire trip, to another "
-        "country, 3 cities, 5 flights, an all inclusive resort, 3 different "
-        "hotel stays, hotel transports, bus transportation, even a hot air "
-        "balloon ride! Zachary will be my go to for all of our future "
-        "vacations. He listened to my ideas to personalize our vacation "
-        "experiences, had patience during the process, communicated trip "
-        "details, and had a positive attitude from start to finish!” "
-        "— Becky G."),
+    # Also Zac's artwork. The wording lives in REVIEWS below and is rendered
+    # as real text over each card by render_review_cards(), so like the
+    # promise cards these carry alt=None: the caption is what a screen reader
+    # and a crawler get, once.
+    "IMG_REVIEW_MICHAEL": ("/assets/img/review-michael-c.png", None),
+    "IMG_REVIEW_STEVEN":  ("/assets/img/review-steven.png", None),
+    "IMG_REVIEW_BECKY":   ("/assets/img/review-becky-g.png", None),
 
     # Repo assets
     # Square brand headshot with the BB mark. Delivered as a 1.6MB PNG, which is
@@ -744,11 +719,73 @@ def faq_schema():
     }
 
 
+# The three review cards. Each is Zac's artwork with the words baked in; the
+# same words are rendered as real text over the card and lift into view as the
+# card scrolls into focus, so they are readable at any size, selectable, and
+# indexable, without a second copy living in an alt attribute. This one table
+# feeds the cards on both pages that carry them and the Review schema, so the
+# wording cannot drift between the three.
+#
+# A change of copy still means re-exporting the card from Canva, because the
+# artwork carries the words too; edit the row here in the same commit.
 REVIEWS = [
-    ("Michael C.", "Incredibly easy and stress-free."),
-    ("Steven", "Personalized our trip by listening to our wants and needs."),
-    ("Becky G.", "Helped to turn a dream into reality."),
+    dict(slug="michael", name="Michael C.", image="IMG_REVIEW_MICHAEL",
+         kicker="Effortless amazing travel",
+         quote="I’ve had Zac plan over three incredible trips for me, and each one "
+               "has been nothing short of spectacular. Zac excels at transforming my "
+               "ideas into reality, creating seamless and unforgettable experiences. "
+               "Booking with him is incredibly easy and stress-free; he handles all "
+               "the planning, allowing me to truly relax and enjoy my vacation."),
+    dict(slug="steven", name="Steven", image="IMG_REVIEW_STEVEN", kicker=None,
+         quote="Zachary helped personalize our trip by listening to our wants and "
+               "needs and that reflected in the options he provided for the trip. "
+               "I’m a very type A personality and let him know this, so he was able "
+               "to work with someone who can be a bit on the more detailed side and "
+               "also likes to actively find the best deals. I’d highly recommend "
+               "working with Zachary for your travel needs as he can help find the "
+               "best locations, the best excursions, and the best deals for your "
+               "trip!"),
+    dict(slug="becky", name="Becky G.", image="IMG_REVIEW_BECKY", kicker=None,
+         quote="Zachary helped to turn a dream, into reality, into life long "
+               "memories for my family. Zachary planned our entire trip, to another "
+               "country, 3 cities, 5 flights, an all inclusive resort, 3 different "
+               "hotel stays, hotel transports, bus transportation, even a hot air "
+               "balloon ride! Zachary will be my go to for all of our future "
+               "vacations. He listened to my ideas to personalize our vacation "
+               "experiences, had patience during the process, communicated trip "
+               "details, and had a positive attitude from start to finish!"),
 ]
+
+
+def render_review_cards():
+    """The three review cards, on the homepage and on reviews.html.
+
+    Generated once so the two pages cannot drift -- a fix applied to one has
+    been forgotten on the other before. The link is a real link to the image
+    file, which is the whole no-JavaScript story; main.js layers the lightbox
+    on top. The alt is empty on purpose: the figcaption carries the words, so a
+    screen reader hears the review once, as text, rather than once as an image
+    description and again as a caption.
+    """
+    out = []
+    for i, r in enumerate(REVIEWS):
+        delay = f" d{i}" if i else ""
+        kicker = (f'            <p class="media-card__kicker">{esc(r["kicker"])}</p>\n'
+                  if r.get("kicker") else "")
+        out.append(
+            f'        <figure class="media-card reveal{delay}">\n'
+            f'          <a class="zoom media-card__art" href="{image_url(r["image"])}" data-zoom '
+            f'aria-label="Enlarge the review from {attr_esc(r["name"])}">\n'
+            f'            <img src="{image_url(r["image"])}" alt="" width="1080" height="1080" loading="lazy" />\n'
+            f'          </a>\n'
+            f'          <figcaption class="media-card__text">\n'
+            f'{kicker}'
+            f'            <blockquote><p>{esc(r["quote"])}</p></blockquote>\n'
+            f'            <cite>{esc(r["name"])}</cite>\n'
+            f'          </figcaption>\n'
+            f'        </figure>\n'
+        )
+    return "".join(out)
 
 
 def reviews_schema():
@@ -756,10 +793,10 @@ def reviews_schema():
     # resort to each review once attributed reviews are collected.
     return [
         {"@type": "Review", "itemReviewed": {"@id": AGENCY_ID},
-         "author": {"@type": "Person", "name": author},
+         "author": {"@type": "Person", "name": r["name"]},
          "reviewRating": {"@type": "Rating", "ratingValue": 5, "bestRating": 5},
-         "reviewBody": body}
-        for author, body in REVIEWS
+         "reviewBody": r["quote"]}
+        for r in REVIEWS
     ]
 
 
@@ -925,11 +962,14 @@ def nav_block(current, hero=False):
 
 
 def footer_block():
+    # The two link columns are <details> so they can fold shut on a phone, where
+    # four stacked lists ran to two screens. They ship `open`: without JS the
+    # lists simply show everywhere, and main.js folds them under --bp-mobile.
     explore = "".join(
-        f'            <li><a href="/{href}">{label}</a></li>\n' for label, href in NAV
+        f'              <li><a href="/{href}">{label}</a></li>\n' for label, href in NAV
     )
     plan = "".join(
-        f'            <li><a href="/{path}">{name}</a></li>\n' for path, name, _ in SERVICES
+        f'              <li><a href="/{path}">{name}</a></li>\n' for path, name, _ in SERVICES
     )
     licenses = " &nbsp;|&nbsp; ".join(
         f"{name.split()[0]}: {value}" for name, value in LICENSES
@@ -950,19 +990,23 @@ def footer_block():
           </div>
         </div>
         <div>
-          <h2 class="footer-col__title" id="footer-plan">What I plan</h2>
-          <nav aria-labelledby="footer-plan">
-          <ul class="footer-links">
-{plan}          </ul>
-          </nav>
+          <details class="footer-col__fold" open>
+            <summary><h2 class="footer-col__title" id="footer-plan">What I plan</h2></summary>
+            <nav aria-labelledby="footer-plan">
+            <ul class="footer-links">
+{plan}            </ul>
+            </nav>
+          </details>
         </div>
         <div>
-          <h2 class="footer-col__title" id="footer-explore">Explore</h2>
-          <nav aria-labelledby="footer-explore">
-          <ul class="footer-links">
-{explore}            <li><a href="/journal.html">Journal</a></li>
-          </ul>
-          </nav>
+          <details class="footer-col__fold" open>
+            <summary><h2 class="footer-col__title" id="footer-explore">Explore</h2></summary>
+            <nav aria-labelledby="footer-explore">
+            <ul class="footer-links">
+{explore}              <li><a href="/journal.html">Journal</a></li>
+            </ul>
+            </nav>
+          </details>
         </div>
         <div>
           <h2 class="footer-col__title" id="footer-touch">Get in touch</h2>
@@ -1023,6 +1067,7 @@ def tokens():
         "INSTAGRAM": INSTAGRAM,
         "LINKEDIN": LINKEDIN,
         "POST_LIST": render_post_list(),
+        "REVIEW_CARDS": render_review_cards(),
         **image_tokens(),
     }
 
