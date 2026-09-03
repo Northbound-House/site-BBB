@@ -73,10 +73,31 @@ so either can move without dragging the other with it. The `token-truth`
 detector in `tools/audit` fails if a name starts lying again, or if two aliases
 collapse onto one value without a documented reason.
 
-**Contrast:** every text/ground pair used in the design passes WCAG AA. The two
-that needed care: white on `--rose` is 4.77:1 (fine), and the active nav link
-uses `--rose-deep` rather than `--rose` because `--rose` on the frosted header
-was only 3.83:1 at the nav's 0.82rem.
+**Contrast:** every text/ground pair used in the design passes WCAG AA, and
+`tools/audit/contrast.mjs` fails the build if one stops. That sentence was in
+this README from the first commit with nothing behind it, and by the time the
+detector was written the footer blurb was at 2.5:1 on all twenty pages.
+
+Four roles exist because a colour that works on paper does not work on the
+footer's purple, and reusing one for the other is how the drift started:
+`--muted-on-dark`, `--ink-on-dark`, `--ink-on-dark-soft` and `--line-on-dark`.
+`--field-border` is separate from `--line` for the same reason in the other
+direction: a card outline may be faint, but a form control's edge is what says
+the control is there, and WCAG 1.4.11 asks 3:1 of it.
+
+Three things carry more of the site's contrast than any colour token:
+
+- **The nav pill's glass** (`--header-glass`). The pill floats over a
+  photograph, so its dark text is only as legible as the white behind it. At
+  the original 0.42 the links measured 3.6:1 over a dark photo and the 9.3px
+  wordmark sub-line 2.2:1.
+- **The hero and page-hero scrims** (`--hero-scrim-*`, `--page-hero-scrim-*`).
+  Same argument: the text is only as legible as the layer between it and the
+  picture.
+- **The active nav link.** It takes `--link`, not a rose. Rose was chosen as AA
+  against white, but the pill is never white — it is glass over a photo, where
+  rose measured 2.1:1 and cannot be rescued at 13px. The aqua underline is what
+  actually marks the active item, so the state never rests on colour alone.
 
 ### Typography
 
@@ -238,7 +259,7 @@ can reach `images.unsplash.com` to catch the next one.
 ### `tools/audit`
 
 Six detectors, run against the rendered page in headless Chromium rather than
-against the source. Hit areas are measured by hit-testing and colours by
+against the source. Contrast is a seventh, in its own file — see below. Hit areas are measured by hit-testing and colours by
 resolving them in the browser, because the defects worth catching only exist
 once the cascade has run.
 
@@ -256,6 +277,45 @@ node audit.mjs --screenshots   # plus 1280x800 stills, for before/after diffs
 | `menu-a11y` | `aria-controls` resolves, focus enters the panel, the body does not scroll behind it, Escape returns focus |
 | `tap-targets` | Every control offers 44x44, per WCAG 2.5.5 |
 | `heading-order` | Every page starts at `h1` and skips no level |
+
+### `tools/audit/contrast.mjs`
+
+```bash
+cd tools/audit && node contrast.mjs
+node contrast.mjs --light      # one appearance only
+node contrast.mjs --verbose    # list what passed, too
+```
+
+Every element that owns visible text, on every page, at 390px and 1280px, in
+both the light and dark appearances, against WCAG 2.2 AA. It is separate from
+`audit.mjs` because it needs passes the others do not — two appearances, and a
+screenshot pass — the same reason `lightbox.mjs` is separate.
+
+Three things it took a wrong answer to learn:
+
+- **Text over a photo is measured against white and black, not against the
+  photo.** Checking today's picture answers the wrong question: most of these
+  are hotlinked from a third party who can swap them. What has to hold is the
+  scrim. So each photo is replaced with flat white and then flat black, and the
+  worse answer is the one reported. Text that clears both clears any photo that
+  could ever land there — which is why the scrim numbers look heavier than the
+  current pictures need.
+- **Only the pixels a glyph actually covers count.** A first cut read the whole
+  element box and reported its worst pixel, which failed the ghost buttons
+  against their own white border. Each region is shot twice, once with the text
+  painted and once with it transparent, and only the pixels that changed are
+  read.
+- **The colour compared is the specified one, not the painted pixel.** Poppins
+  Light at 15px draws strokes about a pixel wide, so nearly every pixel of it is
+  an antialiased blend of letter and ground. Reading colour back out of those
+  measures the renderer, not the design. The ground comes from the pixels; the
+  letter's colour comes from the stylesheet, composited onto it.
+
+It also freezes the closing band's parallax before measuring. The two
+screenshots are taken moments apart, and a frame landing between them shifted
+the photo by a pixel — which put every high-contrast edge in the band into the
+glyph mask. The finding then moved from page to page between runs, which is the
+tell that a detector is measuring its own timing.
 
 Runs at 390px and 768px — phone, and the touch band between the phone
 breakpoints and the 1000px nav collapse.

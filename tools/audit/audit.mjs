@@ -80,10 +80,13 @@ const TAP_WIDTHS = [390, 768];
 // duplicate can never appear by accident and go unnoticed.
 const INTENTIONAL_DUPLICATES = [
   {
-    names: ["--brand", "--link"],
+    names: ["--brand", "--focus-ring", "--link"],
     reason:
-      "Brand ground/headings and interactive text are the same purple today. " +
-      "Separate names so either can move without dragging the other with it.",
+      "Brand ground/headings, interactive text and the keyboard focus ring " +
+      "are the same purple today. Separate names so any of them can move " +
+      "without dragging the others with it — and --focus-ring in particular " +
+      "has to be free to move, because it is the one of the three that also " +
+      "has a value to hold on a dark ground (--focus-ring-on-dark).",
   },
 ];
 

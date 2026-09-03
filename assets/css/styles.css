@@ -52,6 +52,28 @@
   --muted:     #6b6b73;
   --line:      rgba(70, 34, 162, 0.14);
 
+  /* --- Roles for a DARK ground. -------------------------------------------
+     The greys above are tuned for paper. Reused on the footer's purple they
+     measure 2.5:1, which is how the footer blurb came to be unreadable while
+     --muted itself was fine everywhere else. Text on a dark ground takes
+     these instead, and tools/audit/contrast.mjs fails the build if either
+     side of that pairing stops holding WCAG AA. */
+  --ink-on-dark:      #ffffff;                /* primary text on a dark ground */
+  --ink-on-dark-soft: rgba(255, 255, 255, 0.88); /* the same, one step back — subtitles and ledes */
+  --muted-on-dark: rgba(255, 255, 255, 0.7);  /* secondary text on a dark ground — 7.2:1 on --ground-deep */
+  --line-on-dark:  rgba(255, 255, 255, 0.22); /* hairlines and outlines on a dark ground */
+
+  /* A form control's boundary is the only thing that says the control is
+     there, so WCAG 1.4.11 asks 3:1 of it. --line is a card outline at 1.3:1
+     and cannot do that job. */
+  --field-border:  var(--muted);       /* the edge of an input, select or textarea — 5.2:1 on paper */
+
+  /* The keyboard focus ring. Two names because the site has both grounds and
+     one ring cannot serve both: --link is 10.3:1 on paper and 1.3:1 on the
+     footer. */
+  --focus-ring:         var(--link);   /* focus outline on a light ground */
+  --focus-ring-on-dark: #ffffff;       /* focus outline where the ground is dark */
+
   /* Type — Bebas Neue + Evolve Sans per the brand guide.
      Evolve Sans is a commercial face and is not on Google Fonts; Poppins is
      the closest geometric substitute. Swap the stack here if it gets licensed
@@ -400,6 +422,29 @@
      where a target has to be finger-sized — so moving one should not drag the
      other with it. */
 
+  /* CONTRAST GUARDS -----------------------------------------------
+     Added 3 September 2026, per the lock rule above: new knobs, nothing
+     existing retuned by taste. Every number here was set by a measurement
+     and is held by tools/audit/contrast.mjs, which fails the build if one
+     of them stops carrying WCAG AA.
+
+     The scrims and the nav glass are the load-bearing ones. Text over a
+     photo is only as legible as the layer between them, and these photos
+     are hotlinked from a third party — so the layer has to carry the worst
+     photo that could ever land there, not the one that happens to be there
+     today. The detector proves that by measuring each of these against a
+     pure white and a pure black ground and taking the worse answer. That is
+     why the numbers look heavier than the photos currently need. */
+  --header-glass:               0.72; /* how opaque the white is in the floating nav pill — below this its dark text stops passing over a bright photo */
+  --header-glass-scrolled:      0.88; /* how opaque that white gets once the pill is scrolled */
+  --header-glass-edge:          0.85; /* how bright the hairline around the pill reads — keeps the light catch above the fill */
+  --hero-scrim-top:             0.66; /* darkening over the hero photo at the top */
+  --hero-scrim-mid:             0.64; /* darkening across the middle, where the headline and lede sit — the shallowest point of the gradient, so this is the number that decides the hero */
+  --hero-scrim-mid-at:           40%; /* how far down that middle stop sits */
+  --hero-scrim-bottom:          0.80; /* darkening at the foot, under the buttons */
+  --page-hero-scrim-top:        0.74; /* darkening over an inner page's photo, at the top */
+  --page-hero-scrim-bottom:     0.70; /* the same, at the foot */
+
   /* MEDIA CARDS ---------------------------------------------------
      Added after the 24 August lock, per the rule above: new knobs, nothing
      existing retuned. These size the square brand graphics — the five BOUND
@@ -642,10 +687,10 @@ p { margin: 0 0 var(--para-gap); }
   z-index: 60;
   width: min(var(--maxw), calc(100% - var(--header-side-inset)));
   border-radius: var(--header-radius);
-  background: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, var(--header-glass));
   -webkit-backdrop-filter: blur(var(--header-blur)) saturate(var(--header-saturate));
   backdrop-filter: blur(var(--header-blur)) saturate(var(--header-saturate));
-  border: var(--header-border-width) solid rgba(255, 255, 255, 0.45);
+  border: var(--header-border-width) solid rgba(255, 255, 255, var(--header-glass-edge));
   box-shadow:
     0 var(--header-shadow-y) var(--header-shadow-blur) var(--header-shadow-spread) rgba(52, 25, 122, 0.45),
     inset 0 var(--header-highlight-width) 0 rgba(255, 255, 255, 0.6),
@@ -655,8 +700,8 @@ p { margin: 0 0 var(--para-gap); }
 }
 .site-header.is-scrolled {
   top: var(--header-top-scrolled);
-  background: rgba(255, 255, 255, 0.66);
-  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, var(--header-glass-scrolled));
+  border-color: rgba(255, 255, 255, var(--header-glass-edge));
   box-shadow:
     0 var(--header-shadow-y-scrolled) var(--header-shadow-blur-scrolled) var(--header-shadow-spread-scrolled) rgba(52, 25, 122, 0.5),
     inset 0 var(--header-highlight-width) 0 rgba(255, 255, 255, 0.7);
@@ -758,7 +803,10 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .hero__bg {
   position: absolute; inset: 0; z-index: -2;
   background:
-    linear-gradient(180deg, rgba(30, 14, 70,0.55), rgba(30, 14, 70,0.35) 40%, rgba(30, 14, 70,0.7)),
+    linear-gradient(180deg,
+      rgba(30, 14, 70, var(--hero-scrim-top)),
+      rgba(30, 14, 70, var(--hero-scrim-mid)) var(--hero-scrim-mid-at),
+      rgba(30, 14, 70, var(--hero-scrim-bottom))),
     radial-gradient(120% 80% at 50% 0%, rgba(118, 239, 225,0.25), transparent 60%),
     var(--brand);
   background-size: cover;
@@ -766,7 +814,10 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 }
 .hero__bg.has-img {
   background-image:
-    linear-gradient(180deg, rgba(30, 14, 70,0.5), rgba(30, 14, 70,0.3) 40%, rgba(30, 14, 70,0.72)),
+    linear-gradient(180deg,
+      rgba(30, 14, 70, var(--hero-scrim-top)),
+      rgba(30, 14, 70, var(--hero-scrim-mid)) var(--hero-scrim-mid-at),
+      rgba(30, 14, 70, var(--hero-scrim-bottom))),
     var(--hero-img);
 }
 .hero__inner { max-width: var(--hero-width); }
@@ -834,21 +885,23 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .page-hero__bg {
   position: absolute; inset: 0; z-index: -1;
   background:
-    linear-gradient(180deg, rgba(30, 14, 70,0.65), rgba(30, 14, 70,0.55)),
+    linear-gradient(180deg,
+      rgba(30, 14, 70, var(--page-hero-scrim-top)),
+      rgba(30, 14, 70, var(--page-hero-scrim-bottom))),
     var(--page-img, none), var(--brand);
   background-size: cover; background-position: center;
 }
 /* Size is set once in the brand typography block below. */
 .page-hero h1 { margin-bottom: var(--page-hero-title-gap); }
 .page-hero p { max-width: 600px; margin: 0 auto; opacity: 0.94; font-weight: 300; }
-.page-hero .eyebrow { color: var(--aqua-soft); }
+.page-hero .eyebrow { color: var(--aqua); }
 
 /* ---------------------------- Sections -------------------------- */
 .section { padding: clamp(var(--section-pad-min), var(--section-pad-base) + var(--section-pad-vw), var(--section-pad-max)) 0; }
 .section--tint { background: var(--surface-tint); }
 .section--deep { background: var(--ground-deep); color: #fff; }
 .section--deep .eyebrow { color: var(--aqua); }
-.section--deep .muted { color: rgba(255,255,255,0.7); }
+.section--deep .muted { color: var(--muted-on-dark); }
 
 .section-head { max-width: var(--section-head-width); margin: 0 auto var(--section-head-gap); text-align: center; }
 /* Section heading sizes are set once in the brand typography block below. */
@@ -1276,6 +1329,9 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   gap: var(--footer-grid-gap);
   margin-bottom: var(--footer-grid-gap-bottom);
 }
+/* The footer is a dark ground, so --muted (a paper grey) does not belong here:
+   it measured 2.5:1 on the purple. */
+.site-footer .muted { color: var(--muted-on-dark); }
 .site-footer .brand { color: #fff; margin-bottom: var(--footer-brand-gap); }
 .footer-col__title {
   font-family: var(--sans);
@@ -1381,17 +1437,22 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   font-family: var(--sans); font-size: 1rem; font-weight: 300;
   color: var(--ink);
   padding: 0.85em 1em;
-  border: 1px solid var(--line);
+  /* --line is a card outline at 1.3:1. A control's edge is what says the
+     control is there, and WCAG 1.4.11 asks 3:1 of it. */
+  border: 1px solid var(--field-border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--paper);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
-.field input:focus,
-.field textarea:focus,
-.field select:focus {
-  outline: none;
-  border-color: var(--aqua);
-  box-shadow: 0 0 0 3px rgba(118, 239, 225,0.18);
+/* The old focus state removed the outline and leaned on an aqua border at
+   1.4:1 plus a 3px aqua halo at 1.1:1 — visible on a bright screen, invisible
+   on a dim one, and nothing at all to a keyboard user who needs the ring. */
+.field input:focus-visible,
+.field textarea:focus-visible,
+.field select:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-color: var(--link);
 }
 .field textarea { resize: vertical; min-height: 120px; }
 .form-actions { display: flex; gap: 0.8rem; margin-top: 1.4rem; }
@@ -1521,8 +1582,32 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 }
 .skip-link:focus {
   left: 0;
-  outline: var(--focus-ring-width) solid var(--link);
+  outline: var(--focus-ring-width) solid var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
+}
+
+/* ------------------------- Focus ring --------------------------- */
+/* Every interactive thing on the site had been leaning on the browser's own
+   focus ring. That ring is drawn in the UA's colour, not the site's, and the
+   site puts controls on two very different grounds — links in the footer and
+   the CTA band sit on deep purple, where a dark ring is close to invisible.
+   So the ring is declared here, once, and flipped to white wherever the
+   ground is dark.
+
+   :where() holds this at zero specificity on purpose: the components that
+   already draw their own ring (.zoom, .lightbox__close, .service-card,
+   .faq__item summary) keep winning, and this only fills the gaps.
+
+   :focus-visible, not :focus — a mouse click on a link should not leave a
+   ring behind it. */
+:where(a, button, summary, [tabindex], input, select, textarea):focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+:where(.site-footer, .section--deep, .hero, .page-hero, .post-hero, .cta-band,
+       .trust-strip, .referral-banner)
+  :where(a, button, summary, [tabindex]):focus-visible {
+  outline-color: var(--focus-ring-on-dark);
 }
 
 /* ------------------------- Narrow measure ----------------------- */
@@ -1828,7 +1913,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   text-underline-offset: var(--cta-direct-underline);
   white-space: nowrap;
 }
-.cta-band__direct span { margin: 0 var(--cta-direct-dot-space); opacity: 0.6; }
+.cta-band__direct span { margin: 0 var(--cta-direct-dot-space); }
 
 /* ------------------------- Referral ----------------------------- */
 .referral-banner {
@@ -2048,6 +2133,10 @@ h2 .script, h3 .script {
   font-family: var(--sans);
   letter-spacing: var(--brand-sub-tracking);
   font-weight: 400;
+  /* No opacity here on purpose. This line draws at 9.3px, and dimming it to
+     85% took it to 2.2:1 over the hero photo. The size is part of the locked
+     nav fit — six links, a wordmark and a CTA in one pill — so contrast is
+     bought back by dropping the dimming rather than by growing the text. */
 }
 .brand .mark {
   width: var(--brand-mark-width);
@@ -2070,7 +2159,12 @@ strong, b { font-weight: 600; }
 .faq__item summary { font-family: var(--sans); font-weight: 500; }
 
 /* Accent underline on the active nav item + link hovers uses brand aqua */
-.nav-links a.active { color: var(--rose-deep); }  /* AA at nav's 0.82rem */
+/* The active link takes --link, not a rose. Rose was picked as AA against
+   white, but the pill is frosted glass over a photograph, never white: rose
+   measured 2.1:1 there and cannot be rescued at this size. The aqua underline
+   below is what actually marks the active item, so the state never rests on
+   colour alone (WCAG 1.4.1). */
+.nav-links a.active { color: var(--link); font-weight: 500; }
 .nav-links a::after { background: var(--aqua); height: var(--nav-underline-height); }
 
 /* The headshot is cut to the brand hexagon, on every page that shows it.
@@ -2264,7 +2358,15 @@ h1, h2 { text-transform: uppercase; }
   padding: calc(4.5rem + 4vw) 0 3rem;
 }
 .post-hero h1 { color: #fff; margin: 0.35em 0 0.4em; font-size: clamp(2.2rem, 1.6rem + 2.6vw, 3.6rem); }
-.post-hero .lede { color: rgba(255,255,255,0.88); font-size: 1.1rem; margin: 0; }
+.post-hero .shell.narrow > .lede,
+.post-hero .lede {
+  /* Specific enough to beat `.shell.narrow > .lede`, which is one class heavier
+     than a plain `.post-hero .lede` and was painting this --muted — a grey
+     meant for paper — on the hero's purple, at 1.98:1. */
+  color: var(--ink-on-dark-soft);
+  font-size: 1.1rem;
+  margin: 0;
+}
 .post-hero__meta {
   margin: 0;
   font-size: 0.76rem;

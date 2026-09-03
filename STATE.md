@@ -89,7 +89,10 @@ Per `BBB Brand Guidelines.pdf` and the Canva kit, both in Drive.
 
 **Colour:** `#4622a2` purple (primary) · `#d0356a` rose (CTA) · `#f09839` orange
 · `#4aa4a6` teal · `#f6cfee` pink · `#76efe1` aqua, plus the secondary
-neutrals. Every text/ground pair passes WCAG AA.
+neutrals. Every text/ground pair passes WCAG AA — enforced now by
+`tools/audit/contrast.mjs` on every push, not just asserted. When the detector
+was first written it found the footer blurb at 2.5:1, the active nav link at
+2.1:1 on the frosted header, and the journal post subtitles at 2.0:1.
 
 **Type:** Bebas Neue for display (real, loaded). **Poppins substitutes for
 Evolve Sans** and **Sacramento for Jonathan Signature** — both originals are
