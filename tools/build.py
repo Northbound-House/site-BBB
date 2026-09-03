@@ -585,8 +585,22 @@ PAGES = {
     ),
 }
 
+# The journal is HIDDEN. The posts and the index still live in pages/, and the
+# POSTS table below still describes them, but nothing is generated, linked or
+# listed: no journal.html, no journal/*.html, no footer link, no sitemap entry,
+# and no URL that resolves. Flip this to False and rebuild to bring the whole
+# section back exactly as it was -- that is the entire switch.
+#
+# Not a deletion, and not a noindex either. An unlinked page that still answers
+# 200 is still a page anyone can land on and every crawler can find; this way
+# there is nothing to land on.
+JOURNAL_HIDDEN = True
+
+if JOURNAL_HIDDEN:
+    PAGES.pop("journal.html", None)
+
 # Post pages are registered from POSTS so a new row is the only edit needed.
-for _post in POSTS:
+for _post in POSTS if not JOURNAL_HIDDEN else []:
     PAGES[f"journal/{_post['slug']}.html"] = dict(
         path=f"journal/{_post['slug']}.html",
         title=f"{_post['title']} | Bora Bora Bound",
@@ -989,6 +1003,9 @@ def footer_block():
     plan = "".join(
         f'              <li><a href="/{path}">{name}</a></li>\n' for path, name, _ in SERVICES
     )
+    # One row, present only while the journal is published.
+    journal_link = ("" if JOURNAL_HIDDEN
+                    else '              <li><a href="/journal.html">Journal</a></li>\n')
     licenses = " &nbsp;|&nbsp; ".join(
         f"{name.split()[0]}: {value}" for name, value in LICENSES
     )
@@ -1021,8 +1038,7 @@ def footer_block():
             <summary><h2 class="footer-col__title" id="footer-explore">Explore</h2></summary>
             <nav aria-labelledby="footer-explore">
             <ul class="footer-links">
-{explore}              <li><a href="/journal.html">Journal</a></li>
-            </ul>
+{explore}{journal_link}            </ul>
             </nav>
           </details>
         </div>
