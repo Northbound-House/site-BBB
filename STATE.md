@@ -94,6 +94,10 @@ neutrals. Every text/ground pair passes WCAG AA — enforced now by
 was first written it found the footer blurb at 2.5:1, the active nav link at
 2.1:1 on the frosted header, and the journal post subtitles at 2.0:1.
 
+**Appearance:** light and dark, following the reader's system setting. No
+toggle, per Apple's guidance — the OS already knows. The whole dark theme is one
+media block over the semantic layer at the top of `styles.css`.
+
 **Type:** Bebas Neue for display (real, loaded). **Poppins substitutes for
 Evolve Sans** and **Sacramento for Jonathan Signature** — both originals are
 commercial, absent from Google Fonts, and absent from the Drive Fonts folder, so

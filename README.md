@@ -58,7 +58,18 @@ re-theme is an edit to six lines rather than to six hundred:
 | `--accent-bright` | `--aqua` | Bright accent on dark grounds |
 | `--cta` | `--rose` | The primary call to action |
 | `--surface-tint` | `--blush` | The tinted section ground |
-| `--paper` | `--off-white` | Card and page surfaces |
+| `--paper` | `--off-white` | Card, panel and control surfaces — the raised plane |
+| `--ground` | `--off-white` | The page itself — the plane everything sits on |
+| `--heading` | `--brand` | Heading text |
+| `--link-contrast` | `#ffffff` | Text and glyphs *on* a `--link` fill |
+| `--ink-on-brand` | `--blush` | Text on the brand purple, dark in both appearances |
+| `--glass-tint` | `#ffffff` | What the floating nav pill's material is made of |
+
+`--ground` and `--paper` hold one colour on paper and two in the dark
+appearance, and `--brand` and `--heading` are separate for the same reason:
+`--brand` is a *ground* and stays purple, while heading text that borrowed the
+same purple has to go light when the ground goes dark. One token could not do
+both, which is what forced the split.
 
 **Name these for the role, never for the colour.** The layer was previously
 nautical — `--navy`, `--gold`, `--sand`, `--lagoon`, `--deep-sea` — mapped onto
@@ -98,6 +109,44 @@ Three things carry more of the site's contrast than any colour token:
   against white, but the pill is never white — it is glass over a photo, where
   rose measured 2.1:1 and cannot be rescued at 13px. The aqua underline is what
   actually marks the active item, so the state never rests on colour alone.
+
+### Dark appearance
+
+The site follows the reader's system setting and offers no toggle of its own.
+That is Apple's guidance and the reason is practical: an app-specific
+appearance switch makes people set the same preference twice, and a site that
+ignores the one they already set reads as broken.
+
+The whole re-theme is one `@media (prefers-color-scheme: dark)` block at the
+top of `assets/css/styles.css`, overriding the semantic layer and nothing else
+— which is what the role naming above was for. Three palette derivations were
+added to serve it: `--purple-raised` (the elevated surface), `--purple-veil`
+(the tinted section ground) and `--purple-light` (the brand purple lifted until
+it can be read as text on a dark ground — the original measures 1.7:1 there).
+
+Two things deliberately do **not** flip:
+
+- **The scrims over photographs, and the dark section bands.** They are dark in
+  both appearances already and their text is white in both. Flipping them would
+  mean re-solving contrast that is already solved.
+- **`--brand` and `--cta`.** The purple stays the purple and the rose stays the
+  rose. A dark appearance is not a licence to restate the palette.
+
+Surfaces follow the base-and-elevated split Apple uses in dark palettes, so a
+card reads as sitting above the page rather than merging into it. On paper a
+single off-white does that job by itself, which is why `--ground` and `--paper`
+are one colour there and two here.
+
+Two things outside the stylesheet change with the appearance, both in
+`build.py` and both without JavaScript: the header serves the white monogram
+through a `<picture>` with a `prefers-color-scheme` source (the colour mark is
+brand purple and disappears into the dark pill), and there are two
+`theme-color` metas so the browser chrome follows too.
+
+Body text measures 15.7:1 on the page ground and secondary text 7.6:1 on a
+card, which clears the 7:1 Apple asks for on small text rather than only the
+4.5:1 WCAG floor. `contrast.mjs` measures this appearance on every push
+alongside the light one.
 
 ### Typography
 

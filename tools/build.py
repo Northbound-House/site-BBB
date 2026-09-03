@@ -383,9 +383,16 @@ def render_post_list():
 # PAGE TABLE
 # =============================================================================
 
+# The header mark, in both appearances. The colour monogram is drawn in brand
+# purple and vanishes into the dark nav pill, so the white mark is served when
+# the reader's system is set dark. <picture> does this in markup, with no
+# JavaScript and no flash — the browser picks before it fetches either file.
+# The stylesheet gives the <picture> display:contents so the <img> stays the
+# grid item the brand lockup sizes.
 BRAND_MARK = (
-    '<span class="mark" aria-hidden="true">'
-    '<img src="/assets/img/logo-mark.png" alt="" width="27" height="42" /></span>'
+    '<span class="mark" aria-hidden="true"><picture>'
+    '<source srcset="/assets/img/logo-mark-white.png" media="(prefers-color-scheme: dark)">'
+    '<img src="/assets/img/logo-mark.png" alt="" width="27" height="42" /></picture></span>'
 )
 BRAND_MARK_WHITE = (
     '<span class="mark" aria-hidden="true">'
@@ -894,7 +901,10 @@ def head_block(cfg):
          f'  <meta name="robots" content="{robots}" />\n']
     if not cfg.get("no_canonical"):
         o.append(f'  <link rel="canonical" href="{url}" />\n')
-    o += ['  <meta name="theme-color" content="#4622a2">\n',
+    # Two theme-colors, so the browser chrome follows the appearance the
+    # reader is in. Light keeps the brand purple it has always used.
+    o += ['  <meta name="theme-color" content="#4622a2" media="(prefers-color-scheme: light)">\n',
+          '  <meta name="theme-color" content="#1e0e46" media="(prefers-color-scheme: dark)">\n',
           '  <link rel="icon" href="/favicon.ico" sizes="any">\n',
           '  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">\n',
           '  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">\n',

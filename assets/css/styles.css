@@ -31,6 +31,14 @@
   --purple-ink:  #1e0e46;
   --rose-deep:   #b02a59;
   --blush:       #f8f0f7;   /* very light tint of --pink, for section grounds */
+  /* Three more of the same kind, added for the dark appearance. Still not new
+     hues — the brand purple lifted and lightened. --purple-raised and
+     --purple-veil are the "elevated" and "tinted" surfaces that sit above the
+     --purple-ink page ground; --purple-light is the brand purple taken up far
+     enough to be read as text on those grounds. */
+  --purple-raised: #2b1560;
+  --purple-veil:   #241150;
+  --purple-light:  #c4b0ff;
 
   /* --- Semantic aliases. The rest of the sheet is written against these. ---
      Named for the ROLE each one plays, never for the colour it currently holds.
@@ -48,7 +56,24 @@
   --accent-bright: var(--aqua);        /* bright accent on dark grounds */
   --cta:           var(--rose);        /* the primary call to action */
   --surface-tint:  var(--blush);       /* the tinted section ground */
-  --paper:         var(--off-white);   /* card and page surfaces */
+  --paper:         var(--off-white);   /* card, panel and control surfaces — the raised plane */
+  --ground:        var(--off-white);   /* the page itself — the plane everything sits on */
+  /* --ground and --paper hold one colour in the light appearance and two in
+     the dark one. Apple's dark palettes separate a base plane from an elevated
+     one so a card reads as sitting above the page rather than merged into it;
+     on paper a single off-white does that job by itself. */
+
+  /* --brand is a GROUND. Heading text that happened to be the same purple was
+     reading from it too, which is fine until the ground goes dark and the
+     heading has to go light — one token cannot do both. */
+  --heading:       var(--brand);       /* heading text */
+  --link-contrast: #ffffff;            /* text and glyphs ON a --link fill */
+  --ink-on-brand:  var(--blush);       /* text on the brand purple, which is a dark ground in BOTH appearances */
+  --glass-tint:      #ffffff;          /* what the floating nav pill's material is made of */
+  --glass-edge-tint: #ffffff;          /* the light catch along that pill's edge */
+  --icon-tile:     linear-gradient(135deg, var(--aqua-soft), var(--blush)); /* the tile behind a feature card's glyph */
+  --icon-tile-ink: var(--link);        /* the glyph drawn on that tile */
+  --shadow-color:  30, 14, 70;         /* what a shadow is made of — brand ink on paper, true black on a dark ground */
   --muted:     #6b6b73;
   --line:      rgba(70, 34, 162, 0.14);
 
@@ -267,8 +292,8 @@
   --shadow-sm-y:                8px; /* how far a resting card's shadow drops */
   --shadow-sm-blur:            24px; /* how soft the resting shadow is */
   --shadow-sm-spread:         -14px; /* negative keeps the resting shadow tight */
-  --shadow:    0 var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgba(30, 14, 70, 0.45);
-  --shadow-sm: 0 var(--shadow-sm-y) var(--shadow-sm-blur) var(--shadow-sm-spread) rgba(30, 14, 70, 0.4);
+  --shadow:    0 var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgba(var(--shadow-color), 0.45);
+  --shadow-sm: 0 var(--shadow-sm-y) var(--shadow-sm-blur) var(--shadow-sm-spread) rgba(var(--shadow-color), 0.4);
 
   /* TRUST STRIP --------------------------------------------------- */
   --trust-pad-y:             1.4rem; /* height of the purple credentials bar */
@@ -578,6 +603,95 @@
   --bp-phone-narrow:          400px; /* width below which the wordmark drops its sub-line */
   --bp-phone:                 480px; /* width below which headlines shrink to fit long words */
   --bp-short:                 900px; /* window HEIGHT below which the scroll cue hides */
+
+  /* Tell the browser the site renders in both appearances, so the controls it
+     draws itself — scrollbars, the date picker, a default form control before
+     our own rules land — follow the reader rather than staying stuck light. */
+  color-scheme: light dark;
+}
+
+/* =========================================================
+   DARK APPEARANCE
+   ---------------------------------------------------------
+   Follows the reader's system setting and nothing else. There
+   is deliberately no toggle: Apple's guidance is blunt about
+   it — an app-specific appearance switch makes people set the
+   same preference twice, and a site that ignores the one they
+   already set reads as broken. Their OS already knows.
+
+   Only the semantic layer moves. Everything below this block
+   is written against those names, so the whole re-theme is
+   this one screenful — which was the entire point of the
+   naming discipline at the top of this file.
+
+   Two things do NOT move, and both are deliberate:
+
+   - The scrims over photographs, and the dark section bands.
+     They are dark in both appearances already, and the text
+     on them is white in both. Flipping them would mean
+     re-solving contrast that is already solved.
+   - --brand and --cta. The brand purple and the rose stay the
+     brand purple and the rose. A dark appearance is not a
+     licence to restate the palette.
+
+   Every pair below is measured by tools/audit/contrast.mjs in
+   this appearance as well as the light one. Apple asks for
+   7:1 on small text rather than the 4.5:1 floor where you can
+   get it, and the body pairs here clear that.
+   ========================================================= */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Surfaces: a base plane, and a raised one for anything that reads as a
+       card, panel or control sitting above it. */
+    --ground:       var(--purple-ink);
+    --paper:        var(--purple-raised);
+    --surface-tint: var(--purple-veil);
+
+    /* Text. --ink is 15.7:1 on the page ground; --muted is 7.6:1 on a card,
+       which clears the 7:1 Apple asks for on small text rather than only the
+       4.5:1 WCAG floor. */
+    --ink:          #f4f2fb;
+    --muted:        #b9b1d8;
+
+    /* Interactive text is the brand purple lifted until it can be read on a
+       dark ground: the original is 1.7:1 there. --link-contrast follows it,
+       because white on a pale purple fill is the same mistake in reverse. */
+    --link:          var(--purple-light);
+    --link-contrast: var(--purple-ink);
+
+    /* Headings stop borrowing the brand ground's purple and take the body
+       colour. This is the pairing that could not be expressed before the
+       --heading role existed. */
+    --heading:      var(--ink);
+
+    /* Lines, edges and rings. --field-border stays a real 5.4:1 against the
+       control it outlines; --line is decorative and does not need to. */
+    --line:         rgba(255, 255, 255, 0.14);
+    --field-border: #9b93bd;
+    --focus-ring:   var(--focus-ring-on-dark);
+
+    /* The nav pill is a material, not a colour: in the light appearance it is
+       white frosted over the page, and here it is the page's own ink frosted
+       over itself. The blur and the opacity knobs are shared, so the pill
+       reads the same way in both. */
+    --glass-tint:      var(--purple-ink);
+    --glass-edge-tint: #ffffff;
+
+    /* The feature-card glyph tile. The light version is a pale aqua-to-blush
+       wash with purple ink on it — on a dark ground that tile becomes a bright
+       patch and the ink on it fails, so it inverts to a faint wash with the
+       aqua glyph, matching what .section--deep already did on dark bands. */
+    --icon-tile:     linear-gradient(135deg, rgba(118, 239, 225, 0.20), rgba(196, 176, 255, 0.16));
+    --icon-tile-ink: var(--aqua);
+
+    /* A purple shadow is invisible on a purple ground. */
+    --shadow-color: 0, 0, 0;
+  }
+
+  /* The colour monogram is drawn in brand purple, which disappears into a
+     dark pill. build.py serves the white mark here through a <picture>; this
+     lets the <img> stay the grid item the lockup sizes. */
+  .brand .mark picture { display: contents; }
 }
 
 /* ----------------------------- Reset ---------------------------- */
@@ -592,7 +706,7 @@ body {
   font-family: var(--sans);
   font-weight: 300;
   color: var(--ink);
-  background: var(--paper);
+  background: var(--ground);
   line-height: var(--body-leading);
   font-size: clamp(var(--body-size-min), var(--body-size-base) + var(--body-size-vw), var(--body-size-max));
   overflow-x: hidden;
@@ -670,7 +784,7 @@ p { margin: 0 0 var(--para-gap); }
   --btn-fg: var(--link);
   border-color: var(--link);
 }
-.btn--outline:hover { background: var(--link); color: #fff; }
+.btn--outline:hover { background: var(--link); color: var(--link-contrast); }
 
 /* ----------------------------- Nav ------------------------------ */
 /* Floating "liquid glass" nav bar — always frosted so it reads on any background */
@@ -687,10 +801,10 @@ p { margin: 0 0 var(--para-gap); }
   z-index: 60;
   width: min(var(--maxw), calc(100% - var(--header-side-inset)));
   border-radius: var(--header-radius);
-  background: rgba(255, 255, 255, var(--header-glass));
+  background: rgb(from var(--glass-tint) r g b / var(--header-glass));
   -webkit-backdrop-filter: blur(var(--header-blur)) saturate(var(--header-saturate));
   backdrop-filter: blur(var(--header-blur)) saturate(var(--header-saturate));
-  border: var(--header-border-width) solid rgba(255, 255, 255, var(--header-glass-edge));
+  border: var(--header-border-width) solid rgb(from var(--glass-edge-tint) r g b / var(--header-glass-edge));
   box-shadow:
     0 var(--header-shadow-y) var(--header-shadow-blur) var(--header-shadow-spread) rgba(52, 25, 122, 0.45),
     inset 0 var(--header-highlight-width) 0 rgba(255, 255, 255, 0.6),
@@ -700,8 +814,8 @@ p { margin: 0 0 var(--para-gap); }
 }
 .site-header.is-scrolled {
   top: var(--header-top-scrolled);
-  background: rgba(255, 255, 255, var(--header-glass-scrolled));
-  border-color: rgba(255, 255, 255, var(--header-glass-edge));
+  background: rgb(from var(--glass-tint) r g b / var(--header-glass-scrolled));
+  border-color: rgb(from var(--glass-edge-tint) r g b / var(--header-glass-edge));
   box-shadow:
     0 var(--header-shadow-y-scrolled) var(--header-shadow-blur-scrolled) var(--header-shadow-spread-scrolled) rgba(52, 25, 122, 0.5),
     inset 0 var(--header-highlight-width) 0 rgba(255, 255, 255, 0.7);
@@ -947,8 +1061,8 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .card .icon {
   width: var(--card-icon-size); height: var(--card-icon-size); border-radius: var(--card-icon-radius);
   display: grid; place-items: center; margin-bottom: var(--card-icon-gap);
-  background: linear-gradient(135deg, var(--aqua-soft), var(--blush));
-  color: var(--link);
+  background: var(--icon-tile);
+  color: var(--icon-tile-ink);
 }
 .card .icon svg { width: var(--card-icon-glyph); height: var(--card-icon-glyph); }
 /* Card title size is set once in the brand typography block below. */
@@ -1062,7 +1176,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   border: 0;
   border-radius: 50%;
   background: var(--paper);
-  color: var(--brand);
+  color: var(--heading);
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
@@ -1230,7 +1344,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   font-size: var(--quote-text-size);
   font-weight: 500;
   line-height: var(--quote-text-leading);
-  color: var(--brand);
+  color: var(--heading);
 }
 .quote .stars { color: var(--accent-bright); letter-spacing: var(--quote-stars-tracking); margin-bottom: var(--quote-stars-gap); }
 .quote cite {
@@ -1274,7 +1388,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   font-size: 0.82rem;
   letter-spacing: 0.05em;
   background: var(--paper);
-  color: var(--brand);
+  color: var(--heading);
 }
 .badge strong { font-weight: 600; }
 
@@ -1373,7 +1487,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .legal > .updated { color: var(--muted); font-size: 0.9rem; letter-spacing: 0.04em; margin-bottom: 2.2rem; }
 .legal h2 {
   font-size: clamp(1.35rem, 1.1rem + 1.1vw, 1.85rem);
-  color: var(--brand);
+  color: var(--heading);
   margin-top: 2.6rem;
   padding-top: 1.4rem;
   border-top: 1px solid var(--line);
@@ -1620,7 +1734,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 /* ------------------------- Trust strip -------------------------- */
 .trust-strip {
   background: var(--brand);
-  color: var(--surface-tint);
+  color: var(--ink-on-brand);
   padding: var(--trust-pad-y) 0;
 }
 .trust-strip ul {
@@ -1762,7 +1876,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   place-items: center;
   border-radius: 50%;
   background: var(--link);
-  color: #fff;
+  color: var(--link-contrast);
   font-family: var(--serif);
   font-size: var(--process-number-text);
   line-height: 1;
@@ -1816,7 +1930,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   border-radius: var(--radius);
   padding: 1.5rem 1.6rem;
 }
-.credential h3 { margin: 0 0 0.4rem; font-size: 1.15rem; color: var(--brand); }
+.credential h3 { margin: 0 0 0.4rem; font-size: 1.15rem; color: var(--heading); }
 .credential__what {
   font-size: 0.88rem;
   color: var(--muted);
@@ -1918,7 +2032,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 /* ------------------------- Referral ----------------------------- */
 .referral-banner {
   background: var(--brand);
-  color: var(--surface-tint);
+  color: var(--ink-on-brand);
   padding: var(--referral-pad-y) 0;
 }
 .referral-banner .shell {
@@ -1931,7 +2045,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 }
 .referral-banner p { margin: 0; font-size: var(--referral-text-size); }
 .referral-banner strong { color: var(--accent-bright); }
-.referral-banner .btn--outline { border-color: rgba(255,255,255,0.5); color: var(--surface-tint); }
+.referral-banner .btn--outline { border-color: rgba(255,255,255,0.5); color: var(--ink-on-brand); }
 .referral-banner .btn--outline:hover { background: rgba(255,255,255,0.12); }
 
 .referral-actions {
@@ -2206,8 +2320,8 @@ strong, b { font-weight: 600; }
    white sections and the purple bands, which an aqua→rose gradient did not. */
 .btn--primary { --btn-bg: var(--rose); --btn-fg: #ffffff; }
 .btn--primary:hover { --btn-bg: var(--rose-deep); }
-.btn--outline { --btn-fg: var(--purple); border-color: var(--purple); }
-.btn--outline:hover { background: var(--purple); color: #fff; }
+.btn--outline { --btn-fg: var(--link); border-color: var(--link); }
+.btn--outline:hover { background: var(--link); color: var(--link-contrast); }
 
 /* The brand guide sets headings in all caps. Bebas has no lowercase glyphs so
    it caps them anyway — declaring it explicitly keeps the intent if the
@@ -2346,7 +2460,7 @@ h1, h2 { text-transform: uppercase; }
 }
 .post-card h3 { margin: 0; font-size: 1.35rem; letter-spacing: 0.03em; }
 .post-card h3 a { color: var(--ink); }
-.post-card:hover h3 a { color: var(--purple); }
+.post-card:hover h3 a { color: var(--link); }
 .post-card p { margin: 0; color: var(--muted); font-size: 0.94rem; }
 .post-card .arrow { margin-top: auto; padding-top: 0.4rem; color: var(--link); font-weight: 500; font-size: 0.88rem; }
 .post-card .arrow::after { content: " →"; }
