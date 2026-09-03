@@ -31,6 +31,14 @@
   --purple-ink:  #1e0e46;
   --rose-deep:   #b02a59;
   --blush:       #f8f0f7;   /* very light tint of --pink, for section grounds */
+  /* Three more of the same kind, added for the dark appearance. Still not new
+     hues — the brand purple lifted and lightened. --purple-raised and
+     --purple-veil are the "elevated" and "tinted" surfaces that sit above the
+     --purple-ink page ground; --purple-light is the brand purple taken up far
+     enough to be read as text on those grounds. */
+  --purple-raised: #2b1560;
+  --purple-veil:   #241150;
+  --purple-light:  #c4b0ff;
 
   /* --- Semantic aliases. The rest of the sheet is written against these. ---
      Named for the ROLE each one plays, never for the colour it currently holds.
@@ -48,9 +56,48 @@
   --accent-bright: var(--aqua);        /* bright accent on dark grounds */
   --cta:           var(--rose);        /* the primary call to action */
   --surface-tint:  var(--blush);       /* the tinted section ground */
-  --paper:         var(--off-white);   /* card and page surfaces */
+  --paper:         var(--off-white);   /* card, panel and control surfaces — the raised plane */
+  --ground:        var(--off-white);   /* the page itself — the plane everything sits on */
+  /* --ground and --paper hold one colour in the light appearance and two in
+     the dark one. Apple's dark palettes separate a base plane from an elevated
+     one so a card reads as sitting above the page rather than merged into it;
+     on paper a single off-white does that job by itself. */
+
+  /* --brand is a GROUND. Heading text that happened to be the same purple was
+     reading from it too, which is fine until the ground goes dark and the
+     heading has to go light — one token cannot do both. */
+  --heading:       var(--brand);       /* heading text */
+  --link-contrast: #ffffff;            /* text and glyphs ON a --link fill */
+  --ink-on-brand:  var(--blush);       /* text on the brand purple, which is a dark ground in BOTH appearances */
+  --glass-tint:      #ffffff;          /* what the floating nav pill's material is made of */
+  --glass-edge-tint: #ffffff;          /* the light catch along that pill's edge */
+  --icon-tile:     linear-gradient(135deg, var(--aqua-soft), var(--blush)); /* the tile behind a feature card's glyph */
+  --icon-tile-ink: var(--link);        /* the glyph drawn on that tile */
+  --shadow-color:  30, 14, 70;         /* what a shadow is made of — brand ink on paper, true black on a dark ground */
   --muted:     #6b6b73;
   --line:      rgba(70, 34, 162, 0.14);
+
+  /* --- Roles for a DARK ground. -------------------------------------------
+     The greys above are tuned for paper. Reused on the footer's purple they
+     measure 2.5:1, which is how the footer blurb came to be unreadable while
+     --muted itself was fine everywhere else. Text on a dark ground takes
+     these instead, and tools/audit/contrast.mjs fails the build if either
+     side of that pairing stops holding WCAG AA. */
+  --ink-on-dark:      #ffffff;                /* primary text on a dark ground */
+  --ink-on-dark-soft: rgba(255, 255, 255, 0.88); /* the same, one step back — subtitles and ledes */
+  --muted-on-dark: rgba(255, 255, 255, 0.7);  /* secondary text on a dark ground — 7.2:1 on --ground-deep */
+  --line-on-dark:  rgba(255, 255, 255, 0.22); /* hairlines and outlines on a dark ground */
+
+  /* A form control's boundary is the only thing that says the control is
+     there, so WCAG 1.4.11 asks 3:1 of it. --line is a card outline at 1.3:1
+     and cannot do that job. */
+  --field-border:  var(--muted);       /* the edge of an input, select or textarea — 5.2:1 on paper */
+
+  /* The keyboard focus ring. Two names because the site has both grounds and
+     one ring cannot serve both: --link is 10.3:1 on paper and 1.3:1 on the
+     footer. */
+  --focus-ring:         var(--link);   /* focus outline on a light ground */
+  --focus-ring-on-dark: #ffffff;       /* focus outline where the ground is dark */
 
   /* Type — Bebas Neue + Evolve Sans per the brand guide.
      Evolve Sans is a commercial face and is not on Google Fonts; Poppins is
@@ -97,6 +144,12 @@
   --page-pad-max:              3rem; /* widest the side gutter ever gets */
 
   /* BODY TYPE ----------------------------------------------------- */
+  /* Apple's typography guidance is direct about this: avoid Ultralight, Thin
+     and Light weights, which are hard to see, especially at small sizes. Every
+     paragraph, form field and hero lede on this site was set in Poppins Light.
+     Nothing about that shows up in a contrast ratio — the colours were already
+     passing — which is exactly why it needed saying out loud. */
+  --body-weight:                400; /* weight of body text, form fields and ledes */
   --body-size-min:             1rem; /* paragraph size on a phone */
   --body-size-base:         0.96rem; /* fixed part of the in-between paragraph size */
   --body-size-vw:             0.2vw; /* how fast paragraphs grow with the window */
@@ -148,7 +201,7 @@
   --brand-tracking:          0.05em; /* letter spacing in the wordmark */
   --brand-mark-width:          27px; /* logo mark width — the art is 240x373 */
   --brand-mark-height:         42px; /* logo mark height — keep the 0.64:1 ratio */
-  --brand-sub-size:         0.58rem; /* the small line under the wordmark */
+  --brand-sub-size:         0.72rem; /* the small line under the wordmark — footer only now; see below */
   --brand-sub-tracking:      0.12em; /* how spread out that small line reads */
   --brand-sub-gap:              2px; /* space between wordmark and that small line */
   --nav-toggle-width:          30px; /* width of the hamburger button */
@@ -245,8 +298,8 @@
   --shadow-sm-y:                8px; /* how far a resting card's shadow drops */
   --shadow-sm-blur:            24px; /* how soft the resting shadow is */
   --shadow-sm-spread:         -14px; /* negative keeps the resting shadow tight */
-  --shadow:    0 var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgba(30, 14, 70, 0.45);
-  --shadow-sm: 0 var(--shadow-sm-y) var(--shadow-sm-blur) var(--shadow-sm-spread) rgba(30, 14, 70, 0.4);
+  --shadow:    0 var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgba(var(--shadow-color), 0.45);
+  --shadow-sm: 0 var(--shadow-sm-y) var(--shadow-sm-blur) var(--shadow-sm-spread) rgba(var(--shadow-color), 0.4);
 
   /* TRUST STRIP --------------------------------------------------- */
   --trust-pad-y:             1.4rem; /* height of the purple credentials bar */
@@ -400,6 +453,55 @@
      where a target has to be finger-sized — so moving one should not drag the
      other with it. */
 
+  /* CONTRAST GUARDS -----------------------------------------------
+     Added 3 September 2026, per the lock rule above: new knobs, nothing
+     existing retuned by taste. Every number here was set by a measurement
+     and is held by tools/audit/contrast.mjs, which fails the build if one
+     of them stops carrying WCAG AA.
+
+     The scrims and the nav glass are the load-bearing ones. Text over a
+     photo is only as legible as the layer between them, and these photos
+     are hotlinked from a third party — so the layer has to carry the worst
+     photo that could ever land there, not the one that happens to be there
+     today. The detector proves that by measuring each of these against a
+     pure white and a pure black ground and taking the worse answer. That is
+     why the numbers look heavier than the photos currently need. */
+  /* The pill is a MATERIAL, not a tint. Apple's regular glass does not buy
+     legibility by piling on opacity — it blurs the backdrop AND flattens its
+     luminosity, so what shows through can no longer be dark enough to swallow
+     the text. Doing only the first and paying for the rest with opacity is how
+     this pill ended up at 0.72 white, which is barely glass at all.
+     --header-flatten pulls the backdrop's blacks and whites toward each other;
+     --header-lift then moves that compressed band to where the pill's own text
+     can live on it. Together they hold 8:1 for the nav's ink at 0.55 opacity,
+     where opacity alone needed 0.72 to reach the same place. */
+  --header-flatten:              0.5; /* how far the backdrop's own light and dark are squeezed together — lower is flatter */
+  --header-lift:                 1.3; /* where that flattened band sits — above 1 pushes it light, for dark text */
+  --header-glass:               0.55; /* how much of the pill's own tint sits over that backdrop */
+  --header-glass-scrolled:      0.70; /* how much of it sits there once the pill is scrolled */
+  --header-glass-edge:          0.85; /* how bright the hairline around the pill reads — keeps the light catch above the fill */
+  --hero-scrim-top:             0.56; /* darkening over the hero photo at the top */
+  --hero-scrim-mid:             0.48; /* darkening across the middle, where the headline and lede sit — the shallowest point of the gradient, so this is the number that decides the hero */
+  --hero-scrim-mid-at:           40%; /* how far down that middle stop sits */
+  --hero-scrim-bottom:          0.76; /* darkening at the foot, under the buttons */
+  /* A second scrim, anchored to the words rather than to the picture. The
+     headline sits over the brightest part of this photograph — sky — and the
+     script word is a mid-toned aqua, so darkening the WHOLE image enough to
+     carry that one word costs the coastline and the sea, which is the half of
+     the picture worth looking at. Apple's guidance for text over media is a
+     legibility layer behind the text, not a heavier wash over everything. So
+     the gradient above stays light and this ellipse does the work where the
+     text actually is. */
+  --hero-text-scrim:            0.36; /* how dark it gets directly behind the hero text */
+  --hero-text-scrim-hold:        58%; /* how far out it stays at full strength before it starts to fade */
+  --hero-text-scrim-pad:        5rem; /* how far past the text the shade reaches before it is fully gone */
+  /* The radii are fixed at 50% and are not a knob: 50% is exactly the half-box,
+     so the fade finishes precisely at the edge. Anything larger gets clipped by
+     the box and draws a hard rectangle across the photo, which is what the
+     first attempt at this did. Tune --hero-text-scrim-pad to change the size. */
+  --page-hero-scrim-top:        0.74; /* darkening over an inner page's photo, at the top */
+  --page-hero-scrim-bottom:     0.70; /* the same, at the foot */
+
   /* MEDIA CARDS ---------------------------------------------------
      Added after the 24 August lock, per the rule above: new knobs, nothing
      existing retuned. These size the square brand graphics — the five BOUND
@@ -533,6 +635,98 @@
   --bp-phone-narrow:          400px; /* width below which the wordmark drops its sub-line */
   --bp-phone:                 480px; /* width below which headlines shrink to fit long words */
   --bp-short:                 900px; /* window HEIGHT below which the scroll cue hides */
+
+  /* Tell the browser the site renders in both appearances, so the controls it
+     draws itself — scrollbars, the date picker, a default form control before
+     our own rules land — follow the reader rather than staying stuck light. */
+  color-scheme: light dark;
+}
+
+/* =========================================================
+   DARK APPEARANCE
+   ---------------------------------------------------------
+   Follows the reader's system setting and nothing else. There
+   is deliberately no toggle: Apple's guidance is blunt about
+   it — an app-specific appearance switch makes people set the
+   same preference twice, and a site that ignores the one they
+   already set reads as broken. Their OS already knows.
+
+   Only the semantic layer moves. Everything below this block
+   is written against those names, so the whole re-theme is
+   this one screenful — which was the entire point of the
+   naming discipline at the top of this file.
+
+   Two things do NOT move, and both are deliberate:
+
+   - The scrims over photographs, and the dark section bands.
+     They are dark in both appearances already, and the text
+     on them is white in both. Flipping them would mean
+     re-solving contrast that is already solved.
+   - --brand and --cta. The brand purple and the rose stay the
+     brand purple and the rose. A dark appearance is not a
+     licence to restate the palette.
+
+   Every pair below is measured by tools/audit/contrast.mjs in
+   this appearance as well as the light one. Apple asks for
+   7:1 on small text rather than the 4.5:1 floor where you can
+   get it, and the body pairs here clear that.
+   ========================================================= */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Surfaces: a base plane, and a raised one for anything that reads as a
+       card, panel or control sitting above it. */
+    --ground:       var(--purple-ink);
+    --paper:        var(--purple-raised);
+    --surface-tint: var(--purple-veil);
+
+    /* Text. --ink is 15.7:1 on the page ground; --muted is 7.6:1 on a card,
+       which clears the 7:1 Apple asks for on small text rather than only the
+       4.5:1 WCAG floor. */
+    --ink:          #f4f2fb;
+    --muted:        #b9b1d8;
+
+    /* Interactive text is the brand purple lifted until it can be read on a
+       dark ground: the original is 1.7:1 there. --link-contrast follows it,
+       because white on a pale purple fill is the same mistake in reverse. */
+    --link:          var(--purple-light);
+    --link-contrast: var(--purple-ink);
+
+    /* Headings stop borrowing the brand ground's purple and take the body
+       colour. This is the pairing that could not be expressed before the
+       --heading role existed. */
+    --heading:      var(--ink);
+
+    /* Lines, edges and rings. --field-border stays a real 5.4:1 against the
+       control it outlines; --line is decorative and does not need to. */
+    --line:         rgba(255, 255, 255, 0.14);
+    --field-border: #9b93bd;
+    --focus-ring:   var(--focus-ring-on-dark);
+
+    /* The nav pill is a material, not a colour: in the light appearance it is
+       white frosted over the page, and here it is the page's own ink frosted
+       over itself. The blur and the opacity knobs are shared, so the pill
+       reads the same way in both. */
+    --glass-tint:      var(--purple-ink);
+    --glass-edge-tint: #ffffff;
+    /* The flattened band moves the other way here: pushed down, so the pill's
+       light text has something dark to sit on whatever is behind it. */
+    --header-lift:     0.5;
+
+    /* The feature-card glyph tile. The light version is a pale aqua-to-blush
+       wash with purple ink on it — on a dark ground that tile becomes a bright
+       patch and the ink on it fails, so it inverts to a faint wash with the
+       aqua glyph, matching what .section--deep already did on dark bands. */
+    --icon-tile:     linear-gradient(135deg, rgba(118, 239, 225, 0.20), rgba(196, 176, 255, 0.16));
+    --icon-tile-ink: var(--aqua);
+
+    /* A purple shadow is invisible on a purple ground. */
+    --shadow-color: 0, 0, 0;
+  }
+
+  /* The colour monogram is drawn in brand purple, which disappears into a
+     dark pill. build.py serves the white mark here through a <picture>; this
+     lets the <img> stay the grid item the lockup sizes. */
+  .brand .mark picture { display: contents; }
 }
 
 /* ----------------------------- Reset ---------------------------- */
@@ -545,9 +739,9 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
   font-family: var(--sans);
-  font-weight: 300;
+  font-weight: var(--body-weight);
   color: var(--ink);
-  background: var(--paper);
+  background: var(--ground);
   line-height: var(--body-leading);
   font-size: clamp(var(--body-size-min), var(--body-size-base) + var(--body-size-vw), var(--body-size-max));
   overflow-x: hidden;
@@ -625,7 +819,7 @@ p { margin: 0 0 var(--para-gap); }
   --btn-fg: var(--link);
   border-color: var(--link);
 }
-.btn--outline:hover { background: var(--link); color: #fff; }
+.btn--outline:hover { background: var(--link); color: var(--link-contrast); }
 
 /* ----------------------------- Nav ------------------------------ */
 /* Floating "liquid glass" nav bar — always frosted so it reads on any background */
@@ -642,10 +836,15 @@ p { margin: 0 0 var(--para-gap); }
   z-index: 60;
   width: min(var(--maxw), calc(100% - var(--header-side-inset)));
   border-radius: var(--header-radius);
-  background: rgba(255, 255, 255, 0.42);
-  -webkit-backdrop-filter: blur(var(--header-blur)) saturate(var(--header-saturate));
-  backdrop-filter: blur(var(--header-blur)) saturate(var(--header-saturate));
-  border: var(--header-border-width) solid rgba(255, 255, 255, 0.45);
+  background: rgb(from var(--glass-tint) r g b / var(--header-glass));
+  /* Order matters: blur, then colour, then flatten the luminosity, then place
+     the flattened band. Saturate stays ahead of the flatten so the backdrop
+     keeps its colour rather than going grey. */
+  -webkit-backdrop-filter: blur(var(--header-blur)) saturate(var(--header-saturate))
+    contrast(var(--header-flatten)) brightness(var(--header-lift));
+  backdrop-filter: blur(var(--header-blur)) saturate(var(--header-saturate))
+    contrast(var(--header-flatten)) brightness(var(--header-lift));
+  border: var(--header-border-width) solid rgb(from var(--glass-edge-tint) r g b / var(--header-glass-edge));
   box-shadow:
     0 var(--header-shadow-y) var(--header-shadow-blur) var(--header-shadow-spread) rgba(52, 25, 122, 0.45),
     inset 0 var(--header-highlight-width) 0 rgba(255, 255, 255, 0.6),
@@ -655,8 +854,8 @@ p { margin: 0 0 var(--para-gap); }
 }
 .site-header.is-scrolled {
   top: var(--header-top-scrolled);
-  background: rgba(255, 255, 255, 0.66);
-  border-color: rgba(255, 255, 255, 0.6);
+  background: rgb(from var(--glass-tint) r g b / var(--header-glass-scrolled));
+  border-color: rgb(from var(--glass-edge-tint) r g b / var(--header-glass-edge));
   box-shadow:
     0 var(--header-shadow-y-scrolled) var(--header-shadow-blur-scrolled) var(--header-shadow-spread-scrolled) rgba(52, 25, 122, 0.5),
     inset 0 var(--header-highlight-width) 0 rgba(255, 255, 255, 0.7);
@@ -758,7 +957,10 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .hero__bg {
   position: absolute; inset: 0; z-index: -2;
   background:
-    linear-gradient(180deg, rgba(30, 14, 70,0.55), rgba(30, 14, 70,0.35) 40%, rgba(30, 14, 70,0.7)),
+    linear-gradient(180deg,
+      rgba(30, 14, 70, var(--hero-scrim-top)),
+      rgba(30, 14, 70, var(--hero-scrim-mid)) var(--hero-scrim-mid-at),
+      rgba(30, 14, 70, var(--hero-scrim-bottom))),
     radial-gradient(120% 80% at 50% 0%, rgba(118, 239, 225,0.25), transparent 60%),
     var(--brand);
   background-size: cover;
@@ -766,13 +968,28 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 }
 .hero__bg.has-img {
   background-image:
-    linear-gradient(180deg, rgba(30, 14, 70,0.5), rgba(30, 14, 70,0.3) 40%, rgba(30, 14, 70,0.72)),
+    linear-gradient(180deg,
+      rgba(30, 14, 70, var(--hero-scrim-top)),
+      rgba(30, 14, 70, var(--hero-scrim-mid)) var(--hero-scrim-mid-at),
+      rgba(30, 14, 70, var(--hero-scrim-bottom))),
     var(--hero-img);
 }
-.hero__inner { max-width: var(--hero-width); }
+.hero__inner { max-width: var(--hero-width); position: relative; }
+/* Sits above .hero__bg (z-index -2) and below the words. */
+.hero__inner::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--hero-text-scrim-pad));
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    rgb(from var(--purple-ink) r g b / var(--hero-text-scrim)) var(--hero-text-scrim-hold),
+    rgb(from var(--purple-ink) r g b / 0) 100%);
+}
 .hero .tagline {
   font-family: var(--sans);
-  font-weight: 300;
+  font-weight: var(--body-weight);
   letter-spacing: var(--hero-tagline-tracking);
   text-transform: uppercase;
   font-size: clamp(var(--hero-tagline-size-min),
@@ -804,7 +1021,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   font-size: clamp(var(--hero-lede-size-min),
                    var(--hero-lede-size-base) + var(--hero-lede-size-vw),
                    var(--hero-lede-size-max));
-  font-weight: 300;
+  font-weight: var(--body-weight);
   max-width: var(--hero-lede-width);
   margin: 0 auto var(--hero-lede-gap);
   color: rgba(255,255,255,0.92);
@@ -834,21 +1051,23 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .page-hero__bg {
   position: absolute; inset: 0; z-index: -1;
   background:
-    linear-gradient(180deg, rgba(30, 14, 70,0.65), rgba(30, 14, 70,0.55)),
+    linear-gradient(180deg,
+      rgba(30, 14, 70, var(--page-hero-scrim-top)),
+      rgba(30, 14, 70, var(--page-hero-scrim-bottom))),
     var(--page-img, none), var(--brand);
   background-size: cover; background-position: center;
 }
 /* Size is set once in the brand typography block below. */
 .page-hero h1 { margin-bottom: var(--page-hero-title-gap); }
-.page-hero p { max-width: 600px; margin: 0 auto; opacity: 0.94; font-weight: 300; }
-.page-hero .eyebrow { color: var(--aqua-soft); }
+.page-hero p { max-width: 600px; margin: 0 auto; opacity: 0.94; font-weight: var(--body-weight); }
+.page-hero .eyebrow { color: var(--aqua); }
 
 /* ---------------------------- Sections -------------------------- */
 .section { padding: clamp(var(--section-pad-min), var(--section-pad-base) + var(--section-pad-vw), var(--section-pad-max)) 0; }
 .section--tint { background: var(--surface-tint); }
 .section--deep { background: var(--ground-deep); color: #fff; }
 .section--deep .eyebrow { color: var(--aqua); }
-.section--deep .muted { color: rgba(255,255,255,0.7); }
+.section--deep .muted { color: var(--muted-on-dark); }
 
 .section-head { max-width: var(--section-head-width); margin: 0 auto var(--section-head-gap); text-align: center; }
 /* Section heading sizes are set once in the brand typography block below. */
@@ -894,8 +1113,8 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .card .icon {
   width: var(--card-icon-size); height: var(--card-icon-size); border-radius: var(--card-icon-radius);
   display: grid; place-items: center; margin-bottom: var(--card-icon-gap);
-  background: linear-gradient(135deg, var(--aqua-soft), var(--blush));
-  color: var(--link);
+  background: var(--icon-tile);
+  color: var(--icon-tile-ink);
 }
 .card .icon svg { width: var(--card-icon-glyph); height: var(--card-icon-glyph); }
 /* Card title size is set once in the brand typography block below. */
@@ -1009,7 +1228,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   border: 0;
   border-radius: 50%;
   background: var(--paper);
-  color: var(--brand);
+  color: var(--heading);
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
@@ -1177,7 +1396,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   font-size: var(--quote-text-size);
   font-weight: 500;
   line-height: var(--quote-text-leading);
-  color: var(--brand);
+  color: var(--heading);
 }
 .quote .stars { color: var(--accent-bright); letter-spacing: var(--quote-stars-tracking); margin-bottom: var(--quote-stars-gap); }
 .quote cite {
@@ -1221,7 +1440,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   font-size: 0.82rem;
   letter-spacing: 0.05em;
   background: var(--paper);
-  color: var(--brand);
+  color: var(--heading);
 }
 .badge strong { font-weight: 600; }
 
@@ -1276,6 +1495,9 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   gap: var(--footer-grid-gap);
   margin-bottom: var(--footer-grid-gap-bottom);
 }
+/* The footer is a dark ground, so --muted (a paper grey) does not belong here:
+   it measured 2.5:1 on the purple. */
+.site-footer .muted { color: var(--muted-on-dark); }
 .site-footer .brand { color: #fff; margin-bottom: var(--footer-brand-gap); }
 .footer-col__title {
   font-family: var(--sans);
@@ -1317,7 +1539,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .legal > .updated { color: var(--muted); font-size: 0.9rem; letter-spacing: 0.04em; margin-bottom: 2.2rem; }
 .legal h2 {
   font-size: clamp(1.35rem, 1.1rem + 1.1vw, 1.85rem);
-  color: var(--brand);
+  color: var(--heading);
   margin-top: 2.6rem;
   padding-top: 1.4rem;
   border-top: 1px solid var(--line);
@@ -1378,20 +1600,25 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 .field textarea,
 .field select {
   width: 100%;
-  font-family: var(--sans); font-size: 1rem; font-weight: 300;
+  font-family: var(--sans); font-size: 1rem; font-weight: var(--body-weight);
   color: var(--ink);
   padding: 0.85em 1em;
-  border: 1px solid var(--line);
+  /* --line is a card outline at 1.3:1. A control's edge is what says the
+     control is there, and WCAG 1.4.11 asks 3:1 of it. */
+  border: 1px solid var(--field-border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--paper);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
-.field input:focus,
-.field textarea:focus,
-.field select:focus {
-  outline: none;
-  border-color: var(--aqua);
-  box-shadow: 0 0 0 3px rgba(118, 239, 225,0.18);
+/* The old focus state removed the outline and leaned on an aqua border at
+   1.4:1 plus a 3px aqua halo at 1.1:1 — visible on a bright screen, invisible
+   on a dim one, and nothing at all to a keyboard user who needs the ring. */
+.field input:focus-visible,
+.field textarea:focus-visible,
+.field select:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-color: var(--link);
 }
 .field textarea { resize: vertical; min-height: 120px; }
 .form-actions { display: flex; gap: 0.8rem; margin-top: 1.4rem; }
@@ -1443,6 +1670,11 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
     --footer-brand-gap:             0; /* the wordmark shares a row with the social buttons, so no space under it */
     --footer-head-gap:         0.4rem; /* space under a column heading on a phone */
     --footer-link-gap:         0.2rem; /* rows are already finger-height on a phone; a hairline keeps two taps apart */
+    /* The sub-line is legible now rather than 9.3px, which costs it width: at
+       the desktop tracking it wraps to two lines under the wordmark on a
+       phone. Tightened here rather than shrunk back, because the size is the
+       point and the letter spacing is not. */
+    --brand-sub-tracking:     0.055em; /* how spread out that line reads on a phone */
   }
   /* Four blocks stacked one under another ran to two phone screens. The
      wordmark and the social buttons share one row; the two link columns fold
@@ -1521,8 +1753,32 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 }
 .skip-link:focus {
   left: 0;
-  outline: var(--focus-ring-width) solid var(--link);
+  outline: var(--focus-ring-width) solid var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
+}
+
+/* ------------------------- Focus ring --------------------------- */
+/* Every interactive thing on the site had been leaning on the browser's own
+   focus ring. That ring is drawn in the UA's colour, not the site's, and the
+   site puts controls on two very different grounds — links in the footer and
+   the CTA band sit on deep purple, where a dark ring is close to invisible.
+   So the ring is declared here, once, and flipped to white wherever the
+   ground is dark.
+
+   :where() holds this at zero specificity on purpose: the components that
+   already draw their own ring (.zoom, .lightbox__close, .service-card,
+   .faq__item summary) keep winning, and this only fills the gaps.
+
+   :focus-visible, not :focus — a mouse click on a link should not leave a
+   ring behind it. */
+:where(a, button, summary, [tabindex], input, select, textarea):focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+:where(.site-footer, .section--deep, .hero, .page-hero, .post-hero, .cta-band,
+       .trust-strip, .referral-banner)
+  :where(a, button, summary, [tabindex]):focus-visible {
+  outline-color: var(--focus-ring-on-dark);
 }
 
 /* ------------------------- Narrow measure ----------------------- */
@@ -1535,7 +1791,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 /* ------------------------- Trust strip -------------------------- */
 .trust-strip {
   background: var(--brand);
-  color: var(--surface-tint);
+  color: var(--ink-on-brand);
   padding: var(--trust-pad-y) 0;
 }
 .trust-strip ul {
@@ -1677,7 +1933,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   place-items: center;
   border-radius: 50%;
   background: var(--link);
-  color: #fff;
+  color: var(--link-contrast);
   font-family: var(--serif);
   font-size: var(--process-number-text);
   line-height: 1;
@@ -1731,7 +1987,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   border-radius: var(--radius);
   padding: 1.5rem 1.6rem;
 }
-.credential h3 { margin: 0 0 0.4rem; font-size: 1.15rem; color: var(--brand); }
+.credential h3 { margin: 0 0 0.4rem; font-size: 1.15rem; color: var(--heading); }
 .credential__what {
   font-size: 0.88rem;
   color: var(--muted);
@@ -1828,12 +2084,12 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   text-underline-offset: var(--cta-direct-underline);
   white-space: nowrap;
 }
-.cta-band__direct span { margin: 0 var(--cta-direct-dot-space); opacity: 0.6; }
+.cta-band__direct span { margin: 0 var(--cta-direct-dot-space); }
 
 /* ------------------------- Referral ----------------------------- */
 .referral-banner {
   background: var(--brand);
-  color: var(--surface-tint);
+  color: var(--ink-on-brand);
   padding: var(--referral-pad-y) 0;
 }
 .referral-banner .shell {
@@ -1846,7 +2102,7 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 }
 .referral-banner p { margin: 0; font-size: var(--referral-text-size); }
 .referral-banner strong { color: var(--accent-bright); }
-.referral-banner .btn--outline { border-color: rgba(255,255,255,0.5); color: var(--surface-tint); }
+.referral-banner .btn--outline { border-color: rgba(255,255,255,0.5); color: var(--ink-on-brand); }
 .referral-banner .btn--outline:hover { background: rgba(255,255,255,0.12); }
 
 .referral-actions {
@@ -1958,14 +2214,17 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   .cta-band__direct span { display: none; }
 }
 
-/* Below --bp-phone-narrow the wordmark's sub-line pushes the menu button off
-   the pill (a 360px phone loses half the button). The sub-line is decorative;
-   the button is not. */
+/* The nav lockup no longer carries a sub-line at any width — build.py stopped
+   emitting one. It drew at 9.3px, the smallest text on the site by a wide
+   margin and well under Apple's 10pt desktop floor, and the nav could not
+   afford to grow it: six links, a wordmark and a pinned CTA already need about
+   970px of pill. It was also already being hidden in two of the four width
+   bands it could appear in, which is its own argument. The footer keeps it,
+   at a size the footer has room for. */
 @media (max-width: 400px) { /* --bp-phone-narrow */
   :root {
     --brand-size:            1.05rem; /* wordmark size on a small phone */
   }
-  .nav .brand small { display: none; }
 }
 @media (max-width: 1180px) and (min-width: 1001px) { /* --bp-nav-tight down to --bp-nav-menu */
   :root {
@@ -1973,7 +2232,6 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
     --nav-link-size:      0.74rem; /* nav link size at that tight width */
     --nav-link-tracking:   0.09em; /* how spread out the links read there */
   }
-  .nav .brand small { display: none; }
   .nav-cta .btn {
     padding: var(--nav-cta-pad-y) var(--nav-cta-pad-x);
     font-size: var(--nav-cta-size);
@@ -2048,6 +2306,10 @@ h2 .script, h3 .script {
   font-family: var(--sans);
   letter-spacing: var(--brand-sub-tracking);
   font-weight: 400;
+  /* No opacity here on purpose. This line draws at 9.3px, and dimming it to
+     85% took it to 2.2:1 over the hero photo. The size is part of the locked
+     nav fit — six links, a wordmark and a CTA in one pill — so contrast is
+     bought back by dropping the dimming rather than by growing the text. */
 }
 .brand .mark {
   width: var(--brand-mark-width);
@@ -2058,7 +2320,7 @@ h2 .script, h3 .script {
 .brand .mark img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
 /* Body face */
-body { font-family: var(--sans); font-weight: 300; }
+body { font-family: var(--sans); font-weight: var(--body-weight); }
 strong, b { font-weight: 600; }
 .btn { font-family: var(--sans); font-weight: 500; letter-spacing: var(--btn-tracking); }
 .eyebrow { font-family: var(--sans); font-weight: 500; letter-spacing: var(--eyebrow-tracking); }
@@ -2070,7 +2332,12 @@ strong, b { font-weight: 600; }
 .faq__item summary { font-family: var(--sans); font-weight: 500; }
 
 /* Accent underline on the active nav item + link hovers uses brand aqua */
-.nav-links a.active { color: var(--rose-deep); }  /* AA at nav's 0.82rem */
+/* The active link takes --link, not a rose. Rose was picked as AA against
+   white, but the pill is frosted glass over a photograph, never white: rose
+   measured 2.1:1 there and cannot be rescued at this size. The aqua underline
+   below is what actually marks the active item, so the state never rests on
+   colour alone (WCAG 1.4.1). */
+.nav-links a.active { color: var(--link); font-weight: 500; }
 .nav-links a::after { background: var(--aqua); height: var(--nav-underline-height); }
 
 /* The headshot is cut to the brand hexagon, on every page that shows it.
@@ -2112,8 +2379,8 @@ strong, b { font-weight: 600; }
    white sections and the purple bands, which an aqua→rose gradient did not. */
 .btn--primary { --btn-bg: var(--rose); --btn-fg: #ffffff; }
 .btn--primary:hover { --btn-bg: var(--rose-deep); }
-.btn--outline { --btn-fg: var(--purple); border-color: var(--purple); }
-.btn--outline:hover { background: var(--purple); color: #fff; }
+.btn--outline { --btn-fg: var(--link); border-color: var(--link); }
+.btn--outline:hover { background: var(--link); color: var(--link-contrast); }
 
 /* The brand guide sets headings in all caps. Bebas has no lowercase glyphs so
    it caps them anyway — declaring it explicitly keeps the intent if the
@@ -2252,7 +2519,7 @@ h1, h2 { text-transform: uppercase; }
 }
 .post-card h3 { margin: 0; font-size: 1.35rem; letter-spacing: 0.03em; }
 .post-card h3 a { color: var(--ink); }
-.post-card:hover h3 a { color: var(--purple); }
+.post-card:hover h3 a { color: var(--link); }
 .post-card p { margin: 0; color: var(--muted); font-size: 0.94rem; }
 .post-card .arrow { margin-top: auto; padding-top: 0.4rem; color: var(--link); font-weight: 500; font-size: 0.88rem; }
 .post-card .arrow::after { content: " →"; }
@@ -2264,7 +2531,15 @@ h1, h2 { text-transform: uppercase; }
   padding: calc(4.5rem + 4vw) 0 3rem;
 }
 .post-hero h1 { color: #fff; margin: 0.35em 0 0.4em; font-size: clamp(2.2rem, 1.6rem + 2.6vw, 3.6rem); }
-.post-hero .lede { color: rgba(255,255,255,0.88); font-size: 1.1rem; margin: 0; }
+.post-hero .shell.narrow > .lede,
+.post-hero .lede {
+  /* Specific enough to beat `.shell.narrow > .lede`, which is one class heavier
+     than a plain `.post-hero .lede` and was painting this --muted — a grey
+     meant for paper — on the hero's purple, at 1.98:1. */
+  color: var(--ink-on-dark-soft);
+  font-size: 1.1rem;
+  margin: 0;
+}
 .post-hero__meta {
   margin: 0;
   font-size: 0.76rem;

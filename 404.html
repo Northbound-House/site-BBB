@@ -8,7 +8,8 @@
   <title>Page Not Found | Bora Bora Bound</title>
   <meta name="description" content="This page has drifted off course. Head back to Bora Bora Bound to keep planning your trip." />
   <meta name="robots" content="noindex, nofollow" />
-  <meta name="theme-color" content="#4622a2">
+  <meta name="theme-color" content="#4622a2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1e0e46" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -31,7 +32,7 @@
   <meta name="twitter:image:alt" content="Bora Bora Bound — cruises, all-inclusive resorts, and small group tours planned by Zac Sweet-Wright.">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600&family=Sacramento&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/assets/css/styles.css" />
   <!-- Analytics suppressed: this is the staging build. Staging traffic
        would record fake conversions into the live property that the
@@ -42,8 +43,8 @@
   <header class="site-header">
     <nav class="nav shell" aria-label="Primary">
       <a class="brand" href="/index.html">
-        <span class="mark" aria-hidden="true"><img src="/assets/img/logo-mark.png" alt="" width="27" height="42" /></span>
-        <span>Bora Bora Bound<small>Cruises · All-Inclusives · Small Groups</small></span>
+        <span class="mark" aria-hidden="true"><picture><source srcset="/assets/img/logo-mark-white.png" media="(prefers-color-scheme: dark)"><img src="/assets/img/logo-mark.png" alt="" width="27" height="42" /></picture></span>
+        <span>Bora Bora Bound</span>
       </a>
       <ul class="nav-links" id="primary-menu">
           <li><a href="/index.html">Home</a></li>
@@ -63,7 +64,7 @@
 
   <main id="main">
   <section class="hero">
-    <div class="hero__bg has-img" style="--hero-img: url('https://images.unsplash.com/photo-1473116763249-2faaef81ccda?auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="hero__bg has-img" style="--hero-img: url('/assets/img/bermuda.jpg')"></div>
     <div class="hero__inner shell">
       <p class="tagline">Error 404</p>
       <h1>Lost at <span class="script">sea</span></h1>

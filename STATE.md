@@ -89,7 +89,19 @@ Per `BBB Brand Guidelines.pdf` and the Canva kit, both in Drive.
 
 **Colour:** `#4622a2` purple (primary) · `#d0356a` rose (CTA) · `#f09839` orange
 · `#4aa4a6` teal · `#f6cfee` pink · `#76efe1` aqua, plus the secondary
-neutrals. Every text/ground pair passes WCAG AA.
+neutrals. Every text/ground pair passes WCAG AA — enforced now by
+`tools/audit/contrast.mjs` on every push, not just asserted. When the detector
+was first written it found the footer blurb at 2.5:1, the active nav link at
+2.1:1 on the frosted header, and the journal post subtitles at 2.0:1.
+
+**Appearance:** light and dark, following the reader's system setting. No
+toggle, per Apple's guidance — the OS already knows. The whole dark theme is one
+media block over the semantic layer at the top of `styles.css`.
+
+**Type:** body text is Poppins **Regular**, not Light — Apple's guidance is to
+avoid Light weights at small sizes, and nothing about that shows up in a
+contrast ratio. The nav lockup no longer carries its 9.3px sub-line; the footer
+keeps it, larger.
 
 **Type:** Bebas Neue for display (real, loaded). **Poppins substitutes for
 Evolve Sans** and **Sacramento for Jonathan Signature** — both originals are

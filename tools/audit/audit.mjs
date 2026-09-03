@@ -80,10 +80,25 @@ const TAP_WIDTHS = [390, 768];
 // duplicate can never appear by accident and go unnoticed.
 const INTENTIONAL_DUPLICATES = [
   {
-    names: ["--brand", "--link"],
+    names: ["--brand", "--focus-ring", "--heading", "--icon-tile-ink", "--link"],
     reason:
-      "Brand ground/headings and interactive text are the same purple today. " +
-      "Separate names so either can move without dragging the other with it.",
+      "Five roles that happen to be the brand purple in the LIGHT appearance " +
+      "and are not all purple in the dark one, which is exactly why they are " +
+      "five names: --brand stays purple (it is a ground, and the ground stays " +
+      "brand), --heading goes to the body colour, --link and --icon-tile-ink " +
+      "go to two different lifted values, and --focus-ring goes white. " +
+      "Collapsing any pair of them would break the dark appearance, and the " +
+      "dark block at the top of styles.css is where they part company.",
+  },
+  {
+    names: ["--ink-on-brand", "--surface-tint"],
+    reason:
+      "Both are --blush on paper, and they part in the dark appearance: " +
+      "--surface-tint is a GROUND and goes dark with the rest of the page, " +
+      "while --ink-on-brand is TEXT on the brand purple — a ground that is " +
+      "dark in both appearances, so its text has to stay light in both. The " +
+      "trust strip and the referral banner read from the second one; before " +
+      "it existed they read from the first, and would have gone dark-on-dark.",
   },
 ];
 

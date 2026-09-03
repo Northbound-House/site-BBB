@@ -10,7 +10,7 @@ name: checks
 #   2. The committed HTML matches what build.py generates. The root *.html is
 #      output; a hand-edit there, or a forgotten rebuild, is silently lost on
 #      the next build.
-#   3. The six detectors in tools/audit, against the rendered pages.
+#   3. The detectors in tools/audit, against the rendered pages.
 
 on:
   pull_request:
@@ -63,6 +63,16 @@ jobs:
         id: audit
         working-directory: tools/audit
         run: node audit.mjs
+
+      # Contrast is measured in its own step because it needs passes audit.mjs
+      # does not: both appearances, and every photo replaced with flat white
+      # and then flat black so the scrim over it is what gets judged rather
+      # than whichever picture is hotlinked today. README and STATE claimed
+      # AA from the day the site was built and nothing checked it; the footer
+      # blurb had been sitting at 2.5:1 on every page.
+      - name: Contrast
+        working-directory: tools/audit
+        run: node contrast.mjs
 
       # The review cards open full size. That is interactive, so audit.mjs
       # cannot see it -- its detectors measure a rendered page, and this only

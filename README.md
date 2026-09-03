@@ -58,7 +58,18 @@ re-theme is an edit to six lines rather than to six hundred:
 | `--accent-bright` | `--aqua` | Bright accent on dark grounds |
 | `--cta` | `--rose` | The primary call to action |
 | `--surface-tint` | `--blush` | The tinted section ground |
-| `--paper` | `--off-white` | Card and page surfaces |
+| `--paper` | `--off-white` | Card, panel and control surfaces — the raised plane |
+| `--ground` | `--off-white` | The page itself — the plane everything sits on |
+| `--heading` | `--brand` | Heading text |
+| `--link-contrast` | `#ffffff` | Text and glyphs *on* a `--link` fill |
+| `--ink-on-brand` | `--blush` | Text on the brand purple, dark in both appearances |
+| `--glass-tint` | `#ffffff` | What the floating nav pill's material is made of |
+
+`--ground` and `--paper` hold one colour on paper and two in the dark
+appearance, and `--brand` and `--heading` are separate for the same reason:
+`--brand` is a *ground* and stays purple, while heading text that borrowed the
+same purple has to go light when the ground goes dark. One token could not do
+both, which is what forced the split.
 
 **Name these for the role, never for the colour.** The layer was previously
 nautical — `--navy`, `--gold`, `--sand`, `--lagoon`, `--deep-sea` — mapped onto
@@ -73,14 +84,96 @@ so either can move without dragging the other with it. The `token-truth`
 detector in `tools/audit` fails if a name starts lying again, or if two aliases
 collapse onto one value without a documented reason.
 
-**Contrast:** every text/ground pair used in the design passes WCAG AA. The two
-that needed care: white on `--rose` is 4.77:1 (fine), and the active nav link
-uses `--rose-deep` rather than `--rose` because `--rose` on the frosted header
-was only 3.83:1 at the nav's 0.82rem.
+**Contrast:** every text/ground pair used in the design passes WCAG AA, and
+`tools/audit/contrast.mjs` fails the build if one stops. That sentence was in
+this README from the first commit with nothing behind it, and by the time the
+detector was written the footer blurb was at 2.5:1 on all twenty pages.
+
+Four roles exist because a colour that works on paper does not work on the
+footer's purple, and reusing one for the other is how the drift started:
+`--muted-on-dark`, `--ink-on-dark`, `--ink-on-dark-soft` and `--line-on-dark`.
+`--field-border` is separate from `--line` for the same reason in the other
+direction: a card outline may be faint, but a form control's edge is what says
+the control is there, and WCAG 1.4.11 asks 3:1 of it.
+
+Three things carry more of the site's contrast than any colour token:
+
+- **The nav pill's material** (`--header-flatten`, `--header-lift`,
+  `--header-glass`). The pill floats over a photograph, so its text is only as
+  legible as what the material does to that photograph. Apple's regular glass
+  blurs the backdrop *and* flattens its luminosity; buying the same legibility
+  with opacity alone is what took this pill to 0.72 white, which is barely
+  glass. It now flattens and lifts the backdrop and sits at 0.55.
+- **The hero and page-hero scrims** (`--hero-scrim-*`, `--page-hero-scrim-*`).
+  Same argument: the text is only as legible as the layer between it and the
+  picture. The hero carries a second scrim, `--hero-text-scrim`, anchored to
+  the words rather than to the photograph. The headline sits over the brightest
+  part of that picture — sky — and the script word is a mid-toned aqua, so
+  darkening the whole image enough to carry that one word costs the coastline
+  and the sea, which is the half worth looking at. A legibility layer behind
+  the text is what Apple's guidance asks for, and it lets the gradient over the
+  photo stay light. Both hero photos are repo assets for the same reason: one
+  hotlink was holding the scrim over both heroes at its worst case.
+- **The active nav link.** It takes `--link`, not a rose. Rose was chosen as AA
+  against white, but the pill is never white — it is glass over a photo, where
+  rose measured 2.1:1 and cannot be rescued at 13px. The aqua underline is what
+  actually marks the active item, so the state never rests on colour alone.
+
+### Dark appearance
+
+The site follows the reader's system setting and offers no toggle of its own.
+That is Apple's guidance and the reason is practical: an app-specific
+appearance switch makes people set the same preference twice, and a site that
+ignores the one they already set reads as broken.
+
+The whole re-theme is one `@media (prefers-color-scheme: dark)` block at the
+top of `assets/css/styles.css`, overriding the semantic layer and nothing else
+— which is what the role naming above was for. Three palette derivations were
+added to serve it: `--purple-raised` (the elevated surface), `--purple-veil`
+(the tinted section ground) and `--purple-light` (the brand purple lifted until
+it can be read as text on a dark ground — the original measures 1.7:1 there).
+
+Two things deliberately do **not** flip:
+
+- **The scrims over photographs, and the dark section bands.** They are dark in
+  both appearances already and their text is white in both. Flipping them would
+  mean re-solving contrast that is already solved.
+- **`--brand` and `--cta`.** The purple stays the purple and the rose stays the
+  rose. A dark appearance is not a licence to restate the palette.
+
+Surfaces follow the base-and-elevated split Apple uses in dark palettes, so a
+card reads as sitting above the page rather than merging into it. On paper a
+single off-white does that job by itself, which is why `--ground` and `--paper`
+are one colour there and two here.
+
+Two things outside the stylesheet change with the appearance, both in
+`build.py` and both without JavaScript: the header serves the white monogram
+through a `<picture>` with a `prefers-color-scheme` source (the colour mark is
+brand purple and disappears into the dark pill), and there are two
+`theme-color` metas so the browser chrome follows too.
+
+Body text measures 15.7:1 on the page ground and secondary text 7.6:1 on a
+card, which clears the 7:1 Apple asks for on small text rather than only the
+4.5:1 WCAG floor. `contrast.mjs` measures this appearance on every push
+alongside the light one.
 
 ### Typography
 
 The guide specifies **Bebas Neue** for display and **Evolve Sans** for body.
+
+**Body text is Regular, not Light.** Apple's typography guidance is direct
+about avoiding Ultralight, Thin and Light weights, which are hard to see at
+small sizes, and every paragraph, form field and hero lede here was set in
+Poppins Light. `--body-weight` is the one knob; Light is no longer fetched from
+Google Fonts at all. Nothing about this shows up in a contrast ratio, which is
+why it needed saying out loud.
+
+**The nav lockup carries no sub-line.** It drew at 9.3px — the smallest text on
+the site by a wide margin, and well under Apple's 10pt desktop minimum — and
+the nav cannot afford to grow it, because six links, a wordmark and a pinned
+CTA already need about 970px of pill. It was already being hidden in two of the
+four width bands where it could appear. The footer keeps it, at 0.72rem, which
+the footer has room for.
 
 - **Bebas Neue** is on Google Fonts and is loaded. It is caps-only, single-weight
   and condensed, so headings carry extra size, tighter leading and a little
@@ -238,7 +331,7 @@ can reach `images.unsplash.com` to catch the next one.
 ### `tools/audit`
 
 Six detectors, run against the rendered page in headless Chromium rather than
-against the source. Hit areas are measured by hit-testing and colours by
+against the source. Contrast is a seventh, in its own file — see below. Hit areas are measured by hit-testing and colours by
 resolving them in the browser, because the defects worth catching only exist
 once the cascade has run.
 
@@ -256,6 +349,46 @@ node audit.mjs --screenshots   # plus 1280x800 stills, for before/after diffs
 | `menu-a11y` | `aria-controls` resolves, focus enters the panel, the body does not scroll behind it, Escape returns focus |
 | `tap-targets` | Every control offers 44x44, per WCAG 2.5.5 |
 | `heading-order` | Every page starts at `h1` and skips no level |
+
+### `tools/audit/contrast.mjs`
+
+```bash
+cd tools/audit && node contrast.mjs
+node contrast.mjs --light      # one appearance only
+node contrast.mjs --verbose    # list what passed, too
+```
+
+Every element that owns visible text, on every page, at 390px and 1280px, in
+both the light and dark appearances, against WCAG 2.2 AA. It is separate from
+`audit.mjs` because it needs passes the others do not — two appearances, and a
+screenshot pass — the same reason `lightbox.mjs` is separate.
+
+Three things it took a wrong answer to learn:
+
+- **How a photo is measured depends on who owns it.** A hotlinked photo can be
+  swapped, or withdrawn, without a commit here, so it is replaced with flat
+  white and then flat black and judged on the worse answer: what has to hold is
+  the scrim, not today's picture. A photo in `assets/img/` cannot change
+  without a commit, and a commit runs this detector, so it is measured exactly
+  as it renders. The floating pill is always judged against both extremes
+  whatever is under it, because it is `position: fixed` and passes over every
+  part of every page.
+- **Only the pixels a glyph actually covers count.** A first cut read the whole
+  element box and reported its worst pixel, which failed the ghost buttons
+  against their own white border. Each region is shot twice, once with the text
+  painted and once with it transparent, and only the pixels that changed are
+  read.
+- **The colour compared is the specified one, not the painted pixel.** Poppins
+  Light at 15px draws strokes about a pixel wide, so nearly every pixel of it is
+  an antialiased blend of letter and ground. Reading colour back out of those
+  measures the renderer, not the design. The ground comes from the pixels; the
+  letter's colour comes from the stylesheet, composited onto it.
+
+It also freezes the closing band's parallax before measuring. The two
+screenshots are taken moments apart, and a frame landing between them shifted
+the photo by a pixel — which put every high-contrast edge in the band into the
+glyph mask. The finding then moved from page to page between runs, which is the
+tell that a detector is measuring its own timing.
 
 Runs at 390px and 768px — phone, and the touch band between the phone
 breakpoints and the 1000px nav collapse.
