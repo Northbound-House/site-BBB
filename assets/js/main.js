@@ -17,6 +17,7 @@
   var FOCUS_HOLD = parseFloat(knob("--focus-hold", "0.18"));
   var FOCUS_BAND = parseFloat(knob("--focus-band", "0.45"));
   var FOCUS_CENTRE = parseFloat(knob("--focus-centre", "0.5"));
+  var FOCUS_SETTLE = parseFloat(knob("--focus-settle", "240ms"));
   var PARALLAX_DEPTH = parseFloat(knob("--parallax-depth", "0px"));
 
   var reducedMotion = window.matchMedia
@@ -227,12 +228,26 @@
   if (!reducedMotion && (focusCards.length || (bands.length && PARALLAX_DEPTH))) {
     var pending = false;
 
+    /* The words used to lift the moment a card crossed the middle of the
+       window, so the artwork -- which is the thing being shown -- was covered
+       for most of the time the card was on screen. The lift now waits for the
+       page to stop moving: scroll past and you see the cards, stop on one and
+       its words come up. A hover or a tab still lifts it at once, from the
+       stylesheet, because either is already a deliberate act.
+
+       Starts settled so a card that is already centred on load is readable
+       without touching anything. */
+    var settled = true;
+    var settleTimer = null;
+
     var updateFocus = function (vh) {
       var centre = vh * FOCUS_CENTRE;
       var hold = vh * FOCUS_HOLD;
       var reach = vh * FOCUS_BAND;
       if (reach <= hold) reach = hold + 1;
       focusCards.forEach(function (card) {
+        /* Still moving: every card rests, whole artwork visible. */
+        if (!settled) { card.style.setProperty("--focus-scroll", "0"); return; }
         var r = card.getBoundingClientRect();
         /* Off screen: leave it resting. */
         if (r.bottom < 0 || r.top > vh) { card.style.setProperty("--focus-scroll", "0"); return; }
@@ -279,8 +294,22 @@
       pending = true;
       requestAnimationFrame(frame);
     };
+    /* Scrolling drops every card back to its artwork straight away, then
+       arms the settle timer. The timer is restarted by each scroll event, so
+       the words only come up once the page has actually stopped -- not on a
+       lull mid-flick. The parallax is unaffected either way: it follows the
+       scroll, which is the point of it. */
+    var onScroll = function () {
+      if (settled) { settled = false; schedule(); }
+      if (settleTimer) clearTimeout(settleTimer);
+      settleTimer = setTimeout(function () {
+        settled = true;
+        schedule();
+      }, FOCUS_SETTLE);
+    };
+
     schedule();
-    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", schedule);
     window.addEventListener("load", schedule);
   }

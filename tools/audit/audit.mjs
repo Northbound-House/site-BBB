@@ -193,7 +193,12 @@ async function pageList() {
   const pages = [...src.matchAll(/^ {4}"([^"]+\.html)": dict\(/gm)].map((m) => m[1]);
   const posts = [...src.matchAll(/^\s+slug="([^"]+)"/gm)].map((m) => `journal/${m[1]}.html`);
   if (!pages.length) throw new Error("could not read PAGES from tools/build.py");
-  return [...pages, ...posts];
+  // The journal can be hidden, in which case build.py generates none of it and
+  // there is nothing at those URLs to measure. Read the same switch it does
+  // rather than keeping a second list of what is published.
+  const hidden = /^JOURNAL_HIDDEN = True$/m.test(src);
+  const all = [...pages, ...posts];
+  return hidden ? all.filter((f) => f !== "journal.html" && !f.startsWith("journal/")) : all;
 }
 
 async function deliberateNoindex() {

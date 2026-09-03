@@ -329,6 +329,7 @@
 
   /* FEATURE CARDS (the three "a booking site can't do" cards) ------ */
   --cards-cols:                   3; /* feature cards per row — 5 cards read as 3 then 2 */
+  --cards-cols-half:              6; /* the same row counted in half-columns, so the last two can centre under the first three */
   --card-gap:                1.5rem; /* space between feature cards, both directions */
   --card-pad-y:              2.2rem; /* top/bottom padding inside a feature card */
   --card-pad-x:              1.8rem; /* left/right padding inside a feature card */
@@ -588,6 +589,14 @@
   --focus-band:                  0.45; /* how far from the middle a card is fully at rest, as a share of window height */
   --focus-centre:                 0.5; /* where in the window a card counts as centred — 0.5 = halfway down */
   --focus-ms:                    0.2s; /* how quickly a card catches up with the scroll */
+  /* Added 3 September 2026, per the lock rule: a new knob, nothing retuned.
+     The words used to lift the moment a card crossed the middle of the window,
+     which meant the artwork was covered for most of the time it was on screen
+     — and the artwork is the thing Zac drew. Now the lift waits for the page
+     to stop moving. Scroll past and you see the cards; stop on one and its
+     words come up. Hovering or tabbing to a card still lifts it immediately,
+     because that is already a deliberate act. */
+  --focus-settle:               240ms; /* how long the page must be still before a centred card lifts its words */
 
   /* TEXT OVERLAY (the words that lift off a focused card) -----------
      Sizes that read cqw are measured against the card's own width, so a
@@ -1841,6 +1850,17 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   }
   .service-cards--centered > .service-card { grid-column: span 2; }
   .service-cards--centered > .service-card:nth-child(4) { grid-column: 2 / span 2; }
+
+  /* The same trick for a .cards row, used by the five BOUND promise cards so
+     they hang together the way the five trip cards do: three across, then two
+     centred beneath rather than pushed to the left. The child selector is
+     deliberately loose — .cards carries feature cards on some pages and
+     media cards on others, and the centring does not care which. */
+  .cards--centered {
+    grid-template-columns: repeat(var(--cards-cols-half), minmax(0, 1fr));
+  }
+  .cards--centered > * { grid-column: span 2; }
+  .cards--centered > :nth-child(4) { grid-column: 2 / span 2; }
 }
 
 .service-card {
