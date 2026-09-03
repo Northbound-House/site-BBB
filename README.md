@@ -98,13 +98,22 @@ the control is there, and WCAG 1.4.11 asks 3:1 of it.
 
 Three things carry more of the site's contrast than any colour token:
 
-- **The nav pill's glass** (`--header-glass`). The pill floats over a
-  photograph, so its dark text is only as legible as the white behind it. At
-  the original 0.42 the links measured 3.6:1 over a dark photo and the 9.3px
-  wordmark sub-line 2.2:1.
+- **The nav pill's material** (`--header-flatten`, `--header-lift`,
+  `--header-glass`). The pill floats over a photograph, so its text is only as
+  legible as what the material does to that photograph. Apple's regular glass
+  blurs the backdrop *and* flattens its luminosity; buying the same legibility
+  with opacity alone is what took this pill to 0.72 white, which is barely
+  glass. It now flattens and lifts the backdrop and sits at 0.55.
 - **The hero and page-hero scrims** (`--hero-scrim-*`, `--page-hero-scrim-*`).
   Same argument: the text is only as legible as the layer between it and the
-  picture.
+  picture. The hero carries a second scrim, `--hero-text-scrim`, anchored to
+  the words rather than to the photograph. The headline sits over the brightest
+  part of that picture — sky — and the script word is a mid-toned aqua, so
+  darkening the whole image enough to carry that one word costs the coastline
+  and the sea, which is the half worth looking at. A legibility layer behind
+  the text is what Apple's guidance asks for, and it lets the gradient over the
+  photo stay light. Both hero photos are repo assets for the same reason: one
+  hotlink was holding the scrim over both heroes at its worst case.
 - **The active nav link.** It takes `--link`, not a rose. Rose was chosen as AA
   against white, but the pill is never white — it is glass over a photo, where
   rose measured 2.1:1 and cannot be rescued at 13px. The aqua underline is what
@@ -151,6 +160,20 @@ alongside the light one.
 ### Typography
 
 The guide specifies **Bebas Neue** for display and **Evolve Sans** for body.
+
+**Body text is Regular, not Light.** Apple's typography guidance is direct
+about avoiding Ultralight, Thin and Light weights, which are hard to see at
+small sizes, and every paragraph, form field and hero lede here was set in
+Poppins Light. `--body-weight` is the one knob; Light is no longer fetched from
+Google Fonts at all. Nothing about this shows up in a contrast ratio, which is
+why it needed saying out loud.
+
+**The nav lockup carries no sub-line.** It drew at 9.3px — the smallest text on
+the site by a wide margin, and well under Apple's 10pt desktop minimum — and
+the nav cannot afford to grow it, because six links, a wordmark and a pinned
+CTA already need about 970px of pill. It was already being hidden in two of the
+four width bands where it could appear. The footer keeps it, at 0.72rem, which
+the footer has room for.
 
 - **Bebas Neue** is on Google Fonts and is loaded. It is caps-only, single-weight
   and condensed, so headings carry extra size, tighter leading and a little
@@ -342,13 +365,14 @@ screenshot pass — the same reason `lightbox.mjs` is separate.
 
 Three things it took a wrong answer to learn:
 
-- **Text over a photo is measured against white and black, not against the
-  photo.** Checking today's picture answers the wrong question: most of these
-  are hotlinked from a third party who can swap them. What has to hold is the
-  scrim. So each photo is replaced with flat white and then flat black, and the
-  worse answer is the one reported. Text that clears both clears any photo that
-  could ever land there — which is why the scrim numbers look heavier than the
-  current pictures need.
+- **How a photo is measured depends on who owns it.** A hotlinked photo can be
+  swapped, or withdrawn, without a commit here, so it is replaced with flat
+  white and then flat black and judged on the worse answer: what has to hold is
+  the scrim, not today's picture. A photo in `assets/img/` cannot change
+  without a commit, and a commit runs this detector, so it is measured exactly
+  as it renders. The floating pill is always judged against both extremes
+  whatever is under it, because it is `position: fixed` and passes over every
+  part of every page.
 - **Only the pixels a glyph actually covers count.** A first cut read the whole
   element box and reported its worst pixel, which failed the ghost buttons
   against their own white border. Each region is shot twice, once with the text

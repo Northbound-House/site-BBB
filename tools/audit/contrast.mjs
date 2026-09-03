@@ -25,16 +25,28 @@
  *          the nearest opaque colour. Arithmetic cannot answer this, so the
  *          pixels are read out of a screenshot.
  *
- * WHY THE PHOTO CASES ARE MEASURED AGAINST BLACK AND WHITE
+ * WHY SOME PHOTO CASES ARE MEASURED AGAINST BLACK AND WHITE
  *
- * The obvious way to check text over a photo is to look at the photo. That
- * answers the wrong question. Most of these photos are hotlinked from a third
- * party who can swap them, and the ones that are ours get swapped too — so a
- * green result against today's picture says nothing about tomorrow's. What has
- * to hold is the LAYER between the photo and the text: the scrim, or the nav
- * pill's glass. So each photo is replaced with pure white and then with pure
- * black, and the worse of the two answers is the one reported. Text that
- * passes both passes over any photograph that could ever land there.
+ * It depends on who owns the photograph, and the split is the whole point:
+ *
+ *   HOTLINKED  A photo served from someone else's domain can be swapped, or
+ *              withdrawn, without a single commit here — so a green result
+ *              against today's picture says nothing about tomorrow's. What has
+ *              to hold is the LAYER between the photo and the text. Each of
+ *              these is replaced with flat white and then flat black, and the
+ *              worse answer is reported. Text that passes both passes over any
+ *              photograph that could ever land there.
+ *
+ *   REPO ASSET A photo in assets/img/ cannot change without a commit, and a
+ *              commit runs this detector. So it is measured exactly as it
+ *              renders. That is not a weaker test — it is the same test, with
+ *              a guarantee behind it that a hotlink does not have. It also
+ *              stops the worst case of a photo nobody chose from dictating the
+ *              scrim over a photo somebody did.
+ *
+ * The floating nav pill is always measured against both extremes whatever is
+ * beneath it, because it is position:fixed: it passes over every part of every
+ * page, so no single backdrop is its worst case.
  *
  * WHY THE PIXELS ARE MASKED TO THE GLYPHS
  *
@@ -78,6 +90,11 @@ const WIDTHS = [1280, 390];
    nearest opaque colour. Text inside one of these is measured from pixels
    rather than arithmetic. */
 const MEDIA_GROUNDS = ".hero, .page-hero, .cta-band, .media-card, .site-header";
+
+/* Grounds measured against both extremes no matter who owns the photograph
+   underneath. The nav pill is position:fixed and passes over every part of
+   every page, so no single backdrop is its worst case. */
+const ALWAYS_EXTREME = ".site-header";
 
 /* Custom properties that carry a photograph into a background layer. Forced to
    flat white and flat black in turn, so the scrim over them is what is being
@@ -166,7 +183,7 @@ window.__cx = (() => {
 /** Find every element that owns visible text and work out what is behind it.
  *  Runs in the browser: Playwright ships the source across, so it can only use
  *  what is in the page — window.__cx above, and its own argument. */
-function collect(mediaSel) {
+function collect({ mediaSel, photoVars, alwaysExtremeSel }) {
   const { parse, over, ratio, hex, label } = window.__cx;
   const rootBg = parse(getComputedStyle(document.documentElement).backgroundColor);
   const CANVAS = rootBg && rootBg.a > 0
@@ -221,6 +238,30 @@ function collect(mediaSel) {
       if (getComputedStyle(p).position === "fixed") { fixed = true; break; }
     }
 
+    // Who owns the photograph behind this text? A repo asset is measured as it
+    // renders; a hotlink is measured against both extremes. The floating pill
+    // is always extremes -- it passes over every part of the page.
+    let remotePhoto = false;
+    if (media) {
+      if (media.matches(alwaysExtremeSel)) {
+        remotePhoto = true;
+      } else {
+        const urls = [];
+        for (const node of [media, ...media.querySelectorAll("*")]) {
+          for (const v of photoVars) {
+            const val = node.style && node.style.getPropertyValue(v);
+            const m = val && val.match(/url\(\s*["']?([^"')]+)/);
+            if (m) urls.push(m[1]);
+          }
+          if (node.tagName === "IMG" && node.currentSrc) urls.push(node.currentSrc);
+        }
+        remotePhoto = urls.some((u) => {
+          try { return new URL(u, location.href).origin !== location.origin; }
+          catch { return true; } // unparseable is not a guarantee of anything
+        });
+      }
+    }
+
     // Over a photo neither side of the pair is known here: a glyph at 92%
     // opacity takes its final colour from the ground it lands on. The pixel
     // pass reads BOTH out of the screenshots, so nothing is assumed. Only the
@@ -237,6 +278,7 @@ function collect(mediaSel) {
       weight,
       fixed,
       media: !!media,
+      remotePhoto,
       spec,
       // A glyph never lands on its own border. The ghost buttons draw a white
       // hairline inside their box, and sampling it reported the button as
@@ -340,28 +382,53 @@ for (const scheme of SCHEMES) {
       await page.addScriptTag({ content: KIT });
       await page.evaluate(() => window.scrollTo(0, 0));
 
-      const rows = await page.evaluate(collect, MEDIA_GROUNDS);
+      // Make sure every photograph has actually decoded before anything is
+      // measured against it. Background images carried by a custom property do
+      // not show up in document.images, so they are fetched explicitly.
+      await page.evaluate(async (vars) => {
+        const urls = [];
+        document.querySelectorAll("[style]").forEach((el) => {
+          for (const v of vars) {
+            const val = el.style.getPropertyValue(v);
+            const m = val && val.match(/url\(\s*["']?([^"')]+)/);
+            if (m) urls.push(m[1]);
+          }
+        });
+        document.querySelectorAll('img[loading="lazy"]').forEach((i) => { i.loading = "eager"; });
+        const wait = (el) => new Promise((done) => { el.onload = el.onerror = done; });
+        await Promise.all([
+          ...urls.map((u) => { const i = new Image(); const w = wait(i); i.src = u; return w; }),
+          ...[...document.images].filter((i) => !i.complete).map(wait),
+        ]);
+      }, PHOTO_VARS);
+
+      const rows = await page.evaluate(collect,
+        { mediaSel: MEDIA_GROUNDS, photoVars: PHOTO_VARS, alwaysExtremeSel: ALWAYS_EXTREME });
       const where = `${file} [${scheme}, ${width}px]`;
 
       // The arithmetic cases are done already.
       for (const row of rows.filter((r) => !r.media)) judge(row, where);
 
-      // The rest need pixels, once over white and once over black.
-      const needy = rows.filter((r) => r.media);
-      if (needy.length) {
+      // The rest need pixels. Text over a repo photograph is measured once, as
+      // it renders; text over a hotlink, or under the floating pill, is
+      // measured against both extremes and judged on the worse answer.
+      const asRendered = rows.filter((r) => r.media && !r.remotePhoto);
+      const worstCase = rows.filter((r) => r.media && r.remotePhoto);
+
+      if (asRendered.length) {
+        const measured = await measureOverExtreme(page, asRendered, null, width);
+        settleRows(asRendered, measured, where);
+      }
+      if (worstCase.length) {
         const worst = new Map();
         for (const extreme of ["#ffffff", "#000000"]) {
-          const measured = await measureOverExtreme(page, needy, extreme, width);
+          const measured = await measureOverExtreme(page, worstCase, extreme, width);
           for (const [i, m] of measured) {
             const prev = worst.get(i);
             if (!prev || m.ratio < prev.ratio) worst.set(i, m);
           }
         }
-        for (const row of needy) {
-          const m = worst.get(row.i);
-          if (!m) { record("UNVERIFIED", where, `${row.sel} "${row.text}" — no glyph pixels found`); continue; }
-          judge({ ...row, ratio: m.ratio, bg: m.bg, fg: m.fg, over: m.extreme, at: m.at, box: m.box }, where);
-        }
+        settleRows(worstCase, worst, where);
       }
     }
     await ctx.close();
@@ -372,12 +439,27 @@ await browser.close();
 srv.close();
 report();
 
-/* ---- The two measuring passes ------------------------------------------- */
+/* ---- The measuring passes ----------------------------------------------- */
+
+/** Turn a map of measurements into findings, or say so when a row produced no
+ *  glyph pixels at all — which is never quietly a pass. */
+function settleRows(rows, measured, where) {
+  for (const row of rows) {
+    const m = measured.get(row.i);
+    if (!m) {
+      record("UNVERIFIED", where, `${row.sel} "${row.text}" — no glyph pixels found`);
+      continue;
+    }
+    judge({ ...row, ratio: m.ratio, bg: m.bg, fg: m.fg, over: m.extreme,
+            at: m.at, box: m.box }, where);
+  }
+}
 
 function judge(row, where) {
   const need = bar(row.size, row.weight);
   const what = `${row.sel} "${row.text}" — ${row.ratio}:1, needs ${need}:1 ` +
-    `(${row.fg} on ${row.bg}${row.over ? ` over ${row.over}` : ""}, ` +
+    `(${row.fg} on ${row.bg}` +
+    `${row.over ? ` over ${row.over}` : row.media ? " over its own photo" : ""}, ` +
     `${row.size}px/${row.weight}` +
     `${row.at ? `, worst pixel at ${row.at} of ${row.box}` : ""})`;
   if (row.ratio >= need) { if (VERBOSE) record("PASS", where, what); return; }
@@ -397,7 +479,7 @@ function judge(row, where) {
  */
 async function measureOverExtreme(page, rows, extreme, width) {
   const out = new Map();
-  await page.evaluate(({ extreme, vars }) => {
+  if (extreme) await page.evaluate(({ extreme, vars }) => {
     // Only force a photo variable on an element that actually sets one, so a
     // component with no photograph is left exactly as it renders.
     document.querySelectorAll("[style]").forEach((el) => {
@@ -611,9 +693,10 @@ function report() {
   console.log(`\nBora Bora Bound — contrast   (WCAG 2.2 AA: ` +
     `${AA_NORMAL}:1 normal, ${AA_LARGE}:1 at ${LARGE_PX}px+)`);
   console.log(`Appearances: ${SCHEMES.join(", ")}.  Widths: ${WIDTHS.join("px, ")}px.`);
-  console.log(`Photos replaced with flat white and flat black; the worse answer ` +
-    `is the one\nreported, so a swapped photograph cannot quietly break the text ` +
-    `over it.\n`);
+  console.log(`Repo photographs are measured as they render. Hotlinked ones, and ` +
+    `anything under\nthe floating pill, are measured against flat white AND flat ` +
+    `black with the worse\nanswer reported — a photo that can change without a ` +
+    `commit does not get to be\njudged on the one that happens to be there today.\n`);
   console.log(`${failed ? "FAIL " : "PASS "} ${count("PASS")} pass  ${failed} fail  ` +
     `${count("EXEMPT")} exempt  ${count("UNVERIFIED")} unverified`);
 

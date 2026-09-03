@@ -106,7 +106,12 @@ IMAGES = {
 
     # Full-bleed page and hero backgrounds -- drawn in CSS, so no alt text
     "IMG_HERO_HOME":          (unsplash("1505228395891-9a51e7e86bf6", 1920), None),
-    "IMG_HERO_404":           (unsplash("1473116763249-2faaef81ccda", 1920), None),
+    # A repo asset rather than a hotlink, deliberately. The hero scrim is sized
+    # by whichever photo behind it could be worst, and a hotlink can be swapped
+    # for anything by someone who has never seen this site -- so one hotlinked
+    # hero was holding the scrim over BOTH heroes at its worst case. It is also
+    # the page nobody looks at, which is where a rotted photo would sit longest.
+    "IMG_HERO_404":           ("/assets/img/bermuda.jpg", None),
     "IMG_PAGEHERO_GENERIC":   (unsplash("1468413253725-0d5181091126", 1920), None),
     "IMG_PAGEHERO_ABOUT":     (unsplash("1488646953014-85cb44e25828", 1920), None),
     "IMG_PAGEHERO_CONTACT":   (unsplash("1507525428034-b723cf961d3e", 1920), None),
@@ -928,7 +933,7 @@ def head_block(cfg):
           '  <link rel="preconnect" href="https://fonts.googleapis.com" />\n',
           '  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />\n',
           '  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue'
-          '&family=Poppins:wght@300;400;500;600&family=Sacramento&display=swap" rel="stylesheet" />\n',
+          '&family=Poppins:wght@400;500;600&family=Sacramento&display=swap" rel="stylesheet" />\n',
           '  <link rel="stylesheet" href="/assets/css/styles.css" />\n',
           json_ld(cfg["schema"]()),
           analytics_head()]
@@ -947,7 +952,10 @@ def nav_block(current, hero=False):
         '    <nav class="nav shell" aria-label="Primary">\n'
         '      <a class="brand" href="/index.html">\n'
         f"        {BRAND_MARK}\n"
-        f"        <span>{BUSINESS_NAME}<small>Cruises · All-Inclusives · Small Groups</small></span>\n"
+        # No sub-line in the nav. It drew at 9.3px — the smallest text on the
+        # site and well under Apple's 10pt desktop minimum — and the nav has no
+        # room to grow it. The footer lockup below keeps it, larger.
+        f"        <span>{BUSINESS_NAME}</span>\n"
         "      </a>\n"
         # The toggle names the panel it controls, so a screen reader can say
         # what just expanded. main.js also moves focus into it on open.

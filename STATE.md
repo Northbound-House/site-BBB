@@ -98,6 +98,11 @@ was first written it found the footer blurb at 2.5:1, the active nav link at
 toggle, per Apple's guidance — the OS already knows. The whole dark theme is one
 media block over the semantic layer at the top of `styles.css`.
 
+**Type:** body text is Poppins **Regular**, not Light — Apple's guidance is to
+avoid Light weights at small sizes, and nothing about that shows up in a
+contrast ratio. The nav lockup no longer carries its 9.3px sub-line; the footer
+keeps it, larger.
+
 **Type:** Bebas Neue for display (real, loaded). **Poppins substitutes for
 Evolve Sans** and **Sacramento for Jonathan Signature** — both originals are
 commercial, absent from Google Fonts, and absent from the Drive Fonts folder, so
