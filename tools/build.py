@@ -25,8 +25,8 @@ PAGES_DIR = ROOT / "pages"
 # CONFIG
 # =============================================================================
 
-SITE_URL = "https://test.boraborabound.com"
-STAGING = True
+SITE_URL = "https://boraborabound.com"
+STAGING = False
 
 BUSINESS_NAME = "Bora Bora Bound"
 LEGAL_NAME = "Bora Bora Bound, LLC"

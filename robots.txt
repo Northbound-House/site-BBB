@@ -1,4 +1,5 @@
-# Staging site — must not be indexed.
-# tools/set-domain.sh replaces this with the production robots.txt at cutover.
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /pages/
+
+Sitemap: https://boraborabound.com/sitemap.xml

@@ -11,7 +11,7 @@ For what happens next, see [PLAN.md](PLAN.md). For how to work on the site, see
 
 | | |
 | --- | --- |
-| **Live at** | https://test.boraborabound.com |
+| **Live at** | https://test.boraborabound.com until this cutover merges; then https://boraborabound.com (once DNS is pointed at GitHub Pages) |
 | **Serving** | GitHub Pages, from `main`, folder `/ (root)` |
 | **Head of `main`** | `fe82930` — *Open the review cards full size (#10)*, merged 1 September 2026 |
 | **Production domain** | `boraborabound.com` — still the old Travefy site, untouched. The 1 September cutover has not happened. |
@@ -21,7 +21,7 @@ For what happens next, see [PLAN.md](PLAN.md). For how to work on the site, see
 The test site is **fully blocked from search**, on purpose. An indexable second
 copy of the brand would compete with the live site for its own terms.
 
-- `CNAME` → `test.boraborabound.com`
+- `CNAME` → `boraborabound.com` (production build; was `test.boraborabound.com` on staging)
 - `robots.txt` → `User-agent: * / Disallow: /`
 - Every page carries `<meta name="robots" content="noindex, nofollow">`
 - All canonicals, `og:url` and schema `@id`s point at the test subdomain

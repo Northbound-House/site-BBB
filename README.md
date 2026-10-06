@@ -6,10 +6,10 @@ the browser downloads but the site's own files. The one npm dependency is
 `tools/audit`, a dev-only detector suite that never ships: Pages serves the repo
 root, and that folder's `node_modules` is gitignored.
 
-> **Status: staging.** `CNAME` points at `test.boraborabound.com`, every page carries
-> `noindex, nofollow`, and `robots.txt` disallows everything. This is deliberate — an
-> indexable copy of the site on a second domain competes with the real one in search.
-> Run `./tools/set-domain.sh production` to flip all of it at cutover.
+> **Status: production build.** `CNAME` points at `boraborabound.com`, pages are
+> `index, follow` (only `404.html` and `terms.html` stay `noindex`), and `robots.txt`
+> allows crawling. `./tools/set-domain.sh staging` flips it back to the
+> `test.boraborabound.com` posture if a second copy is ever needed.
 >
 > **The `noindex` is the lock with no visible symptom.** Ship it to production and
 > the site looks perfect and never appears in search. `tools/build.py` therefore
@@ -17,7 +17,7 @@ root, and that folder's `node_modules` is gitignored.
 > `verify_indexability()` — and it is an explicit line on the cutover checklist in
 > [PLAN.md](PLAN.md). Do not remove either guard.
 
-**Deployed to https://test.boraborabound.com** — see **[STATE.md](STATE.md)** for
+**Deploys to https://boraborabound.com** once DNS points at GitHub Pages — see **[STATE.md](STATE.md)** for
 where everything stands and **[PLAN.md](PLAN.md)** for what's next, including the
 cutover checklist. This README covers how to work on the site.
 
