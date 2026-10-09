@@ -655,6 +655,36 @@
   --hero-shine-tint:          #ffffff; /* colour of that light */
   --hero-shine-bleed:          0.4em; /* room above and below "getaway" for its loops, which reach past its tight line box — the light is only painted inside it */
 
+  /* HEADINGS, BUTTONS AND THE TRIP-TYPE STRIP --------------------------
+     Added 9 October 2026, per the lock rule: new knobs, nothing retuned.
+     Three effects after React Bits, written without React: section headings
+     brighten word by word as they scroll up the window (ScrollReveal), the
+     main call-to-action buttons lean toward a nearby pointer (Magnet), and a
+     strip of trip types under the homepage hero drifts sideways, faster while
+     the page is scrolling (ScrollVelocity). main.js measures; these draw.
+     None of it runs under reduced motion, and the buttons only lean for a
+     mouse or trackpad. */
+  --heading-reveal-start:         1; /* where in the window a heading starts brightening — 1 = as it enters at the bottom */
+  --heading-reveal-end:        0.65; /* where it is fully bright — 0.65 = its top is a third of the way up the window */
+  --heading-reveal-spread:        3; /* how many words are part-way bright at once — bigger = a softer sweep */
+  --heading-reveal-rest:       0.15; /* how faint a word is before its turn */
+  --heading-reveal-blur:        4px; /* how soft a word is before its turn */
+  --magnet-reach:              48px; /* how far outside a button the pointer starts to pull it */
+  --magnet-pull:               0.15; /* share of the pointer's distance from the button's centre that the button follows */
+  --magnet-max:                10px; /* the furthest a button ever leans, however wide it is */
+  --magnet-ms:                 0.4s; /* how quickly the button catches up with the pointer, and settles back */
+  --marquee-size-min:         2.2rem; /* strip text size on a phone */
+  --marquee-size-base:        1.2rem; /* fixed part of its in-between size */
+  --marquee-size-vw:            3vw; /* how fast it grows with the window */
+  --marquee-size-max:         4.2rem; /* strip text size once the window is wide */
+  --marquee-tracking:        0.04em; /* how spread out the strip's words read */
+  --marquee-pad-y:            1.1rem; /* height of the band above and below the words */
+  --marquee-gap:              0.6em; /* space either side of the star between trip types */
+  --marquee-speed:               40; /* drift at rest, in pixels per second */
+  --marquee-boost:            0.006; /* extra speed per pixel-per-second of scrolling — 0 = scrolling has no effect */
+  --marquee-boost-max:            6; /* most the scroll can multiply the drift by */
+  --marquee-settle:            0.08; /* share of the gap closed each frame as the speed eases toward the scroll's — smaller = slower to react and to calm */
+
   /* BREAKPOINTS — the numbers are repeated in the @media conditions
      further down, because @media cannot read a custom property.
      Change both. ------------------------------------------------- */
@@ -1090,6 +1120,71 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
 /* The drift moves the photo down through the hero's bottom edge. Clip it there
    so it never paints over the section below. */
 .motion .hero { overflow: clip; }
+
+/* Trip-type strip, under the homepage hero. Decorative and aria-hidden: the
+   same trip types are the hero tagline and the cards below it. main.js copies
+   the group until it overfills the window and moves the track; without it the
+   strip simply sits still, centred and clipped at the edges. */
+.marquee {
+  overflow: clip;
+  background: var(--ground-deep);
+  color: var(--ink-on-dark);
+  padding: var(--marquee-pad-y) 0;
+}
+.marquee__track { display: flex; width: max-content; will-change: transform; }
+.marquee__group {
+  display: flex;
+  align-items: center;
+  flex: none;
+  font-family: var(--display);
+  font-size: clamp(var(--marquee-size-min),
+                   var(--marquee-size-base) + var(--marquee-size-vw),
+                   var(--marquee-size-max));
+  letter-spacing: var(--marquee-tracking);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.marquee__group > span::after {
+  content: "\2726";
+  color: var(--accent-bright);
+  margin: 0 var(--marquee-gap);
+  font-size: 0.5em;
+  vertical-align: middle;
+}
+/* Before main.js has filled the track, show the one group centred. */
+.marquee:not(.is-running) .marquee__track { margin: 0 auto; }
+
+/* Section headings brighten word by word as they rise up the window, after
+   React Bits' ScrollReveal. main.js wraps each word in a span carrying its
+   index (--i), gives the heading its word count (--words), and writes how far
+   it has risen (--heading-progress, 0 entering to 1 fully bright). Each word's
+   share is worked out here, so the whole look is in the knobs. Until main.js
+   writes a progress the default is 1, so a heading is never left faint. */
+.motion .heading-reveal .word {
+  --w: clamp(0,
+    (var(--heading-progress, 1) * (var(--words) + var(--heading-reveal-spread)) - var(--i))
+      / var(--heading-reveal-spread),
+    1);
+  display: inline-block;
+  opacity: calc(var(--heading-reveal-rest) + (1 - var(--heading-reveal-rest)) * var(--w));
+  filter: blur(calc(var(--heading-reveal-blur) * (1 - var(--w))));
+}
+
+/* The main call-to-action buttons lean toward a nearby pointer, after React
+   Bits' Magnet. main.js writes the lean as --magnet-x/--magnet-y; it goes on
+   the separate translate property so it composes with the hover lift on
+   transform rather than replacing it. Mouse and trackpad only: on touch there
+   is no pointer to lean toward until the tap has already happened. The nav
+   pill's button is left out -- leaning, it would poke out of the pill. */
+@media (hover: hover) and (pointer: fine) {
+  .motion main .btn--primary {
+    translate: var(--magnet-x, 0px) var(--magnet-y, 0px);
+    transition: transform var(--lift-ms) var(--ease), box-shadow var(--lift-ms) var(--ease),
+      background var(--hover-ms) ease, color var(--hover-ms) ease,
+      translate var(--magnet-ms) var(--ease);
+  }
+}
 
 /* A slow band of light across the script word, after React Bits' ShinyText.
    The fill is clipped to the letters and runs from the word's own colour up to
