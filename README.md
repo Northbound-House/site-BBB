@@ -4,7 +4,11 @@ A static site for [boraborabound.com](https://boraborabound.com), hosted on **Gi
 Hand-coded HTML/CSS/JS with a small Python generator — no framework, and nothing
 the browser downloads but the site's own files. The one npm dependency is
 `tools/audit`, a dev-only detector suite that never ships: Pages serves the repo
-root, and that folder's `node_modules` is gitignored.
+root, and that folder's `node_modules` is gitignored. The two runtime libraries,
+[Lenis](https://github.com/darkroomengineering/lenis) and
+[GSAP](https://github.com/greensock/GSAP), are copied into `assets/js/vendor/`
+rather than fetched from a CDN — see that folder's README for versions and
+licences.
 
 > **Status: production build.** `CNAME` points at `boraborabound.com`, pages are
 > `index, follow` (only `404.html` and `terms.html` stay `noindex`), and `robots.txt`

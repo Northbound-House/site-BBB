@@ -631,6 +631,30 @@
   --parallax-depth:             400px; /* how far the band's photo drifts as the page scrolls past — 0 turns it off */
   --parallax-overscan: var(--parallax-depth); /* extra photo drawn above and below the band so the drift never shows an edge — tracks depth */
 
+  /* SMOOTH SCROLL AND HERO MOTION -----------------------------------
+     Added 9 October 2026, per the lock rule: new knobs, nothing retuned.
+     Lenis eases mouse-wheel and trackpad scrolling; touch stays native. GSAP
+     plays the hero in once on load: the photo settles from a slight zoom,
+     the headline arrives word by word out of a blur, and the rest follows.
+     As the page scrolls, the hero photo drifts down slower than the page.
+     None of it runs when the visitor has asked for reduced motion. main.js
+     reads every value here; times are in seconds because GSAP counts in them. */
+  --scroll-lerp:                  0.1; /* share of the remaining distance the page covers each frame on a wheel scroll — 1 = no smoothing */
+  --hero-intro-zoom:             1.08; /* how far zoomed in the hero photo starts before it settles */
+  --hero-intro-zoom-s:            2.4; /* how long the photo takes to settle */
+  --hero-intro-delay-s:          0.15; /* pause after load before the words start */
+  --hero-word-s:                  0.9; /* how long each headline word takes to arrive */
+  --hero-word-stagger-s:         0.08; /* gap between one headline word starting and the next */
+  --hero-word-blur:              12px; /* how soft each word starts */
+  --hero-word-rise:            0.35em; /* how far each word travels up as it arrives */
+  --hero-follow-rise:            18px; /* how far the tagline, paragraph and buttons travel up as they fade in */
+  --hero-follow-s:                0.8; /* how long those take to fade in */
+  --hero-failsafe:                 3s; /* if the intro never starts, the hero shows anyway after this long */
+  --hero-drift:                 160px; /* how far the hero photo has drifted down once the hero has scrolled away — 0 turns it off */
+  --hero-shine-cycle:              7s; /* one pass of the light across "getaway", including the rest between passes */
+  --hero-shine-tint:          #ffffff; /* colour of that light */
+  --hero-shine-bleed:          0.4em; /* room above and below "getaway" for its loops, which reach past its tight line box — the light is only painted inside it */
+
   /* BREAKPOINTS — the numbers are repeated in the @media conditions
      further down, because @media cannot read a custom property.
      Change both. ------------------------------------------------- */
@@ -744,6 +768,17 @@
 *::after { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+/* Lenis's own stylesheet (lenis/dist/lenis.css, 1.3.26), trimmed to the rules
+   this site's setup uses. scroll-behavior: smooth above can stay: Lenis writes
+   every position with behavior "instant", so the two never stack, and an
+   in-page link or the keyboard still gets the browser's own smoothing.
+   Left out: .lenis-stopped { overflow: clip }. main.js stops Lenis while the
+   menu or the lightbox is open, and clipping the root there would drop the
+   scrollbar and shunt the page sideways behind the lightbox. A stopped Lenis
+   already swallows the wheel, which is the part that matters. */
+html.lenis, html.lenis body { height: auto; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
 
 body {
   margin: 0;
@@ -1036,6 +1071,56 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
   color: rgba(255,255,255,0.92);
 }
 .hero__actions { display: flex; gap: var(--hero-actions-gap); justify-content: center; flex-wrap: wrap; }
+
+/* Hero motion. .motion is set in the page head before anything paints, and
+   only when the visitor has not asked for reduced motion, so these rules never
+   reach that visitor at all.
+
+   The words are hidden until main.js has set the intro's starting positions,
+   otherwise they would paint once in place and then vanish to animate in. If
+   the intro never starts -- a script that failed to load, an error -- the
+   failsafe shows them anyway. main.js adds .motion-ready the moment the intro
+   is set up, which cancels it. */
+.motion .hero__inner { opacity: 0; animation: hero-failsafe 0s var(--hero-failsafe) forwards; }
+.motion.motion-ready .hero__inner { opacity: 1; animation: none; }
+@keyframes hero-failsafe { to { opacity: 1; } }
+/* The photo starts zoomed so the intro can settle it. Without the intro it
+   simply stays a little closer, which is harmless. */
+.motion .hero__bg { transform: scale(var(--hero-intro-zoom)); will-change: transform, translate; }
+/* The drift moves the photo down through the hero's bottom edge. Clip it there
+   so it never paints over the section below. */
+.motion .hero { overflow: clip; }
+
+/* A slow band of light across the script word, after React Bits' ShinyText.
+   The fill is clipped to the letters and runs from the word's own colour up to
+   --hero-shine-tint, so it is never less legible than the plain word. `color`
+   is left alone on purpose: that is what the contrast detector reads, and it
+   is the darkest the word ever gets.
+
+   A clipped fill only paints inside the element's box, and the script line's
+   leading is tighter than the letters, so the loops of the g and y fell
+   outside it and vanished. The padding grows the painted box to cover them;
+   the matching negative margins keep the line exactly where it was. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero h1 .script {
+    padding-block: var(--hero-shine-bleed);
+    margin-top: calc(var(--hero-script-gap) - var(--hero-shine-bleed));
+    margin-bottom: calc(-1 * var(--hero-shine-bleed));
+    background: linear-gradient(110deg,
+      var(--aqua-soft) 40%, var(--hero-shine-tint) 50%, var(--aqua-soft) 60%)
+      0 0 / 250% 100% no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: hero-shine var(--hero-shine-cycle) linear infinite;
+  }
+}
+/* The light crosses in the first 40% of the cycle and is off the word for the
+   rest, so it reads as a glint rather than a constant sweep. */
+@keyframes hero-shine {
+  0%        { background-position: 100% 0; }
+  40%, 100% { background-position: 0% 0; }
+}
 
 .scroll-cue {
   position: absolute; bottom: var(--cue-bottom); left: 50%; transform: translateX(-50%);
