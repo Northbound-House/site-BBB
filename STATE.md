@@ -176,6 +176,34 @@ All of it is driven by knobs in the control block and switched off under
   with `.js`; the fade-in only hides content when that class is present, so a
   visitor with scripts off, or a broken `main.js`, sees the page.
 
+### Motion added 9 October 2026
+
+Same rules as above: knobs in the control block (the *Smooth scroll and hero
+motion* group), and none of it under `prefers-reduced-motion`. The libraries
+are self-hosted in `assets/js/vendor/`.
+
+- **Smooth wheel scrolling** on every page, from Lenis (about 19KB). Touch
+  scrolling stays native. Lenis is stopped while the mobile menu or the review
+  lightbox is open, so a wheel there no longer scrolls the page behind it.
+  `--scroll-lerp`.
+- **Hero intro** on the homepage and the 404, from GSAP and its SplitText plugin
+  (about 80KB, loaded only on those two pages). The photo settles out of a
+  slight zoom, the headline arrives word by word out of a blur, and the
+  tagline, paragraph and buttons follow. The split is undone when it finishes,
+  so the headline is plain text again. If the scripts never run, a CSS
+  failsafe shows the hero after `--hero-failsafe`. `--hero-intro-*`,
+  `--hero-word-*`, `--hero-follow-*`.
+- **Shine on "getaway".** A band of light crosses the script word every
+  `--hero-shine-cycle`. It runs from the word's own aqua up to white, so it is
+  never less legible than the plain word.
+- **Hero drift.** The hero photo sinks by up to `--hero-drift` as the hero
+  scrolls away. It is measured from the hero's box, like the band's parallax,
+  because the mobile menu's scroll lock reports `scrollY` as 0.
+- **Fixed: both parallax photos now follow the scroll.** Since the 3 September
+  settle change, the scroll handler only asked for a frame when scrolling
+  started, so the band's photo froze mid-scroll and jumped into place once the
+  page stopped.
+
 Two Drive folders were reviewed and **cannot** be used: `JustBooked` is
 1080×1080 social graphics with "JUST BOOKED", your name and the URL baked into
 the pixels; `Supplier Images` is cruise line logos and supplier marketing shots

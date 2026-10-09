@@ -19,9 +19,26 @@
   var FOCUS_CENTRE = parseFloat(knob("--focus-centre", "0.5"));
   var FOCUS_SETTLE = parseFloat(knob("--focus-settle", "240ms"));
   var PARALLAX_DEPTH = parseFloat(knob("--parallax-depth", "0px"));
+  var SCROLL_LERP = parseFloat(knob("--scroll-lerp", "0.1"));
+  var HERO_DRIFT = parseFloat(knob("--hero-drift", "0px"));
 
   var reducedMotion = window.matchMedia
     && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- Smooth scroll ----
+     Lenis eases mouse-wheel and trackpad scrolling. Touch is left native,
+     which is Lenis's default and the right call: a phone's own momentum is
+     what its owner's hands expect. Lenis moves the real document scroll, so
+     every scroll listener below keeps working unchanged and simply sees more,
+     smaller steps.
+
+     It is stopped while the mobile menu or the lightbox is open (see each),
+     because a running Lenis turns a wheel over either into a scroll of the
+     page behind it. */
+  var lenis = null;
+  if (!reducedMotion && typeof window.Lenis === "function") {
+    lenis = new window.Lenis({ lerp: SCROLL_LERP, autoRaf: true });
+  }
 
   /* ---- Sticky header state ---- */
   var header = document.querySelector(".site-header");
@@ -70,6 +87,7 @@
        everywhere else too. The stylesheet keeps overflow: hidden as well, so a
        visitor with JS disabled gets the better-than-nothing version. */
     var lockScroll = function () {
+      if (lenis) lenis.stop();
       lockedAt = window.scrollY;
       /* Fixing the body removes the scrollbar, which would shunt the page
          sideways. Hand its width to the stylesheet to pay back as padding. */
@@ -87,6 +105,9 @@
       /* The sheet sets scroll-behavior: smooth, which would animate the
          restore into a visible jump back up the page. */
       window.scrollTo({ top: y, behavior: "instant" });
+      /* After the restore, not before: start() re-reads the scroll position,
+         and before the restore it would read the pinned body's 0. */
+      if (lenis) lenis.start();
     };
 
     var setOpen = function (open, returnFocus) {
@@ -113,6 +134,10 @@
     };
 
     toggle.addEventListener("click", function () { setOpen(!isOpen()); });
+
+    /* A stopped Lenis swallows every wheel event, including one over a menu
+       tall enough to scroll on a short landscape screen. Let that one through. */
+    if (lenis) panel.setAttribute("data-lenis-prevent", "");
 
     /* Following a link closes the menu, but the browser is already navigating —
        pulling focus back to the toggle would fight that. */
@@ -212,12 +237,110 @@
     revealEls.forEach(function (el) { el.classList.add("in"); });
   }
 
+  /* ---- Hero intro ----
+     Plays once, on load, on pages with the full-screen hero. The photo settles
+     out of a slight zoom; the tagline fades up; the headline arrives word by
+     word out of a blur (after React Bits' BlurText, built on GSAP SplitText);
+     the script word follows as one piece so its shine stays whole; then the
+     paragraph, the buttons and the scroll cue. Every measurement is a knob in
+     the control block.
+
+     The stylesheet hides the hero's words under .motion until .motion-ready
+     lands, so they never paint once in place and then vanish to animate in.
+     .motion-ready is added in the finally below whatever happens here: a
+     missing library or an error shows the hero as it always was, at once,
+     rather than waiting for the stylesheet's failsafe.
+
+     When it finishes, the split is reverted and the inline styles cleared, so
+     the headline goes back to being one plain text node for selection, find
+     and assistive tech, and nothing the intro wrote is left behind.
+
+     On a connection slow enough that the failsafe has already shown the hero
+     by the time this runs, the intro is skipped: hiding words the visitor is
+     already reading, to fade them in again, is worse than no intro. */
+  var docEl = document.documentElement;
+  var heroEl = document.querySelector(".hero");
+  var FAILSAFE_MS = parseFloat(knob("--hero-failsafe", "3s")) * 1000;
+  if (heroEl && docEl.classList.contains("motion")) {
+    var tl = null;
+    try {
+      if (!reducedMotion && window.gsap
+          && !(window.performance && performance.now() > FAILSAFE_MS)) {
+        var gsap = window.gsap;
+        var secs = function (name, fallback) { return parseFloat(knob(name, fallback)); };
+        var ZOOM_S = secs("--hero-intro-zoom-s", "2.4");
+        var DELAY_S = secs("--hero-intro-delay-s", "0.15");
+        var WORD_S = secs("--hero-word-s", "0.9");
+        var STAGGER_S = secs("--hero-word-stagger-s", "0.08");
+        var FOLLOW_S = secs("--hero-follow-s", "0.8");
+        var BLUR = "blur(" + knob("--hero-word-blur", "12px") + ")";
+        var FOLLOW_RISE = parseFloat(knob("--hero-follow-rise", "18px"));
+
+        var bg = heroEl.querySelector(".hero__bg");
+        var h1 = heroEl.querySelector("h1");
+        var script = h1 && h1.querySelector(".script");
+        var tagline = heroEl.querySelector(".tagline");
+        var follow = [heroEl.querySelector(".lede"), heroEl.querySelector(".hero__actions")]
+          .filter(Boolean);
+        var cue = heroEl.querySelector(".scroll-cue");
+
+        /* The rise is an em knob so it scales with the headline; GSAP wants px. */
+        var rise = parseFloat(knob("--hero-word-rise", "0.35em"))
+          * (h1 ? parseFloat(getComputedStyle(h1).fontSize) : 16);
+
+        var split = null;
+        var words = [];
+        if (h1 && window.SplitText) {
+          gsap.registerPlugin(window.SplitText);
+          split = window.SplitText.create(h1, { type: "words", ignore: ".script", aria: "auto" });
+          words = split.words;
+        }
+
+        var arriving = { opacity: 0, y: rise, filter: BLUR };
+        var arrived = { opacity: 1, y: 0, filter: "blur(0px)", ease: "power3.out" };
+        var touched = [tagline, script, cue].concat(words, follow).filter(Boolean);
+
+        tl = gsap.timeline({
+          onComplete: function () {
+            gsap.set(touched, { clearProps: "opacity,transform,filter" });
+            if (split) split.revert();
+          }
+        });
+        if (bg) tl.to(bg, { scale: 1, duration: ZOOM_S, ease: "power2.out" }, 0);
+        if (tagline) {
+          tl.from(tagline, { opacity: 0, y: FOLLOW_RISE, duration: FOLLOW_S, ease: "power3.out" }, DELAY_S);
+        }
+        if (words.length) {
+          tl.fromTo(words, arriving,
+            Object.assign({ duration: WORD_S, stagger: STAGGER_S }, arrived), DELAY_S + STAGGER_S);
+        }
+        if (script) {
+          tl.fromTo(script, arriving,
+            Object.assign({ duration: WORD_S * 1.4 }, arrived), ">-" + (WORD_S * 0.5));
+        }
+        if (follow.length) {
+          tl.from(follow, { opacity: 0, y: FOLLOW_RISE, duration: FOLLOW_S, stagger: STAGGER_S * 2,
+            ease: "power3.out" }, ">-" + (WORD_S * 0.7));
+        }
+        if (cue) tl.from(cue, { opacity: 0, duration: FOLLOW_S }, ">-" + (FOLLOW_S * 0.3));
+      }
+    } catch (err) {
+      /* Half-built: some words may already sit at their hidden start. Jump to
+         the end, which runs the cleanup, then let the error surface. */
+      if (tl) tl.progress(1);
+      throw err;
+    } finally {
+      docEl.classList.add("motion-ready");
+    }
+  }
+
   /* ---- Scroll-linked effects ----
-     Two things move with the scroll rather than on it: the review and BOUND
-     promise cards colour in as they reach the middle of the window, and the
-     closing band's photo drifts against the page. Both are measured here and
-     drawn by the stylesheet — this writes one number per element and nothing
-     else, so the look is tuned in the control block, not in code.
+     Three things move with the scroll rather than on it: the review and BOUND
+     promise cards colour in as they reach the middle of the window, the
+     closing band's photo drifts against the page, and so does the hero's. All
+     are measured here and drawn by the stylesheet — this writes one number per
+     element and nothing else, so the look is tuned in the control block, not
+     in code.
 
      One frame per scroll event, never more: the handler only asks for a frame
      if one is not already pending. Both are skipped when the visitor has asked
@@ -225,7 +348,9 @@
      simply show at full colour and the photo stays put. */
   var focusCards = document.querySelectorAll(".media-card");
   var bands = document.querySelectorAll(".cta-band");
-  if (!reducedMotion && (focusCards.length || (bands.length && PARALLAX_DEPTH))) {
+  var heroBg = document.querySelector(".hero .hero__bg");
+  if (!reducedMotion && (focusCards.length || (bands.length && PARALLAX_DEPTH)
+      || (heroBg && HERO_DRIFT))) {
     var pending = false;
 
     /* The words used to lift the moment a card crossed the middle of the
@@ -283,11 +408,33 @@
       });
     };
 
+    /* Measured from the hero's own box rather than from scrollY, like the
+       band above: the mobile menu pins the body to lock scrolling, which reads
+       as scrollY 0 while the page has not visibly moved. A scrollY-based drift
+       would jump the photo behind the open menu.
+
+       Written to the separate translate property, not transform, because the
+       intro animates transform (the zoom) on the same element and the two
+       must not overwrite each other. The photo sinks by at most --hero-drift,
+       which is far less than the hero is tall, so its top edge is always off
+       the top of the window by the time it has moved; the hero clips the
+       bottom edge. */
+    var updateHeroDrift = function () {
+      if (!heroBg || !HERO_DRIFT) return;
+      var r = heroBg.parentNode.getBoundingClientRect();
+      if (r.bottom < 0 || !r.height) return;
+      var p = -r.top / r.height;
+      if (p < 0) p = 0;
+      if (p > 1) p = 1;
+      heroBg.style.translate = "0 " + (p * HERO_DRIFT).toFixed(1) + "px";
+    };
+
     var frame = function () {
       pending = false;
       var vh = window.innerHeight;
       updateFocus(vh);
       updateParallax(vh);
+      updateHeroDrift();
     };
     var schedule = function () {
       if (pending) return;
@@ -298,9 +445,13 @@
        arms the settle timer. The timer is restarted by each scroll event, so
        the words only come up once the page has actually stopped -- not on a
        lull mid-flick. The parallax is unaffected either way: it follows the
-       scroll, which is the point of it. */
+       scroll, which is the point of it -- so every scroll event asks for a
+       frame, not only the first one. It used to ask only when the page started
+       moving, which left both photos frozen mid-scroll and jumping into place
+       once it settled. schedule() still caps it at one frame per refresh. */
     var onScroll = function () {
-      if (settled) { settled = false; schedule(); }
+      settled = false;
+      schedule();
       if (settleTimer) clearTimeout(settleTimer);
       settleTimer = setTimeout(function () {
         settled = true;
@@ -379,6 +530,7 @@
       dialog.addEventListener("close", function () {
         dialogImg.removeAttribute("src");
         dialogImg.removeAttribute("alt");
+        if (lenis) lenis.start();
       });
 
       document.body.appendChild(dialog);
@@ -401,6 +553,7 @@
         var caption = figure && figure.querySelector("figcaption");
         var words = caption ? caption.textContent.replace(/\s+/g, " ").trim() : "";
         dialogImg.alt = words || (img ? img.getAttribute("alt") || "" : "");
+        if (lenis) lenis.stop();
         dialog.showModal();
       });
     });
