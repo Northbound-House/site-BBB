@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# claude-routed — start Claude Code with requests going through two local proxies:
+#
+#   claude ──▶ Headroom :8787 ──▶ OmniRoute :20128 ──▶ the providers you connected
+#             (compresses context)   (routing, fallbacks, combos)
+#
+# Plain `claude` is left alone and still talks to Anthropic directly, so if
+# either proxy misbehaves you can fall back without undoing anything.
+#
+# Any arguments are passed through to Claude Code:
+#   claude-routed                    # interactive session
+#   claude-routed --model auto       # let OmniRoute pick the model
+#   claude-routed -- -p "say OK"     # extra args for claude after --
+#
+# Installed into ~/.local/bin by tools/ai-setup/setup.sh. Reads its settings
+# from ~/.config/claude-routed/env (created by setup.sh, chmod 600).
+
+set -euo pipefail
+
+CONFIG_FILE="${CLAUDE_ROUTED_CONFIG:-$HOME/.config/claude-routed/env}"
+[[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
+
+OMNIROUTE_URL="${OMNIROUTE_URL:-http://127.0.0.1:20128}"
+HEADROOM_PORT="${HEADROOM_PORT:-8787}"
+OMNIROUTE_LOG="${OMNIROUTE_LOG:-$HOME/.omniroute/claude-routed.log}"
+
+die() { printf 'claude-routed: %s\n' "$*" >&2; exit 1; }
+
+command -v headroom  >/dev/null || die "headroom not found. Run tools/ai-setup/setup.sh first."
+command -v omniroute >/dev/null || die "omniroute not found. Run tools/ai-setup/setup.sh first."
+command -v claude    >/dev/null || die "claude not found. Install Claude Code first."
+
+[[ -n "${OMNIROUTE_API_KEY:-}" && "$OMNIROUTE_API_KEY" != "paste-your-key-here" ]] \
+  || die "OMNIROUTE_API_KEY is not set. Copy it from the OmniRoute dashboard (Endpoints) into $CONFIG_FILE."
+
+omniroute_up() { curl -fsS -o /dev/null --max-time 2 "$OMNIROUTE_URL/api/health" 2>/dev/null \
+                 || curl -fsS -o /dev/null --max-time 2 "$OMNIROUTE_URL/" 2>/dev/null; }
+
+# Start OmniRoute in the background if nothing is listening yet.
+if ! omniroute_up; then
+  mkdir -p "$(dirname "$OMNIROUTE_LOG")"
+  printf 'Starting OmniRoute (log: %s)…\n' "$OMNIROUTE_LOG" >&2
+  nohup omniroute >>"$OMNIROUTE_LOG" 2>&1 &
+  for _ in $(seq 1 60); do omniroute_up && break; sleep 0.5; done
+  omniroute_up || die "OmniRoute did not come up on $OMNIROUTE_URL. See $OMNIROUTE_LOG."
+fi
+
+# Headroom forwards to ANTHROPIC_TARGET_API_URL instead of api.anthropic.com.
+# Claude Code sends the OmniRoute key as `Authorization: Bearer …`, Headroom
+# passes it through, and OmniRoute authenticates the request with it.
+export ANTHROPIC_TARGET_API_URL="$OMNIROUTE_URL"
+export ANTHROPIC_AUTH_TOKEN="$OMNIROUTE_API_KEY"
+# Nothing else may authenticate: a Claude subscription token in the shell
+# must never be sent on to OmniRoute.
+unset ANTHROPIC_API_KEY ANTHROPIC_BASE_URL CLAUDE_CODE_OAUTH_TOKEN
+
+# Lists OmniRoute's claude*/anthropic* models (and any discovery aliases you
+# enable in its dashboard) in Claude Code's /model picker.
+export CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY="${CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY:-1}"
+
+exec headroom wrap claude --port "$HEADROOM_PORT" ${HEADROOM_WRAP_FLAGS:-} "$@"
