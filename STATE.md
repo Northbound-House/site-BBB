@@ -265,7 +265,7 @@ unreachable from here):
   self-hosting the current placeholders is the fallback.
 - Three reviews, first names only. The cards are Zac's artwork and read well
   full size, but eight to ten attributed reviews is the target.
-- `TERN_SCHEDULING` and `TERN_REFERRAL_FORM` fall back to the trip-request form.
+- `TERN_SCHEDULING` falls back to the trip-request form, so the Contact page offers it as one "free consultation" form rather than a slot picker. `REFERRAL_LINK` is a pre-filled email until a Tern referral form exists.
 
 ## Audit status — all 30 findings
 

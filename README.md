@@ -249,8 +249,9 @@ Three details worth knowing:
 - **Card rows carry an explicit column count**, not an auto-fit pixel floor.
   Auto-fit lets the available space pick the column count, and at mid widths that
   left a row holding one card — three trip cards came out two-and-one. `--*-cols`
-  knobs set the count, and step down at `--bp-process` / `--bp-contact` (four
-  across go two by two) and `--bp-cards` (everything stacks). The rule: a row
+  knobs set the count, and step down at `--bp-process` (four steps go two by
+  two) and `--bp-cards` (everything stacks). The three contact cards hold three
+  across until `--bp-cards`, since two-by-two would orphan one. The rule: a row
   never holds a single card. Adding a card to a grid means checking its count
   against those knobs.
 - **One knob sets every card title.** Trip cards, feature cards and process steps
@@ -315,7 +316,7 @@ Single source of truth for:
 
 Content fragments can reference config values as `{{TOKEN}}` — `{{EMAIL}}`,
 `{{PHONE_DISPLAY}}`, `{{PHONE_E164}}`, `{{TERN_SCHEDULING}}`, `{{TERN_TRIP_FORM}}`,
-`{{TERN_REFERRAL_FORM}}`, `{{FACEBOOK}}`, `{{INSTAGRAM}}`, `{{LINKEDIN}}`, `{{ADVISOR}}`,
+`{{REFERRAL_LINK}}`, `{{FACEBOOK}}`, `{{INSTAGRAM}}`, `{{LINKEDIN}}`, `{{ADVISOR}}`,
 `{{BUSINESS_NAME}}`. An unknown token fails the build rather than shipping silently.
 
 #### Swapping a photo
@@ -570,7 +571,7 @@ Each of these is a one-line change in `tools/build.py` CONFIG unless noted.
 | **GA4 measurement ID** | `GA4_ID` | Copy from the live Travefy site so historical data stays continuous. Tags are inert until set. |
 | **Meta Pixel ID** | `META_PIXEL_ID` | Same. |
 | **Tern scheduling link** | `TERN_SCHEDULING` | Currently falls back to the trip-request form, so no CTA is broken — but "Book a free consultation" should point at a real booking page. |
-| **Tern referral form** | `TERN_REFERRAL_FORM` | Same fallback. A dedicated form would capture the referrer and friend separately. |
+| **Tern referral form** | `REFERRAL_LINK` | Currently a pre-filled email to hello@ asking for both names — the trip-request form it used to fall back to never recorded the referral. A dedicated form would capture the referrer and friend separately. |
 | **Attributed reviews** | `pages/reviews.html`, `REVIEWS` in build.py | Still the same three unattributed quotes. Target is 8–10 with name, what they booked, and month/year. |
 | **Off-site review links** | `pages/reviews.html` | Trustpilot, The Knot, WeddingWire, Google Business Profile URLs. |
 | **More of your own photography** | `pages/*.html` | Two of your own photos are now in use and self-hosted: `stkitts-coastline.jpg` (the shot the brand guide uses as its own header) and `bermuda.jpg`. Everything else is still hotlinked Unsplash. The `JustBooked` folder in Drive can't be used — those are 1080×1080 social graphics with "JUST BOOKED" and the URL baked in. What's needed is more clean, unbranded, landscape-orientation photos: ships, resort grounds, and you and Chad on the road. |

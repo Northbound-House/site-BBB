@@ -395,7 +395,7 @@
   --cta-direct-underline:       3px; /* drop from those links to their underline */
   --cta-direct-dot-space:    0.5rem; /* air either side of the dot separator */
   --cta-direct-stack-gap:    0.35rem; /* space between address and phone once they stack */
-  --contact-cols:                 4; /* contact cards per row (inner pages) */
+  --contact-cols:                 3; /* contact cards per row (inner pages) — one per way to reach Zac */
 
   /* REFERRAL BAND ------------------------------------------------- */
   --referral-pad-y:          1.1rem; /* height of the bottom referral bar */
@@ -694,7 +694,6 @@
   --bp-nav-menu:             1000px; /* width where the nav becomes a dropdown menu */
   --bp-cards:                 900px; /* width below which card rows stack to one column */
   --bp-process:              1100px; /* width below which the four steps go two by two */
-  --bp-contact:              1100px; /* width below which the contact cards go two by two */
   --bp-phone-narrow:          400px; /* width below which the wordmark drops its sub-line */
   --bp-phone:                 480px; /* width below which headlines shrink to fit long words */
   --bp-short:                 900px; /* window HEIGHT below which the scroll cue hides */
@@ -2355,10 +2354,9 @@ body.nav-open .nav-toggle span:nth-child(3) { top: var(--nav-toggle-bar-mid); tr
    trip cards came out two-and-one, four steps three-and-one. The counts are
    explicit now, and step down at the widths where the cards would otherwise be
    too narrow to read. The rule throughout: a row never holds a single card. */
-@media (max-width: 1100px) { /* --bp-process, --bp-contact */
+@media (max-width: 1100px) { /* --bp-process */
   :root {
     --process-cols:                 2; /* four steps go two by two */
-    --contact-cols:                 2; /* contact cards go two by two */
   }
 }
 @media (max-width: 900px) { /* --bp-cards */
@@ -2683,6 +2681,16 @@ h1, h2 { text-transform: uppercase; }
   .nav-cta-mobile { border-bottom: none; padding-top: var(--menu-cta-gap); }
   .nav-cta-mobile .btn { display: flex; width: 100%; justify-content: center; }
   .nav-cta-mobile a { border-bottom: none; padding: var(--btn-pad-y) var(--btn-pad-x); }
+  /* The menu's link rules (.nav-links a, and .is-scrolled / .inner-page
+     .nav-links a at 0,2,1) out-rank .btn, so this button used to inherit menu
+     link type: --ink on rose at 3.0:1, normal weight, menu tracking. Three
+     classes put the button's own type back. */
+  .nav-links .nav-cta-mobile .btn {
+    color: var(--btn-fg);
+    font-size: var(--btn-size);
+    font-weight: 500;
+    letter-spacing: var(--btn-tracking);
+  }
 }
 
 /* ------------------------- Hero fit ----------------------------------- */
