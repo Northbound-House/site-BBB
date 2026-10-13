@@ -42,12 +42,26 @@ LINKEDIN = "https://www.linkedin.com/company/boraboraboundgo"
 SOCIAL_PROFILES = [FACEBOOK, INSTAGRAM, LINKEDIN]
 
 # --- Tern ---------------------------------------------------------------
-# The trip-request form is the one confirmed Tern URL. The scheduling and
-# referral endpoints below fall back to it so no CTA is ever broken; replace
-# them with the real Tern URLs when they exist.
+# The trip-request form is the one confirmed Tern URL. The scheduling endpoint
+# below falls back to it so no CTA is ever broken; replace it with the real
+# Tern booking URL when it exists. Until then, copy must not promise a calendar.
 TERN_TRIP_FORM = "https://app.tern.travel/public/forms/YSXCa_LTnTtBehDg0Kty1Q/responses/new"
 TERN_SCHEDULING = TERN_TRIP_FORM   # TODO: swap for the Tern consultation booking link
-TERN_REFERRAL_FORM = TERN_TRIP_FORM  # TODO: swap for a dedicated Tern referral form
+
+# Where "Refer a friend" goes. It used to fall back to the trip-request form,
+# which sent referrers into a form about planning their OWN trip — the referral,
+# and the $100 riding on it, was never recorded as one. A pre-filled email asks
+# for exactly what a referral needs: who sent it, and who to contact. Swap in a
+# dedicated Tern referral form when one exists, and put target="_blank"
+# rel="noopener" back on the refer page's button then — an email link has none.
+REFERRAL_LINK = (
+    f"mailto:{EMAIL}"
+    "?subject=Referral%3A%20%5Byour%20friend%27s%20name%5D"
+    "&body=Your%20name%3A%0A"
+    "Your%20friend%27s%20name%3A%0A"
+    "Their%20email%20or%20phone%3A%0A"
+    "What%20they%27re%20thinking%20of%20planning%20(if%20you%20know)%3A%0A"
+)
 
 # --- Imagery ------------------------------------------------------------
 # Every photo the site renders, keyed by the SLOT it fills rather than by what
@@ -545,8 +559,8 @@ PAGES = {
         path="refer.html",
         title="Refer a Friend, Earn $100 | Bora Bora Bound",
         description=(
-            "Earn $100 cash every time a friend books, plus an exclusive experience after three "
-            "referrals. Your friends get perks too. Here's how it works."
+            "Earn $100 cash every time a friend books, and your friend gets a perk on their trip "
+            "too. Here's how it works."
         ),
         sitemap=("0.6", "yearly"),
         schema=lambda: [breadcrumb("Refer & Earn", "refer.html")],
@@ -1106,7 +1120,7 @@ def tokens():
     return {
         "TERN_TRIP_FORM": TERN_TRIP_FORM,
         "TERN_SCHEDULING": TERN_SCHEDULING,
-        "TERN_REFERRAL_FORM": TERN_REFERRAL_FORM,
+        "REFERRAL_LINK": REFERRAL_LINK,
         "EMAIL": EMAIL,
         "PHONE_DISPLAY": PHONE_DISPLAY,
         "PHONE_E164": PHONE_E164,
