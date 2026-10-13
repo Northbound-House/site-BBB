@@ -21,6 +21,8 @@
   var PARALLAX_DEPTH = parseFloat(knob("--parallax-depth", "0px"));
   var SCROLL_LERP = parseFloat(knob("--scroll-lerp", "0.1"));
   var HERO_DRIFT = parseFloat(knob("--hero-drift", "0px"));
+  var HEADING_START = parseFloat(knob("--heading-reveal-start", "1"));
+  var HEADING_END = parseFloat(knob("--heading-reveal-end", "0.65"));
 
   var reducedMotion = window.matchMedia
     && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -334,10 +336,46 @@
     }
   }
 
+  /* ---- Section headings: split into words ----
+     Each word goes in its own span so the stylesheet can brighten them one at
+     a time (see .heading-reveal there); the scroll loop below says how far
+     each heading has risen. The headings are plain text, so a word is simply
+     a run of non-space characters, and the spaces between are left as they
+     were. The spans are hidden from assistive tech and the heading carries its
+     own text as a label, so it is still announced once, as one phrase, rather
+     than word by word -- the same arrangement GSAP's SplitText uses. */
+  var revealHeadings = [];
+  if (!reducedMotion && docEl.classList.contains("motion")) {
+    document.querySelectorAll(".section-head h2").forEach(function (h) {
+      if (h.children.length) return; /* not plain text: leave it alone */
+      var text = h.textContent;
+      var parts = text.split(/(\s+)/);
+      var count = 0;
+      var frag = document.createDocumentFragment();
+      parts.forEach(function (part) {
+        if (!part) return;
+        if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+        var span = document.createElement("span");
+        span.className = "word";
+        span.setAttribute("aria-hidden", "true");
+        span.style.setProperty("--i", count++);
+        span.textContent = part;
+        frag.appendChild(span);
+      });
+      h.setAttribute("aria-label", text.replace(/\s+/g, " ").trim());
+      h.textContent = "";
+      h.appendChild(frag);
+      h.style.setProperty("--words", count);
+      h.classList.add("heading-reveal");
+      revealHeadings.push(h);
+    });
+  }
+
   /* ---- Scroll-linked effects ----
-     Three things move with the scroll rather than on it: the review and BOUND
+     Four things move with the scroll rather than on it: the review and BOUND
      promise cards colour in as they reach the middle of the window, the
-     closing band's photo drifts against the page, and so does the hero's. All
+     closing band's photo drifts against the page, so does the hero's, and the
+     section headings brighten as they rise. All
      are measured here and drawn by the stylesheet — this writes one number per
      element and nothing else, so the look is tuned in the control block, not
      in code.
@@ -350,7 +388,7 @@
   var bands = document.querySelectorAll(".cta-band");
   var heroBg = document.querySelector(".hero .hero__bg");
   if (!reducedMotion && (focusCards.length || (bands.length && PARALLAX_DEPTH)
-      || (heroBg && HERO_DRIFT))) {
+      || (heroBg && HERO_DRIFT) || revealHeadings.length)) {
     var pending = false;
 
     /* The words used to lift the moment a card crossed the middle of the
@@ -429,12 +467,33 @@
       heroBg.style.translate = "0 " + (p * HERO_DRIFT).toFixed(1) + "px";
     };
 
+    /* 0 while a heading's top is at or below --heading-reveal-start (as a
+       share of the window, from the top), 1 once it has risen to
+       --heading-reveal-end, in proportion between. Measured from its box for
+       the same reason as the drift above. Scrubbed both ways, so scrolling
+       back up lets a heading fade again as it sinks. */
+    var updateHeadings = function (vh) {
+      var span = HEADING_START - HEADING_END;
+      if (span <= 0) span = 1;
+      revealHeadings.forEach(function (h) {
+        var r = h.getBoundingClientRect();
+        var p = (HEADING_START - r.top / vh) / span;
+        if (p < 0) p = 0;
+        if (p > 1) p = 1;
+        var v = p.toFixed(3);
+        if (h.style.getPropertyValue("--heading-progress") !== v) {
+          h.style.setProperty("--heading-progress", v);
+        }
+      });
+    };
+
     var frame = function () {
       pending = false;
       var vh = window.innerHeight;
       updateFocus(vh);
       updateParallax(vh);
       updateHeroDrift();
+      updateHeadings(vh);
     };
     var schedule = function () {
       if (pending) return;
@@ -557,6 +616,165 @@
         dialog.showModal();
       });
     });
+  }
+
+  /* ---- Magnetic buttons ----
+     The page's main call-to-action buttons lean toward a mouse pointer that
+     comes within --magnet-reach of them, by --magnet-pull of the distance
+     from their centre and never more than --magnet-max, after React Bits'
+     Magnet. Only for a fine pointer that
+     hovers -- the stylesheet draws nothing otherwise -- and never under
+     reduced motion. The lean goes back to nothing when the pointer leaves.
+
+     The button's own box moves as it leans, so its centre is taken from the
+     box with the current lean subtracted; measuring the leaned box would chase
+     its own tail. One frame per pointer move or scroll, as with the scroll
+     loop above. The nav pill's button is not included (see the stylesheet). */
+  var magnets = document.querySelectorAll("main .btn--primary");
+  if (!reducedMotion && magnets.length && docEl.classList.contains("motion")
+      && window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    var REACH = parseFloat(knob("--magnet-reach", "48px"));
+    var PULL = parseFloat(knob("--magnet-pull", "0.15"));
+    var LEAN_MAX = parseFloat(knob("--magnet-max", "10px"));
+    var pointer = null;
+    var leanFrame = false;
+    var leans = new Map();
+
+    var lean = function () {
+      leanFrame = false;
+      magnets.forEach(function (btn) {
+        var was = leans.get(btn) || { x: 0, y: 0 };
+        var x = 0;
+        var y = 0;
+        if (pointer) {
+          var r = btn.getBoundingClientRect();
+          var cx = r.left + r.width / 2 - was.x;
+          var cy = r.top + r.height / 2 - was.y;
+          var dx = pointer.x - cx;
+          var dy = pointer.y - cy;
+          if (Math.abs(dx) < r.width / 2 + REACH && Math.abs(dy) < r.height / 2 + REACH) {
+            x = dx * PULL;
+            y = dy * PULL;
+            /* A wide button's centre is far from a pointer at its end, so
+               without a cap the widest buttons would lean the most. */
+            var len = Math.sqrt(x * x + y * y);
+            if (len > LEAN_MAX) { x *= LEAN_MAX / len; y *= LEAN_MAX / len; }
+          }
+        }
+        if (x === was.x && y === was.y) return;
+        leans.set(btn, { x: x, y: y });
+        btn.style.setProperty("--magnet-x", x.toFixed(1) + "px");
+        btn.style.setProperty("--magnet-y", y.toFixed(1) + "px");
+      });
+    };
+    var askLean = function () {
+      if (leanFrame) return;
+      leanFrame = true;
+      requestAnimationFrame(lean);
+    };
+    document.addEventListener("pointermove", function (e) {
+      if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
+      pointer = { x: e.clientX, y: e.clientY };
+      askLean();
+    }, { passive: true });
+    /* The pointer left the window: let everything settle back. */
+    document.documentElement.addEventListener("pointerleave", function () {
+      pointer = null;
+      askLean();
+    });
+    window.addEventListener("scroll", function () { if (pointer) askLean(); }, { passive: true });
+  }
+
+  /* ---- Trip-type strip ----
+     Drifts sideways at --marquee-speed, after React Bits' ScrollVelocity.
+     Scrolling speeds it up in proportion to how fast the page is moving, up
+     to --marquee-boost-max, and it eases back once the page stops; scrolling
+     up turns it round. It only animates while it is on screen.
+
+     The markup holds one group of trip types. Copies are added until the
+     track is at least one group wider than the window, so moving it by
+     exactly one group's width and wrapping is seamless. Copies are refilled on
+     resize, since a wider window needs more of them.
+
+     The speed reads scrollY, so the mobile menu's scroll lock -- which drops
+     scrollY to 0 and puts it back on close -- would read as a violent scroll.
+     While the menu is open the reading is ignored and re-based afterwards. */
+  var strip = document.querySelector(".marquee");
+  if (strip && !reducedMotion && docEl.classList.contains("motion")) {
+    var track = strip.querySelector(".marquee__track");
+    var group = track && track.querySelector(".marquee__group");
+    if (track && group) {
+      var SPEED = parseFloat(knob("--marquee-speed", "40"));
+      var BOOST = parseFloat(knob("--marquee-boost", "0.006"));
+      var BOOST_MAX = parseFloat(knob("--marquee-boost-max", "6"));
+      var SETTLE = parseFloat(knob("--marquee-settle", "0.08"));
+
+      var groupWidth = 0;
+      var fill = function () {
+        groupWidth = group.getBoundingClientRect().width;
+        if (!groupWidth) return;
+        var need = Math.ceil(window.innerWidth / groupWidth) + 1;
+        var have = track.children.length;
+        for (; have < need; have++) track.appendChild(group.cloneNode(true));
+      };
+      fill();
+      strip.classList.add("is-running");
+
+      var offset = 0;
+      var factor = 1;
+      var direction = 1;
+      var lastY = null;
+      var lastT = null;
+      var running = false;
+
+      var step = function (t) {
+        if (!running) return;
+        var dt = lastT === null ? 0 : Math.min((t - lastT) / 1000, 0.1);
+        lastT = t;
+
+        var target = 1;
+        if (document.body.classList.contains("nav-open")) {
+          lastY = null;
+        } else {
+          var y = window.scrollY;
+          if (lastY !== null && dt > 0) {
+            var v = (y - lastY) / dt;
+            if (v > 0) direction = 1;
+            else if (v < 0) direction = -1;
+            target = 1 + Math.min(Math.abs(v) * BOOST, BOOST_MAX);
+          }
+          lastY = y;
+        }
+        factor += (target - factor) * SETTLE;
+
+        offset -= direction * SPEED * factor * dt;
+        if (groupWidth) {
+          offset %= groupWidth;
+          if (offset > 0) offset -= groupWidth;
+        }
+        track.style.transform = "translate3d(" + offset.toFixed(2) + "px,0,0)";
+        requestAnimationFrame(step);
+      };
+
+      var setRunning = function (on) {
+        if (on === running) return;
+        running = on;
+        lastT = null;
+        lastY = null;
+        if (on) requestAnimationFrame(step);
+      };
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(function (entries) {
+          setRunning(entries[entries.length - 1].isIntersecting);
+        }).observe(strip);
+      } else {
+        setRunning(true);
+      }
+      window.addEventListener("resize", fill);
+      /* The display face is condensed, so the group is narrower once it
+         lands; re-measure then too. */
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fill);
+    }
   }
 
   /* ---- Footer folds ----

@@ -14,6 +14,17 @@
     <div class="scroll-cue">Three ways to travel</div>
   </section>
 
+  <!-- Trip-type strip. Decorative, so hidden from assistive tech: the same
+       five are the hero tagline and the cards right below. main.js repeats the
+       group to fill the window and drifts it, faster while the page scrolls. -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <div class="marquee__group">
+        <span>Cruises</span><span>All-Inclusive Resorts</span><span>Small Group Tours</span><span>Honeymoons &amp; Romance</span><span>LGBTQ+ Travel</span>
+      </div>
+    </div>
+  </div>
+
   <!-- The credentials bar stood here. Removed as out of place directly under
        the hero: four acronyms are a wall of proof before anyone has been told
        what is on offer. The same credentials still appear where they answer a

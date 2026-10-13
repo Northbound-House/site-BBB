@@ -204,6 +204,28 @@ are self-hosted in `assets/js/vendor/`.
   started, so the band's photo froze mid-scroll and jumped into place once the
   page stopped.
 
+### Headings, buttons and the trip-type strip, added 9 October 2026
+
+Three React Bits effects, rewritten as plain JavaScript in `main.js` rather
+than adding React. None of them needs GSAP, so inner pages still load only
+Lenis. Knobs are in the *Headings, buttons and the trip-type strip* group;
+none of it runs under `prefers-reduced-motion`.
+
+- **Section headings brighten word by word** as they rise up the window
+  (after ScrollReveal): faint and soft at the bottom, fully sharp by the time
+  the heading's top is a third of the way up. Scrubbed both ways. Each word is
+  a span hidden from assistive tech, and the heading carries its text as a
+  label, so it is still read once as one phrase. Every `.section-head h2` on
+  every page. `--heading-reveal-*`.
+- **The main call-to-action buttons lean toward the mouse** (after Magnet),
+  by at most `--magnet-max` (10px). Mouse and trackpad only; the nav pill's
+  button is left out so it never pokes out of the pill. `--magnet-*`.
+- **A strip of trip types under the homepage hero** drifts sideways, speeds up
+  while the page scrolls and turns round when you scroll up (after
+  ScrollVelocity). Decorative and `aria-hidden`: the same five trip types are
+  the hero tagline and the cards below. It only animates while on screen, and
+  ignores the jump the mobile menu's scroll lock makes. `--marquee-*`.
+
 Two Drive folders were reviewed and **cannot** be used: `JustBooked` is
 1080×1080 social graphics with "JUST BOOKED", your name and the URL baked into
 the pixels; `Supplier Images` is cruise line logos and supplier marketing shots
